@@ -9,7 +9,7 @@ Online repository for publishing install scripts for MMFP Products.
 One-command installer that sets up Docker and launches the MIM Bootstrap web UI for guided setup.
 
 ```bash
-curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
 ```
 
 **What it does:**
@@ -24,7 +24,7 @@ curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
 Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no MIM Bootstrap web UI required.
 
 ```bash
-curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 ```
 
 **What it deploys (7 containers):**
@@ -99,8 +99,8 @@ This is a public GitHub repo. Scripts and templates are served via GitHub Pages 
 
 ```bash
 # Web installer
-curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
 
 # CLI installer
-curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 ```

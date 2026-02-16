@@ -6,10 +6,28 @@
 # Deploys the complete MMFP mining infrastructure via terminal prompts.
 # No MIM Bootstrap web UI required.
 #
-# Usage: curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
+# Usage: sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 #        or: sudo bash scripts/install-cli.sh
 # ============================================================================
 set -euo pipefail
+
+# ── Interactive input guard ──────────────────────────────────────────────────
+# This script requires interactive prompts. If stdin is not a terminal
+# (e.g. piped from curl), exit with instructions for the correct command.
+if [[ ! -t 0 ]]; then
+  echo -e "\033[0;31m[FAIL]\033[0m This installer requires interactive input but stdin is not a terminal."
+  echo ""
+  echo "  Please use one of these commands instead:"
+  echo ""
+  echo "    sudo bash -c \"\$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)\""
+  echo ""
+  echo "  Or download and run:"
+  echo ""
+  echo "    curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh -o /tmp/install-cli.sh"
+  echo "    sudo bash /tmp/install-cli.sh"
+  echo ""
+  exit 1
+fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 INSTALLER_VERSION="1.0.0"
@@ -40,12 +58,12 @@ confirm() {
   local reply
 
   if [[ "$default" == "Y" ]]; then
-    echo -en "${CYAN}${prompt} [Y/n]:${NC} " >/dev/tty
+    echo -en "${CYAN}${prompt} [Y/n]:${NC} "
   else
-    echo -en "${CYAN}${prompt} [y/N]:${NC} " >/dev/tty
+    echo -en "${CYAN}${prompt} [y/N]:${NC} "
   fi
 
-  read -r reply </dev/tty
+  read -r reply
   reply="${reply:-$default}"
 
   [[ "$reply" =~ ^[Yy]$ ]]
@@ -57,16 +75,16 @@ prompt_value() {
   local value
 
   if [[ -n "$default" ]]; then
-    echo -en "${CYAN}${prompt} [${default}]:${NC} " >/dev/tty
+    echo -en "${CYAN}${prompt} [${default}]:${NC} " >&2
   else
-    echo -en "${CYAN}${prompt}:${NC} " >/dev/tty
+    echo -en "${CYAN}${prompt}:${NC} " >&2
   fi
 
-  read -r value </dev/tty
+  read -r value
   value="${value:-$default}"
 
   if [[ -z "$value" ]]; then
-    error "Value cannot be empty." >/dev/tty
+    error "Value cannot be empty." >&2
     exit 1
   fi
 
