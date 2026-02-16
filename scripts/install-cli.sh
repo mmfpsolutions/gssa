@@ -107,7 +107,7 @@ banner() {
   echo "  ╔══════════════════════════════════════════════════╗"
   echo "  ║                                                  ║"
   echo "  ║       MMFP Solutions - Full CLI Installer        ║"
-  echo "  ║       v${INSTALLER_VERSION}                                       ║"
+  echo "  ║       v${INSTALLER_VERSION}                      ║"
   echo "  ║                                                  ║"
   echo "  ╚══════════════════════════════════════════════════╝"
   echo -e "${NC}"

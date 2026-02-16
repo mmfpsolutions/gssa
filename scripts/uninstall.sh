@@ -131,7 +131,6 @@ if [[ -d "$DATA_DIR" ]]; then
 
   # Show wallet address if available
   if [[ -f "${DATA_DIR}/dgb/dgb_wallet.txt" ]]; then
-    local wallet_addr
     wallet_addr=$(cat "${DATA_DIR}/dgb/dgb_wallet.txt" 2>/dev/null || echo "unknown")
     warn "Wallet address: ${wallet_addr}"
     echo -e "    ${RED}Make sure you have backed up any funds before proceeding!${NC}"

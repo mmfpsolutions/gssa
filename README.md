@@ -4,24 +4,9 @@ Online repository for publishing install scripts for MMFP Products.
 
 ## Installers
 
-### Web Installer (`install-web.sh`)
-
-One-command installer that sets up Docker and launches the MIM Bootstrap web UI for guided setup.
-
-```bash
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
-
-**What it does:**
-1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
-2. Creates `/data` directory
-3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Pulls and starts MIM Bootstrap container on port 3002
-5. Prints the web installer URL
-
 ### CLI Installer (`install-cli.sh`)
 
-Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no MIM Bootstrap web UI required.
+Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no web UI required.
 
 ```bash
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
@@ -62,6 +47,21 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 3. Remove `mim` system user (defaults to No)
 4. Remove Docker Engine entirely (defaults to No)
 
+### Web Installer — Optional (`install-web.sh`)
+
+Alternative installer that launches the MIM Bootstrap web UI for guided setup. Use this if you prefer a browser-based workflow.
+
+```bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
+```
+
+**What it does:**
+1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
+2. Creates `/data` directory
+3. Checks for Docker Engine — installs official Docker if needed (interactive)
+4. Pulls and starts MIM Bootstrap container on port 3002
+5. Prints the web installer URL
+
 ## Requirements
 
 - Ubuntu Server 24.04 or later
@@ -73,14 +73,14 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 ## Manual testing
 
 ```bash
-# Web installer
-sudo bash scripts/install-web.sh
-
 # CLI installer
 sudo bash scripts/install-cli.sh
 
 # Uninstaller
 sudo bash scripts/uninstall.sh
+
+# Web installer (optional)
+sudo bash scripts/install-web.sh
 ```
 
 ## Project Structure
@@ -89,9 +89,9 @@ sudo bash scripts/uninstall.sh
 gssa/
 ├── README.md
 ├── scripts/
-│   ├── install-web.sh          # Web installer (MIM Bootstrap)
 │   ├── install-cli.sh          # Full CLI installer
-│   └── uninstall.sh            # Tiered uninstaller
+│   ├── uninstall.sh            # Tiered uninstaller
+│   └── install-web.sh          # Web installer (MIM Bootstrap, optional)
 ├── templates/                   # Config templates (served via GitHub Pages)
 │   ├── docker-compose.yml
 │   ├── env.template
@@ -116,12 +116,12 @@ gssa/
 This is a public GitHub repo. Scripts and templates are served via GitHub Pages at `get.mmfpsolutions.io`.
 
 ```bash
-# Web installer
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-
 # CLI installer
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 
 # Uninstaller
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
+
+# Web installer (optional)
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
 ```
