@@ -48,6 +48,20 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 9. Starts PostgreSQL, creates GoSlimStratum database and role
 10. Brings up the full 7-container stack
 
+### Uninstaller (`uninstall.sh`)
+
+Removes MMFP components with tiered prompts — choose what to keep and what to remove.
+
+```bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
+```
+
+**Prompts to remove (in order):**
+1. Stop and remove all MMFP containers (+ optionally remove Docker images)
+2. Delete `/data` directory (wallet warning, defaults to No)
+3. Remove `mim` system user (defaults to No)
+4. Remove Docker Engine entirely (defaults to No)
+
 ## Requirements
 
 - Ubuntu Server 24.04 or later
@@ -64,6 +78,9 @@ sudo bash scripts/install-web.sh
 
 # CLI installer
 sudo bash scripts/install-cli.sh
+
+# Uninstaller
+sudo bash scripts/uninstall.sh
 ```
 
 ## Project Structure
@@ -73,7 +90,8 @@ gssa/
 ├── README.md
 ├── scripts/
 │   ├── install-web.sh          # Web installer (MIM Bootstrap)
-│   └── install-cli.sh          # Full CLI installer
+│   ├── install-cli.sh          # Full CLI installer
+│   └── uninstall.sh            # Tiered uninstaller
 ├── templates/                   # Config templates (served via GitHub Pages)
 │   ├── docker-compose.yml
 │   ├── env.template
@@ -103,4 +121,7 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
 
 # CLI installer
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
+
+# Uninstaller
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 ```
