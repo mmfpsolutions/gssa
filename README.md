@@ -76,7 +76,7 @@ gssa/
 │   └── install-cli.sh          # Full CLI installer
 ├── templates/                   # Config templates (served via GitHub Pages)
 │   ├── docker-compose.yml
-│   ├── .env.template
+│   ├── env.template
 │   ├── digibyte.conf.template
 │   ├── goslimstratum/
 │   │   └── config.json.template

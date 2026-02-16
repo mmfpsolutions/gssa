@@ -399,7 +399,7 @@ download_templates() {
 
   local files=(
     "docker-compose.yml"
-    ".env.template"
+    "env.template"
     "digibyte.conf.template"
     "goslimstratum/config.json.template"
     "axeos-dashboard/config.json.template"
@@ -493,7 +493,7 @@ generate_configs() {
   # ── .env ──
   info "Generating .env..."
   sed -e "s|{POSTGRES_ADMIN_PASSWORD}|${POSTGRES_ADMIN_PASSWORD}|g" \
-      "${TEMPLATE_DIR}/.env.template" > "${COMPOSE_DIR}/.env"
+      "${TEMPLATE_DIR}/env.template" > "${COMPOSE_DIR}/.env"
   success ".env → /data/docker-compose/.env"
 
   # ── goslimstratum config.json (wallet address placeholder for now) ──
