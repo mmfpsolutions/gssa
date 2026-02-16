@@ -340,10 +340,9 @@ collect_config() {
   # Pruning
   echo ""
   if confirm "Enable blockchain pruning? (saves disk space)"; then
-    PRUNE_GB=$(prompt_value "Prune size in GB" "4")
-    PRUNE_MB=$(( PRUNE_GB * 1024 ))
+    PRUNE_MB=$(prompt_value "Prune size in MB (minimum 550)" "550")
     PRUNE_VALUE="prune=${PRUNE_MB}"
-    success "Pruning enabled: ${PRUNE_GB} GB (${PRUNE_MB} MB)"
+    success "Pruning enabled: ${PRUNE_MB} MB"
   else
     PRUNE_VALUE="#prune=4096"
     success "Pruning disabled (full blockchain)"
