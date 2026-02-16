@@ -1,0 +1,4 @@
+{
+    "jsonWebTokenKey":"{JWT_SECRET}",
+    "expiresIn":"1h"
+}

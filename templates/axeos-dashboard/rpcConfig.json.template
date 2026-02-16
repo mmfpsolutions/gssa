@@ -1,0 +1,10 @@
+{
+    "cryptoNodes":[
+        {
+            "NodeId":"dgb1",
+            "NodeRPCAddress":"127.0.0.1",
+            "NodeRPCPort":9001,
+            "NodeRPAuth":"{DIGIBYTE_RPC_USER}:{DIGIBYTE_RPC_USER_PASSWORD}"
+        }
+    ]
+}

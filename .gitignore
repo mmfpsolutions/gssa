@@ -30,3 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+#ignore folders - things we don't want in github
+/design-documents
+/no-githhub-folder

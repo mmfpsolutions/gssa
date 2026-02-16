@@ -1,0 +1,29 @@
+{
+  "servers": [
+    {
+      "id": "m1M200t7",
+      "name": "Mining Server",
+      "ssh_host": "{SERVER_IP}",
+      "ssh_port": 22,
+      "ssh_user": "mim",
+      "ssh_password": "{MIM_PASSWORD}",
+      "docker_host": "ssh://mim@{SERVER_IP}",
+      "enabled": true,
+      "description": "MIM Configured Server"
+    }
+  ],
+  "settings": {
+    "docker_timeout": 30,
+    "logging": {
+      "compress": false,
+      "level": "INFO",
+      "log_file_path": "/app/logs/mim.log",
+      "log_to_file": true,
+      "max_age_days": 30,
+      "max_backups": 10,
+      "max_size_mb": 20
+    },
+    "refresh_interval": 60,
+    "ssh_timeout": 30
+  }
+}

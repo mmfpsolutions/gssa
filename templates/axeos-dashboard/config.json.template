@@ -1,0 +1,35 @@
+{
+    "axeos_dashboard_version": 3,
+    "axeos_instances": [],
+    "cookie_max_age": 3600,
+    "cryptNodesEnabled": true,
+    "cryptoNodes": [
+        {
+            "Nodes": [
+                {
+                    "NodeAlgo": "sha256d",
+                    "NodeId": "dgb1",
+                    "NodeName": "MIM-DigitByte Node",
+                    "NodeType": "dgb"
+                }
+            ]
+        }
+    ],
+    "disable_authentication": true,
+    "disable_configurations": false,
+    "disable_settings": false,
+    "mining_core_enabled": false,
+    "mining_core_url": [],
+    "goslimstratum_enabled": true,
+    "goslimstratum_instances": [
+        {
+            "api_port": "4004",
+            "coin_type": "dgb",
+            "host": "{SERVER_IP}",
+            "name": "GSS-DGB",
+            "webui_port": "3003"
+        }
+    ],
+    "title": "AxeOS Dashboard",
+    "web_server_port": 3000
+}

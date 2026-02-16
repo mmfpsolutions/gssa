@@ -1,0 +1,98 @@
+services:
+  # ============================================================
+  # Group: Mining
+  # ============================================================
+
+  dgb:
+    image: ghcr.io/mmfpsolutions/digibyte:latest
+    container_name: dgb
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/dgb/data:/data
+    restart: unless-stopped
+
+  goslimstratum:
+    image: ghcr.io/mmfpsolutions/goslimstratum:latest
+    container_name: goslimstratum
+    network_mode: host
+    stop_grace_period: 120s
+    depends_on:
+      - postgres
+    volumes:
+     - /data/goslimstratum/config:/app/config
+     - /data/goslimstratum/logs:/app/logs
+     - /data/goslimstratum/data:/app/data
+    restart: unless-stopped
+    environment:
+      - TZ=America/New_York
+
+  postgres:
+    image: postgres:18
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - /data/postgres18:/var/lib/postgresql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    restart: unless-stopped
+
+  # ============================================================
+  # Group: Admin and Monitoring
+  # ============================================================
+
+  mim:
+    image: ghcr.io/mmfpsolutions/mim:latest
+    container_name: mim
+    ports:
+      - "3001:3001"
+    volumes:
+      - /data/mim/data:/app/data
+      - /data/mim/config:/app/config
+      - /data/mim/logs:/app/logs
+    restart: always
+
+  axeos-dashboard:
+    image: ghcr.io/mmfpsolutions/axeos-dashboard:latest
+    container_name: axeos-dashboard
+    network_mode: host
+    volumes:
+      - /data/axeos-dashboard/data:/app/data
+      - /data/axeos-dashboard/config:/app/config
+    restart: unless-stopped
+
+  dozzle:
+    image: ghcr.io/amir20/dozzle:latest
+    container_name: dozzle
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker:/config
+    environment:
+      - DOCKER_API_VERSION=1.52
+      - DOCKER_CONFIG=/config
+    command: ["--interval", "21600"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+    restart: unless-stopped
