@@ -40,12 +40,12 @@ confirm() {
   local reply
 
   if [[ "$default" == "Y" ]]; then
-    echo -en "${CYAN}${prompt} [Y/n]:${NC} "
+    echo -en "${CYAN}${prompt} [Y/n]:${NC} " >/dev/tty
   else
-    echo -en "${CYAN}${prompt} [y/N]:${NC} "
+    echo -en "${CYAN}${prompt} [y/N]:${NC} " >/dev/tty
   fi
 
-  read -r reply
+  read -r reply </dev/tty
   reply="${reply:-$default}"
 
   [[ "$reply" =~ ^[Yy]$ ]]
@@ -57,16 +57,16 @@ prompt_value() {
   local value
 
   if [[ -n "$default" ]]; then
-    echo -en "${CYAN}${prompt} [${default}]:${NC} "
+    echo -en "${CYAN}${prompt} [${default}]:${NC} " >/dev/tty
   else
-    echo -en "${CYAN}${prompt}:${NC} "
+    echo -en "${CYAN}${prompt}:${NC} " >/dev/tty
   fi
 
-  read -r value
+  read -r value </dev/tty
   value="${value:-$default}"
 
   if [[ -z "$value" ]]; then
-    error "Value cannot be empty."
+    error "Value cannot be empty." >/dev/tty
     exit 1
   fi
 

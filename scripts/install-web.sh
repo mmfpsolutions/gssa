@@ -35,12 +35,12 @@ confirm() {
   local reply
 
   if [[ "$default" == "Y" ]]; then
-    echo -en "${CYAN}${prompt} [Y/n]:${NC} "
+    echo -en "${CYAN}${prompt} [Y/n]:${NC} " >/dev/tty
   else
-    echo -en "${CYAN}${prompt} [y/N]:${NC} "
+    echo -en "${CYAN}${prompt} [y/N]:${NC} " >/dev/tty
   fi
 
-  read -r reply
+  read -r reply </dev/tty
   reply="${reply:-$default}"
 
   [[ "$reply" =~ ^[Yy]$ ]]

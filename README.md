@@ -54,7 +54,7 @@ curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
 - Root access
 - Internet connection
 - ARM64 or AMD64 architecture
-- 8 GB RAM minimum (configurable via `MIN_MEMORY_GB`)
+- 16 GB RAM minimum (configurable via `MIN_MEMORY_GB`)
 
 ## Manual testing
 
