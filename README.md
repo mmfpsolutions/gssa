@@ -1,4 +1,4 @@
-# GSSA - GoSlimStratum Asset
+# GSSA - GoSlimStratum Assets
 
 Online repository for publishing install scripts for MMFP Products.
 
@@ -9,7 +9,7 @@ Online repository for publishing install scripts for MMFP Products.
 One-command installer that sets up Docker and launches the MIM Bootstrap web UI for guided setup.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-web.sh | sudo bash
+curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
 ```
 
 **What it does:**
@@ -24,7 +24,7 @@ curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/inst
 Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no MIM Bootstrap web UI required.
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-cli.sh | sudo bash
+curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
 ```
 
 **What it deploys (7 containers):**
@@ -74,7 +74,7 @@ gssa/
 ├── scripts/
 │   ├── install-web.sh          # Web installer (MIM Bootstrap)
 │   └── install-cli.sh          # Full CLI installer
-├── templates/                   # Config templates (served via GitHub raw)
+├── templates/                   # Config templates (served via GitHub Pages)
 │   ├── docker-compose.yml
 │   ├── .env.template
 │   ├── digibyte.conf.template
@@ -95,12 +95,12 @@ gssa/
 
 ## Deployment
 
-This is a public GitHub repo. Scripts and templates are served directly via `raw.githubusercontent.com`.
+This is a public GitHub repo. Scripts and templates are served via GitHub Pages at `get.mmfpsolutions.io`.
 
 ```bash
 # Web installer
-curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-web.sh | sudo bash
+curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
 
 # CLI installer
-curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-cli.sh | sudo bash
+curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
 ```

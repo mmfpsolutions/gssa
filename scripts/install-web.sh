@@ -3,7 +3,7 @@
 # MMFP Solutions - MIM Bootstrap Installer
 # https://mmfpsolutions.io
 #
-# Usage: curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-web.sh | sudo bash
+# Usage: curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh | sudo bash
 # ============================================================================
 set -euo pipefail
 

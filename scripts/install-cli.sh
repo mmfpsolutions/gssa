@@ -6,14 +6,14 @@
 # Deploys the complete MMFP mining infrastructure via terminal prompts.
 # No MIM Bootstrap web UI required.
 #
-# Usage: curl -sSL https://raw.githubusercontent.com/mmfpsolutions/gssa/main/scripts/install-cli.sh | sudo bash
+# Usage: curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh | sudo bash
 #        or: sudo bash scripts/install-cli.sh
 # ============================================================================
 set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 INSTALLER_VERSION="1.0.0"
-GITHUB_RAW="https://raw.githubusercontent.com/mmfpsolutions/gssa/main/templates"
+GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
 COMPOSE_DIR="${DATA_DIR}/docker-compose"
