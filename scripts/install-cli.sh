@@ -35,7 +35,7 @@ GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
 COMPOSE_DIR="${DATA_DIR}/docker-compose"
-MIN_MEMORY_GB=16
+MIN_MEMORY_GB=12
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
