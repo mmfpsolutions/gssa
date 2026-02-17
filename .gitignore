@@ -32,4 +32,4 @@ go.work.sum
 # .vscode/
 #ignore folders - things we don't want in github
 /design-documents
-/no-githhub-folder
+/no-github-folder

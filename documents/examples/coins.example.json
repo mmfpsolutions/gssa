@@ -1,0 +1,241 @@
+{
+  "$schema": "coins.schema.json",
+  "coins": {
+    "digibyte": {
+      "name": "DigiByte",
+      "symbol": "DGB",
+      "segwit": true,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 30, "testnet": 126 },
+          "p2sh": { "mainnet": 63, "testnet": 196 }
+        },
+        "bech32": {
+          "hrp": { "mainnet": "dgb", "testnet": "dgbt" }
+        }
+      },
+      "explorer": {
+        "block": "https://digiexplorer.info/block/{hash}",
+        "tx": "https://digiexplorer.info/tx/{txid}",
+        "address": "https://digiexplorer.info/address/{address}"
+      }
+    },
+    "terracoin": {
+      "name": "Terracoin",
+      "symbol": "TRC",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://explorer.terracoin.io/block/{hash}",
+        "tx": "https://explorer.terracoin.io/tx/{txid}"
+      }
+    },
+    "ixcoin": {
+      "name": "Ixcoin",
+      "symbol": "IXC",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 138, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      }
+    },
+    "devcoin": {
+      "name": "Devcoin",
+      "symbol": "DVC",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      }
+    },
+    "bitcoinsv": {
+      "name": "Bitcoin SV",
+      "symbol": "BSV",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://whatsonchain.com/block/{hash}",
+        "tx": "https://whatsonchain.com/tx/{txid}",
+        "address": "https://whatsonchain.com/address/{address}"
+      }
+    },
+    "unobtanium": {
+      "name": "Unobtanium",
+      "symbol": "UNO",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 130, "testnet": 111 },
+          "p2sh": { "mainnet": 30, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/uno/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/uno/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/uno/address.dws?{address}.htm"
+      }
+    },
+    "zetacoin": {
+      "name": "Zetacoin",
+      "symbol": "ZET",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 80, "testnet": 111 },
+          "p2sh": { "mainnet": 9, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/zet/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/zet/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/zet/address.dws?{address}.htm"
+      }
+    },
+    "deutscheemark": {
+      "name": "Deutsche eMark",
+      "symbol": "DEM",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 53, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/dem/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/dem/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/dem/address.dws?{address}.htm"
+      }
+    },
+    "joulecoin": {
+      "name": "Joulecoin",
+      "symbol": "XJO",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 43, "testnet": 111 },
+          "p2sh": { "mainnet": 11, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/xjo/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/xjo/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/xjo/address.dws?{address}.htm"
+      }
+    },
+    "curecoin": {
+      "name": "Curecoin",
+      "symbol": "CURE",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 28, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/cure/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/cure/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/cure/address.dws?{address}.htm"
+      }
+    },
+    "crown": {
+      "name": "Crown",
+      "symbol": "CRW",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 28, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/crw/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/crw/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/crw/address.dws?{address}.htm"
+      }
+    },
+    "freicoin": {
+      "name": "Freicoin",
+      "symbol": "FRC",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://chainz.cryptoid.info/frc/block.dws?{hash}.htm",
+        "tx": "https://chainz.cryptoid.info/frc/tx.dws?{txid}.htm",
+        "address": "https://chainz.cryptoid.info/frc/address.dws?{address}.htm"
+      }
+    },
+    "bytecoin": {
+      "name": "Bytecoin",
+      "symbol": "BTE",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 18, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      }
+    },
+    "battlecoin": {
+      "name": "Battlecoin",
+      "symbol": "BCX",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 25, "testnet": 111 },
+          "p2sh": { "mainnet": 85, "testnet": 196 }
+        }
+      }
+    },
+    "titcoin": {
+      "name": "Titcoin",
+      "symbol": "TIT",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      }
+    },
+    "bitcoinii": {
+      "name": "Bitcoin II",
+      "symbol": "BC2",
+      "segwit": true,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        },
+        "bech32": {
+          "hrp": { "mainnet": "bc", "testnet": "tb" }
+        }
+      },
+      "explorer": {
+        "block": "https://explorer.bitcoin-ii.org/block/{hash}",
+        "tx": "https://explorer.bitcoin-ii.org/tx/{txid}",
+        "address": "https://explorer.bitcoin-ii.org/address/{address}"
+      }
+    }
+  }
+}

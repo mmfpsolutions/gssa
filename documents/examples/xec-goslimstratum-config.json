@@ -1,30 +1,31 @@
-    "BTC": {
-      "enabled": true,
-      "coin_type": "bitcoin",
-      "display_name": "Bitcoin",
+{
+    "XEC": {
+      "enabled": false,
+      "coin_type": "ecash",
+      "display_name": "eCash",
       "node": {
         "host": "127.0.0.1",
-        "port": 9003,
-        "username": "{RPC_USER}",
-        "password": "{RPC_PASSWORD}",
+        "port": 9007,
+        "username": "{{XEC_RPC_USER}}",
+        "password": "{{XEC_RPC_USER_PASSWORD}}",
         "use_ssl": false,
         "wallet_name": "default",
-        "zmq_block_notify": "tcp://127.0.0.1:28334",
-        "template_refresh_interval": 100,
+        "zmq_block_notify": "tcp://127.0.0.1:28337",
+        "template_refresh_interval": 900,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 2000,
         "dual_node_comm": true
       },
       "stratum": {
         "host": "0.0.0.0",
-        "port": 3335,
+        "port": 3337,
         "difficulty": 4096,
-        "accept_miner_suggested_diff": false,
-        "connection_timeout_seconds": 7200,
+        "accept_miner_suggested_diff":false,
+        "connection_timeout_seconds": 1800,
         "ping_enabled": true
       },
       "mining": {
-        "address": "{WALLET_ADDRESS}",
+        "address": "{{XEC_NODE_WALLET_ADDRESS}}",
         "network": "mainnet",
         "coinbase_text": "GoSlimStratum",
         "extranonce_size": 8,
@@ -34,8 +35,8 @@
       },
       "vardiff": {
         "enabled": true,
-        "useFloatDiff": false,
-        "minDiff": 512,
+        "useFloatDiff":false,
+        "minDiff": 4096,
         "maxDiff": 262144,
         "targetTime": 20,
         "retargetTime": 600,
@@ -43,12 +44,13 @@
       },
       "payout": {
         "enabled": true,
-        "pool_fee_percent": 1.0,
+        "pool_fee_percent": 1,
         "maturity_confirmations": 100,
         "payment_interval_seconds": 1800,
-        "minimum_confirmations": 6,
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
+        "minimum_confirmations": 6,
         "wallet_rpc_timeout_seconds": 30
       }
     }
+}

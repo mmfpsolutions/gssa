@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "coins.schema.json",
+  "title": "GoSlimStratum Coins Configuration",
+  "description": "Define SHA256d coins for mining without code changes",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "coins": {
+      "type": "object",
+      "description": "Map of coin definitions, keyed by coin_type (lowercase)",
+      "additionalProperties": {
+        "$ref": "#/definitions/coinDefinition"
+      },
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9]*$",
+        "description": "Coin type must be lowercase alphanumeric, starting with a letter"
+      }
+    }
+  },
+  "required": ["coins"],
+  "definitions": {
+    "coinDefinition": {
+      "type": "object",
+      "description": "Definition for a SHA256d coin",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable coin name (e.g., 'Peercoin')"
+        },
+        "symbol": {
+          "type": "string",
+          "pattern": "^[A-Z0-9]{2,10}$",
+          "description": "Ticker symbol, 2-10 uppercase characters (e.g., 'PPC')"
+        },
+        "segwit": {
+          "type": "boolean",
+          "description": "Whether the coin supports SegWit. If true, bech32 HRP is required."
+        },
+        "address": {
+          "$ref": "#/definitions/addressConfig"
+        },
+        "explorer": {
+          "$ref": "#/definitions/explorerConfig"
+        }
+      },
+      "required": ["name", "symbol", "segwit", "address"],
+      "additionalProperties": false
+    },
+    "addressConfig": {
+      "type": "object",
+      "description": "Address format configuration",
+      "properties": {
+        "base58": {
+          "$ref": "#/definitions/base58Config"
+        },
+        "bech32": {
+          "$ref": "#/definitions/bech32Config"
+        }
+      },
+      "required": ["base58"],
+      "additionalProperties": false
+    },
+    "base58Config": {
+      "type": "object",
+      "description": "Base58Check address version bytes",
+      "properties": {
+        "p2pkh": {
+          "$ref": "#/definitions/networkVersions",
+          "description": "Pay-to-Public-Key-Hash version bytes"
+        },
+        "p2sh": {
+          "$ref": "#/definitions/networkVersions",
+          "description": "Pay-to-Script-Hash version bytes (optional)"
+        }
+      },
+      "required": ["p2pkh"],
+      "additionalProperties": false
+    },
+    "networkVersions": {
+      "type": "object",
+      "description": "Version bytes for mainnet and testnet",
+      "properties": {
+        "mainnet": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Version byte for mainnet addresses (0-255)"
+        },
+        "testnet": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255,
+          "description": "Version byte for testnet addresses (0-255)"
+        }
+      },
+      "required": ["mainnet", "testnet"],
+      "additionalProperties": false
+    },
+    "bech32Config": {
+      "type": "object",
+      "description": "Bech32 SegWit address configuration",
+      "properties": {
+        "hrp": {
+          "$ref": "#/definitions/networkHRP"
+        }
+      },
+      "required": ["hrp"],
+      "additionalProperties": false
+    },
+    "networkHRP": {
+      "type": "object",
+      "description": "Human-readable parts for Bech32 addresses",
+      "properties": {
+        "mainnet": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$",
+          "description": "HRP for mainnet (lowercase alphanumeric, e.g., 'bc' for Bitcoin)"
+        },
+        "testnet": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$",
+          "description": "HRP for testnet (lowercase alphanumeric, e.g., 'tb' for Bitcoin)"
+        }
+      },
+      "required": ["mainnet", "testnet"],
+      "additionalProperties": false
+    },
+    "explorerConfig": {
+      "type": "object",
+      "description": "Block explorer URL templates",
+      "properties": {
+        "block": {
+          "type": "string",
+          "pattern": ".*\\{hash\\}.*",
+          "description": "Block explorer URL with {hash} placeholder"
+        },
+        "tx": {
+          "type": "string",
+          "pattern": ".*\\{txid\\}.*",
+          "description": "Transaction explorer URL with {txid} placeholder"
+        },
+        "address": {
+          "type": "string",
+          "pattern": ".*\\{address\\}.*",
+          "description": "Address explorer URL with {address} placeholder"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
