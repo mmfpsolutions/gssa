@@ -1,0 +1,8 @@
+  btc:
+    image: ghcr.io/mmfpsolutions/bitcoin-knots:latest
+    container_name: btc
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/btc/data:/data
+    restart: unless-stopped

@@ -305,6 +305,47 @@ setup_docker() {
 # ── Step 4: Collect Configuration ─────────────────────────────────────────────
 collect_config() {
   step "4" "Configuration"
+
+  # ── Coin selection ──
+  echo ""
+  echo -e "  ${BOLD}Which coin would you like to mine?${NC}"
+  echo ""
+  echo -e "    1) DigiByte  (DGB)"
+  echo -e "    2) Bitcoin Cash (BCH)"
+  echo -e "    3) Bitcoin   (BTC)"
+  echo ""
+  local coin_choice
+  coin_choice=$(prompt_value "Select [1-3]" "1")
+
+  case "$coin_choice" in
+    1)
+      COIN_ID="dgb";  COIN_ID_UPPER="DGB";  COIN_NAME="DigiByte"
+      COIN_TYPE="digibyte";  COIN_NODE_TYPE="dgb";  COIN_NODE_ID="dgb1"
+      CONTAINER_NAME="dgb";  DATA_SUBDIR="dgb"
+      RPC_PORT=9001;  ZMQ_PORT=28332;  STRATUM_PORT=3333
+      NODE_CLI="digibyte-cli";  NODE_CONF="digibyte.conf"
+      ;;
+    2)
+      COIN_ID="bch";  COIN_ID_UPPER="BCH";  COIN_NAME="Bitcoin Cash"
+      COIN_TYPE="bitcoincash";  COIN_NODE_TYPE="bch";  COIN_NODE_ID="bch1"
+      CONTAINER_NAME="bch";  DATA_SUBDIR="bch"
+      RPC_PORT=9002;  ZMQ_PORT=28333;  STRATUM_PORT=3334
+      NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      ;;
+    3)
+      COIN_ID="btc";  COIN_ID_UPPER="BTC";  COIN_NAME="Bitcoin"
+      COIN_TYPE="bitcoin";  COIN_NODE_TYPE="btc";  COIN_NODE_ID="btc1"
+      CONTAINER_NAME="btc";  DATA_SUBDIR="btc"
+      RPC_PORT=9003;  ZMQ_PORT=28334;  STRATUM_PORT=3335
+      NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      ;;
+    *)
+      error "Invalid selection. Please enter 1, 2, or 3."
+      exit 1
+      ;;
+  esac
+  success "Selected: ${COIN_NAME} (${COIN_ID_UPPER})"
+
   echo ""
   echo -e "  ${BOLD}Please provide the following configuration values.${NC}"
   echo -e "  ${BOLD}Passwords are displayed as you type.${NC}"
@@ -318,18 +359,18 @@ collect_config() {
   GSS_DB_PASSWORD=$(prompt_value "GoSlimStratum database password")
   success "GoSlimStratum DB password set"
 
-  # DigiByte RPC username
-  RPC_USER=$(prompt_value "DigiByte RPC username" "digibyterpc")
+  # Node RPC username
+  RPC_USER=$(prompt_value "Node RPC username" "digibyterpc")
   success "RPC username: $RPC_USER"
 
-  # DigiByte RPC password
+  # Node RPC password
   echo ""
-  if confirm "Auto-generate DigiByte RPC password?"; then
+  if confirm "Auto-generate Node RPC password?"; then
     RPC_PASSWORD=$(openssl rand -base64 32)
     echo -e "  ${BOLD}Generated RPC password:${NC} ${CYAN}${RPC_PASSWORD}${NC}"
     echo -e "  ${YELLOW}Save this password — you will need it for RPC access.${NC}"
   else
-    RPC_PASSWORD=$(prompt_value "DigiByte RPC password")
+    RPC_PASSWORD=$(prompt_value "Node RPC password")
   fi
   success "RPC password set"
 
@@ -361,6 +402,7 @@ collect_config() {
   # Confirmation
   echo ""
   echo -e "  ${BOLD}Configuration Summary:${NC}"
+  echo -e "    Coin:                     ${CYAN}${COIN_NAME} (${COIN_ID_UPPER})${NC}"
   echo -e "    Postgres admin password:  ${CYAN}${POSTGRES_ADMIN_PASSWORD}${NC}"
   echo -e "    GSS database password:    ${CYAN}${GSS_DB_PASSWORD}${NC}"
   echo -e "    RPC username:             ${CYAN}${RPC_USER}${NC}"
@@ -400,7 +442,6 @@ download_templates() {
   local files=(
     "docker-compose.yml"
     "env.template"
-    "digibyte.conf.template"
     "goslimstratum/config.json.template"
     "axeos-dashboard/config.json.template"
     "axeos-dashboard/rpcConfig.json.template"
@@ -408,6 +449,9 @@ download_templates() {
     "axeos-dashboard/jsonWebTokenKey.json"
     "mim-config/servers.json.template"
     "postgres/user-db-setup.sql.template"
+    "coins/${COIN_ID}/docker-compose.yml"
+    "coins/${COIN_ID}/node.conf.template"
+    "coins/${COIN_ID}/gss-coin.json.template"
   )
 
   for file in "${files[@]}"; do
@@ -442,7 +486,7 @@ system_setup() {
   # Create directory structure
   info "Creating directory structure..."
   local dirs=(
-    "${DATA_DIR}/dgb/data"
+    "${DATA_DIR}/${DATA_SUBDIR}/data"
     "${DATA_DIR}/goslimstratum/config"
     "${DATA_DIR}/goslimstratum/logs"
     "${DATA_DIR}/goslimstratum/data"
@@ -478,16 +522,20 @@ generate_configs() {
   local jwt_secret
   jwt_secret=$(openssl rand -base64 32)
 
-  # ── digibyte.conf ──
-  info "Generating digibyte.conf..."
+  # ── Node config (digibyte.conf / bitcoin.conf) ──
+  info "Generating ${NODE_CONF}..."
   sed -e "s|{RPC_AUTH_STRING}|${RPC_AUTH_STRING}|g" \
       -e "s|{PRUNE_VALUE}|${PRUNE_VALUE}|g" \
-      "${TEMPLATE_DIR}/digibyte.conf.template" > "${DATA_DIR}/dgb/data/digibyte.conf"
-  success "digibyte.conf → /data/dgb/data/digibyte.conf"
+      "${TEMPLATE_DIR}/coins/${COIN_ID}/node.conf.template" > "${DATA_DIR}/${DATA_SUBDIR}/data/${NODE_CONF}"
+  success "${NODE_CONF} → /data/${DATA_SUBDIR}/data/${NODE_CONF}"
 
-  # ── docker-compose.yml ──
+  # ── docker-compose.yml (base + coin service) ──
   info "Generating docker-compose.yml..."
-  cp "${TEMPLATE_DIR}/docker-compose.yml" "${COMPOSE_DIR}/docker-compose.yml"
+  {
+    cat "${TEMPLATE_DIR}/docker-compose.yml"
+    echo ""
+    cat "${TEMPLATE_DIR}/coins/${COIN_ID}/docker-compose.yml"
+  } > "${COMPOSE_DIR}/docker-compose.yml"
   success "docker-compose.yml → /data/docker-compose/docker-compose.yml"
 
   # ── .env ──
@@ -496,26 +544,39 @@ generate_configs() {
       "${TEMPLATE_DIR}/env.template" > "${COMPOSE_DIR}/.env"
   success ".env → /data/docker-compose/.env"
 
-  # ── goslimstratum config.json (wallet address placeholder for now) ──
+  # ── goslimstratum config.json ──
   info "Generating goslimstratum config.json..."
-  sed -e "s|{DIGIBYTE_RPC_USER}|${RPC_USER}|g" \
-      -e "s|{DIGIBYTE_RPC_USER_PASSWORD}|${RPC_PASSWORD}|g" \
-      -e "s|{YOUR_LEGACY_WALLET_ADDRESS}|PENDING_WALLET_CREATION|g" \
-      -e "s|{GOSLIMSTRATUM_DB_PASSWORD}|${GSS_DB_PASSWORD}|g" \
-      -e "s|{SERVER_IP}|${SERVER_IP}|g" \
-      "${TEMPLATE_DIR}/goslimstratum/config.json.template" > "${DATA_DIR}/goslimstratum/config/config.json"
+  # Process the coin-specific GSS block
+  local coin_block
+  coin_block=$(sed -e "s|{RPC_USER}|${RPC_USER}|g" \
+      -e "s|{RPC_PASSWORD}|${RPC_PASSWORD}|g" \
+      -e "s|{WALLET_ADDRESS}|PENDING_WALLET_CREATION|g" \
+      "${TEMPLATE_DIR}/coins/${COIN_ID}/gss-coin.json.template")
+  # Insert coin block at __COIN_CONFIG__ placeholder and substitute shared values
+  awk -v block="$coin_block" '{gsub(/__COIN_CONFIG__/, block); print}' \
+      "${TEMPLATE_DIR}/goslimstratum/config.json.template" | \
+      sed -e "s|{GOSLIMSTRATUM_DB_PASSWORD}|${GSS_DB_PASSWORD}|g" \
+          -e "s|{SERVER_IP}|${SERVER_IP}|g" \
+      > "${DATA_DIR}/goslimstratum/config/config.json"
   success "config.json → /data/goslimstratum/config/config.json"
 
   # ── axeos-dashboard config.json ──
   info "Generating axeos-dashboard config.json..."
-  sed -e "s|{SERVER_IP}|${SERVER_IP}|g" \
+  sed -e "s|{COIN_NODE_ID}|${COIN_NODE_ID}|g" \
+      -e "s|{COIN_NAME}|${COIN_NAME}|g" \
+      -e "s|{COIN_NODE_TYPE}|${COIN_NODE_TYPE}|g" \
+      -e "s|{COIN_TYPE}|${COIN_TYPE}|g" \
+      -e "s|{COIN_ID_UPPER}|${COIN_ID_UPPER}|g" \
+      -e "s|{SERVER_IP}|${SERVER_IP}|g" \
       "${TEMPLATE_DIR}/axeos-dashboard/config.json.template" > "${DATA_DIR}/axeos-dashboard/config/config.json"
   success "config.json → /data/axeos-dashboard/config/config.json"
 
   # ── axeos-dashboard rpcConfig.json ──
   info "Generating axeos-dashboard rpcConfig.json..."
-  sed -e "s|{DIGIBYTE_RPC_USER}|${RPC_USER}|g" \
-      -e "s|{DIGIBYTE_RPC_USER_PASSWORD}|${RPC_PASSWORD}|g" \
+  sed -e "s|{COIN_NODE_ID}|${COIN_NODE_ID}|g" \
+      -e "s|{RPC_PORT}|${RPC_PORT}|g" \
+      -e "s|{RPC_USER}|${RPC_USER}|g" \
+      -e "s|{RPC_PASSWORD}|${RPC_PASSWORD}|g" \
       "${TEMPLATE_DIR}/axeos-dashboard/rpcConfig.json.template" > "${DATA_DIR}/axeos-dashboard/config/rpcConfig.json"
   success "rpcConfig.json → /data/axeos-dashboard/config/rpcConfig.json"
 
@@ -543,60 +604,60 @@ generate_configs() {
   success "user-db-setup.sql prepared"
 }
 
-# ── Step 8: Start DigiByte & Create Wallet ────────────────────────────────────
-start_dgb_and_wallet() {
-  step "8" "Starting DigiByte Core & creating wallet"
+# ── Step 8: Start Node & Create Wallet ────────────────────────────────────────
+start_node_and_wallet() {
+  step "8" "Starting ${COIN_NAME} node & creating wallet"
 
-  info "Starting DigiByte Core container..."
-  docker compose -f "${COMPOSE_DIR}/docker-compose.yml" up -d dgb
+  info "Starting ${COIN_NAME} container..."
+  docker compose -f "${COMPOSE_DIR}/docker-compose.yml" up -d "$CONTAINER_NAME"
 
   # Wait for container to be running
   sleep 3
-  if ! docker ps --format '{{.Names}}' | grep -q '^dgb$'; then
-    error "DigiByte container failed to start. Check: docker logs dgb"
+  if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    error "${COIN_NAME} container failed to start. Check: docker logs ${CONTAINER_NAME}"
     exit 1
   fi
-  success "DigiByte Core container running"
+  success "${COIN_NAME} container running"
 
   # Wait for RPC to become available (poll with retries)
-  info "Waiting for DigiByte RPC to become available..."
+  info "Waiting for ${COIN_NAME} RPC to become available..."
   local max_attempts=24
   local attempt=0
   while [[ $attempt -lt $max_attempts ]]; do
-    if docker exec dgb digibyte-cli \
+    if docker exec "$CONTAINER_NAME" "$NODE_CLI" \
         -rpcuser="$RPC_USER" \
         -rpcpassword="$RPC_PASSWORD" \
-        -rpcport=9001 \
+        -rpcport="$RPC_PORT" \
         getblockchaininfo &>/dev/null 2>&1; then
       break
     fi
     attempt=$((attempt + 1))
     if [[ $attempt -eq $max_attempts ]]; then
-      error "DigiByte RPC did not become available after 2 minutes."
-      error "Check logs: docker logs dgb"
+      error "${COIN_NAME} RPC did not become available after 2 minutes."
+      error "Check logs: docker logs ${CONTAINER_NAME}"
       exit 1
     fi
     echo -en "\r  Waiting... (${attempt}/${max_attempts})"
     sleep 5
   done
   echo ""
-  success "DigiByte RPC available"
+  success "${COIN_NAME} RPC available"
 
   # Create wallet
   info "Creating default wallet..."
-  docker exec dgb digibyte-cli \
+  docker exec "$CONTAINER_NAME" "$NODE_CLI" \
     -rpcuser="$RPC_USER" \
     -rpcpassword="$RPC_PASSWORD" \
-    -rpcport=9001 \
+    -rpcport="$RPC_PORT" \
     createwallet "default" 2>/dev/null || true
   success "Default wallet created"
 
   # Get legacy address
   info "Generating legacy wallet address..."
-  WALLET_ADDRESS=$(docker exec dgb digibyte-cli \
+  WALLET_ADDRESS=$(docker exec "$CONTAINER_NAME" "$NODE_CLI" \
     -rpcuser="$RPC_USER" \
     -rpcpassword="$RPC_PASSWORD" \
-    -rpcport=9001 \
+    -rpcport="$RPC_PORT" \
     getnewaddress "" "legacy" 2>/dev/null)
 
   if [[ -z "$WALLET_ADDRESS" ]]; then
@@ -605,9 +666,9 @@ start_dgb_and_wallet() {
   fi
 
   # Save wallet address to file
-  echo "$WALLET_ADDRESS" > "${DATA_DIR}/dgb/dgb_wallet.txt"
+  echo "$WALLET_ADDRESS" > "${DATA_DIR}/${DATA_SUBDIR}/${COIN_ID}_wallet.txt"
   success "Wallet address: $WALLET_ADDRESS"
-  success "Saved to: /data/dgb/dgb_wallet.txt"
+  success "Saved to: /data/${DATA_SUBDIR}/${COIN_ID}_wallet.txt"
 
   # Update goslimstratum config with actual wallet address
   info "Updating GoSlimStratum config with wallet address..."
@@ -662,7 +723,7 @@ deploy_stack() {
   sleep 5
   info "Verifying containers..."
 
-  local expected_containers=(dgb goslimstratum postgres mim axeos-dashboard dozzle watchtower)
+  local expected_containers=("$CONTAINER_NAME" goslimstratum postgres mim axeos-dashboard dozzle watchtower)
   local all_running=true
 
   for container in "${expected_containers[@]}"; do
@@ -692,25 +753,27 @@ finish() {
   echo "  ║                                                  ║"
   echo "  ╚══════════════════════════════════════════════════╝"
   echo -e "${NC}"
+  echo -e "  ${BOLD}Coin: ${COIN_NAME} (${COIN_ID_UPPER})${NC}"
+  echo ""
   echo -e "  ${BOLD}Your Services:${NC}"
   echo ""
   echo -e "    MIM Dashboard:      ${CYAN}http://${SERVER_IP}:3001${NC}"
   echo -e "    AxeOS Dashboard:    ${CYAN}http://${SERVER_IP}:3000${NC}"
   echo -e "    GSS Web UI:         ${CYAN}http://${SERVER_IP}:3003${NC}"
-  echo -e "    Stratum Connect:    ${CYAN}stratum+tcp://${SERVER_IP}:3333${NC}"
+  echo -e "    Stratum Connect:    ${CYAN}stratum+tcp://${SERVER_IP}:${STRATUM_PORT}${NC}"
   echo -e "    Dozzle Logs:        ${CYAN}http://${SERVER_IP}:8080${NC}"
   echo ""
   echo -e "  ${BOLD}Wallet Address:${NC}"
   echo -e "    ${CYAN}${WALLET_ADDRESS}${NC}"
-  echo -e "    Saved to: ${CYAN}/data/dgb/dgb_wallet.txt${NC}"
+  echo -e "    Saved to: ${CYAN}/data/${DATA_SUBDIR}/${COIN_ID}_wallet.txt${NC}"
   echo ""
-  echo -e "  ${YELLOW}Note: DigiByte blockchain sync is in progress.${NC}"
+  echo -e "  ${YELLOW}Note: ${COIN_NAME} blockchain sync is in progress.${NC}"
   echo -e "  ${YELLOW}This may take several hours depending on your connection.${NC}"
   echo ""
   echo -e "  ${BOLD}Useful commands:${NC}"
   echo -e "    ${CYAN}docker ps${NC}                              List running containers"
   echo -e "    ${CYAN}docker logs -f goslimstratum${NC}           View stratum logs"
-  echo -e "    ${CYAN}docker logs -f dgb${NC}                     View DigiByte logs"
+  echo -e "    ${CYAN}docker logs -f ${CONTAINER_NAME}${NC}                     View ${COIN_NAME} logs"
   echo -e "    ${CYAN}docker compose -f ${COMPOSE_DIR}/docker-compose.yml down${NC}   Stop all"
   echo -e "    ${CYAN}docker compose -f ${COMPOSE_DIR}/docker-compose.yml up -d${NC}  Start all"
   echo ""
@@ -726,7 +789,7 @@ main() {
   download_templates
   system_setup
   generate_configs
-  start_dgb_and_wallet
+  start_node_and_wallet
   setup_postgres
   deploy_stack
   finish

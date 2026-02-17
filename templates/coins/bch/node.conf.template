@@ -1,0 +1,38 @@
+# BCH Node Configuration
+server=1
+# Turn off listener, not needed for outbound only
+listen=0
+
+# RPC Configuration
+rpcauth={RPC_AUTH_STRING}
+rpcport=9002
+rpcworkqueue=64
+rpcthreads=16
+rpcallowip=127.0.0.1
+rpcbind=127.0.0.1
+
+# Blockchain storage
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+maxmempool=1000
+
+# Wallet settings
+keypool=100
+wallet=default
+walletbroadcast=1
+
+# ZMQ notifications
+zmqpubhashblock=tcp://0.0.0.0:28333
+
+# Connection limits
+maxuploadtarget=500      # 500mb per day upload limit
+maxreceivebuffer=5000    # Limit receive buffer per connection
+maxsendbuffer=1000       # Limit send buffer per connection
+maxconnections=32
+blocksonly=1             # Only relay/request blocks, not loose txs
+timeout=30000
+
+# Whitelist trusted connections
+whitelist=127.0.0.1      # Always allow local connections

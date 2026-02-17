@@ -8,9 +8,9 @@
             "Nodes": [
                 {
                     "NodeAlgo": "sha256d",
-                    "NodeId": "dgb1",
-                    "NodeName": "MIM-DigitByte Node",
-                    "NodeType": "dgb"
+                    "NodeId": "{COIN_NODE_ID}",
+                    "NodeName": "MIM-{COIN_NAME} Node",
+                    "NodeType": "{COIN_NODE_TYPE}"
                 }
             ]
         }
@@ -24,9 +24,9 @@
     "goslimstratum_instances": [
         {
             "api_port": "4004",
-            "coin_type": "dgb",
+            "coin_type": "{COIN_TYPE}",
             "host": "{SERVER_IP}",
-            "name": "GSS-DGB",
+            "name": "GSS-{COIN_ID_UPPER}",
             "webui_port": "3003"
         }
     ],

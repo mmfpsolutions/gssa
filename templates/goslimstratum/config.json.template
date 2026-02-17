@@ -4,59 +4,7 @@
     "connection_timeout_seconds": 600
   },
   "coins": {
-    "DGB": {
-      "enabled": true,
-      "coin_type": "digibyte",
-      "display_name": "DigiByte Mainnet",
-      "node": {
-        "host": "127.0.0.1",
-        "port": 9001,
-        "username": "{DIGIBYTE_RPC_USER}",
-        "password": "{DIGIBYTE_RPC_USER_PASSWORD}",
-        "use_ssl": false,
-        "wallet_name": "default",
-        "zmq_block_notify": "tcp://127.0.0.1:28332",
-        "template_refresh_interval": 15,
-        "zmq_enabled": true,
-        "zmq_stale_detection_time": 120,
-        "dual_node_comm": true
-      },
-      "stratum": {
-        "host": "0.0.0.0",
-        "port": 3333,
-        "difficulty": 4096,
-        "connection_timeout_seconds": 3600,
-        "ping_enabled": true
-      },
-      "mining": {
-        "address": "{YOUR_LEGACY_WALLET_ADDRESS}",
-        "network": "mainnet",
-        "coinbase_text": "GoSlimStratum",
-        "extranonce_size": 8,
-        "max_job_history": 20,
-        "job_expiration_time": 300,
-        "stale_share_grace_period": 5
-      },
-      "vardiff": {
-        "enabled": true,
-        "useFloatDiff": false,
-        "minDiff": 512,
-        "maxDiff": 32768,
-        "targetTime": 15,
-        "retargetTime": 180,
-        "variancePercent": 30
-      },
-      "payout": {
-        "enabled": true,
-        "pool_fee_percent": 1.0,
-        "maturity_confirmations": 100,
-        "payment_interval_seconds": 600,
-        "minimum_confirmations": 6,
-        "maturity_check_interval_seconds": 60,
-        "confirmation_check_interval_seconds": 300,
-        "wallet_rpc_timeout_seconds": 30
-      }
-    }
+__COIN_CONFIG__
   },
   "logging": {
     "level": "info",

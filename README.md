@@ -6,14 +6,14 @@ Online repository for publishing install scripts for MMFP Products.
 
 ### CLI Installer (`install-cli.sh`)
 
-Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no web UI required.
+Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no web UI required. Supports **DigiByte (DGB)**, **Bitcoin Cash (BCH)**, and **Bitcoin (BTC)**.
 
 ```bash
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 ```
 
 **What it deploys (7 containers):**
-- DigiByte Core node
+- Coin node (DigiByte, Bitcoin Cash, or Bitcoin Knots — user selects during install)
 - GoSlimStratum mining stratum server
 - PostgreSQL 18 database
 - MIM management dashboard
@@ -25,11 +25,11 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 1. Preflight checks (root, Ubuntu 24.04+, ARM64/AMD64, memory, openssl)
 2. Creates `/data` directory
 3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Collects configuration (passwords, RPC credentials, pruning, server IP)
-5. Downloads config templates from GitHub
+4. Coin selection (DGB/BCH/BTC) + collects configuration (passwords, RPC credentials, pruning, server IP)
+5. Downloads config templates from GitHub (base + coin-specific)
 6. Creates MIM system user with sudo/docker access
 7. Generates all config files from templates
-8. Starts DigiByte Core, creates wallet, saves address to `/data/dgb/dgb_wallet.txt`
+8. Starts coin node, creates wallet, saves address
 9. Starts PostgreSQL, creates GoSlimStratum database and role
 10. Brings up the full 7-container stack
 
@@ -89,13 +89,12 @@ sudo bash scripts/install-web.sh
 gssa/
 ├── README.md
 ├── scripts/
-│   ├── install-cli.sh          # Full CLI installer
+│   ├── install-cli.sh          # Full CLI installer (multi-coin)
 │   ├── uninstall.sh            # Tiered uninstaller
 │   └── install-web.sh          # Web installer (MIM Bootstrap, optional)
 ├── templates/                   # Config templates (served via GitHub Pages)
-│   ├── docker-compose.yml
+│   ├── docker-compose.yml       # Base services (GSS, Postgres, MIM, AxeOS, etc.)
 │   ├── env.template
-│   ├── digibyte.conf.template
 │   ├── goslimstratum/
 │   │   └── config.json.template
 │   ├── axeos-dashboard/
@@ -105,8 +104,21 @@ gssa/
 │   │   └── jsonWebTokenKey.json
 │   ├── mim-config/
 │   │   └── servers.json.template
-│   └── postgres/
-│       └── user-db-setup.sql.template
+│   ├── postgres/
+│   │   └── user-db-setup.sql.template
+│   └── coins/                   # Per-coin templates
+│       ├── dgb/                 # DigiByte
+│       │   ├── docker-compose.yml
+│       │   ├── node.conf.template
+│       │   └── gss-coin.json.template
+│       ├── bch/                 # Bitcoin Cash
+│       │   ├── docker-compose.yml
+│       │   ├── node.conf.template
+│       │   └── gss-coin.json.template
+│       └── btc/                 # Bitcoin (Knots)
+│           ├── docker-compose.yml
+│           ├── node.conf.template
+│           └── gss-coin.json.template
 └── design-documents/
     └── install-cli-design.md
 ```
