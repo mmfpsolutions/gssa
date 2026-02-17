@@ -35,7 +35,7 @@ GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
 COMPOSE_DIR="${DATA_DIR}/docker-compose"
-MIN_MEMORY_GB=8
+MIN_MEMORY_GB=16
 
 # ── Colors ────────────────────────────────────────────────────────────────────
 RED='\033[0;31m'
@@ -107,7 +107,7 @@ banner() {
   echo "  ╔══════════════════════════════════════════════════╗"
   echo "  ║                                                  ║"
   echo "  ║       MMFP Solutions - Full CLI Installer        ║"
-  echo "  ║       v${INSTALLER_VERSION}                      ║"
+  echo "  ║       v${INSTALLER_VERSION}                                    ║"
   echo "  ║                                                  ║"
   echo "  ╚══════════════════════════════════════════════════╝"
   echo -e "${NC}"
