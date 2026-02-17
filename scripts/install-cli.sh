@@ -504,14 +504,6 @@ system_setup() {
   done
   success "Directory structure created"
 
-  # Container processes run as non-root users — ensure all data dirs are writable
-  info "Setting directory permissions..."
-  chmod -R 777 "${DATA_DIR}/${DATA_SUBDIR}"
-  chmod -R 777 "${DATA_DIR}/goslimstratum"
-  chmod -R 777 "${DATA_DIR}/axeos-dashboard"
-  chmod -R 777 "${DATA_DIR}/mim"
-  chmod -R 777 "${DATA_DIR}/postgres18"
-  success "Directory permissions set"
 }
 
 # ── Step 7: Generate Configs ──────────────────────────────────────────────────
@@ -611,6 +603,16 @@ generate_configs() {
   sed -e "s|{GOSLIMSTRATUM_DB_PASSWORD}|${GSS_DB_PASSWORD}|g" \
       "${TEMPLATE_DIR}/postgres/user-db-setup.sql.template" > "${TEMPLATE_DIR}/user-db-setup.sql"
   success "user-db-setup.sql prepared"
+
+  # Container processes run as non-root users — ensure all data dirs are writable
+  # Must run AFTER config files are generated so the files inherit the permissions
+  info "Setting directory permissions..."
+  chmod -R 777 "${DATA_DIR}/${DATA_SUBDIR}"
+  chmod -R 777 "${DATA_DIR}/goslimstratum"
+  chmod -R 777 "${DATA_DIR}/axeos-dashboard"
+  chmod -R 777 "${DATA_DIR}/mim"
+  chmod -R 777 "${DATA_DIR}/postgres18"
+  success "Directory permissions set"
 }
 
 # ── Step 8: Start Node & Create Wallet ────────────────────────────────────────
