@@ -1,0 +1,76 @@
+{
+  "app": {
+    "name": "GoSlimStratum User Client",
+    "port": 3005,
+    "host": "0.0.0.0"
+  },
+  "gss_api": {
+    "base_url": "http://localhost:4004/api/v1",
+    "timeout_seconds": 10,
+    "retry_attempts": 3,
+    "retry_delay_ms": 1000
+  },
+  "pools": [
+    {
+      "gss_key":"DGB",
+      "symbol": "DGB",
+      "display_name": "DigiByte",
+      "icon_url": "",
+      "enabled": true,
+      "stratum_host": "stratum.example.com",
+      "stratum_port": 3333
+    },
+    {
+      "gss_key":"BTC",
+      "symbol": "BTC",
+      "display_name": "Bitcoin",
+      "icon_url": "",
+      "enabled": false,
+      "stratum_host": "stratum.example.com",
+      "stratum_port": 3334
+    },
+    {
+      "gss_key":"BCH",
+      "symbol": "BCH",
+      "display_name": "Bitcoin Cash",
+      "icon_url": "",
+      "enabled": false,
+      "stratum_host": "stratum.example.com",
+      "stratum_port": 3335
+    }
+  ],
+  "web_ui": {
+    "site_title": "My Mining Pool",
+    "refresh_intervals": {
+      "dashboard": 30,
+      "miner_detail": 30,
+      "blocks": 60,
+      "payments": 60,
+      "network": 30
+    },
+    "pagination": {
+      "blocks_per_page": 50,
+      "payments_per_page": 100
+    }
+  },
+  "logging": {
+    "level": "info",
+    "log_to_file": true,
+    "log_file_path": "/app/logs/gssuc.log",
+    "max_size_mb": 100,
+    "max_age_days": 30,
+    "max_backups": 10,
+    "compress": true
+  },
+  "footer": {
+    "company_name": "MMFP Solutions",
+    "website_url": "https://www.mmfpsolutions.io",
+    "copyright_year": 2026
+  },
+  "security":{
+    "config_pin":"1234",
+    "enable_web_admin":true,
+    "hide_admin_icon":false,
+    "restrict_admin_to_private_network": true
+  }
+}

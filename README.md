@@ -66,11 +66,13 @@ gssa/
 │   ├── GSS Miners/
 │   ├── MIM/
 │   ├── AxeOS Dashboard/
+│   ├── GSSUC/
 │   ├── examples/             # Example configuration files for each product
 │   │   ├── GoSlimStratum/    # gss-config.example.json, coins.example.json
 │   │   ├── GSS Miners/       # config.example.json, notifications.example.json
 │   │   ├── MIM/              # servers.example.json
-│   │   └── AxeOS Dashboard/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
+│   │   ├── AxeOS Dashboard/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
+│   │   └── GSSUC/            # config.example.json
 │   └── diagrams/
 ├── design-documents/         # Internal technical specifications
 ├── cli-installer.md          # CLI installer reference
@@ -128,6 +130,18 @@ AxeOS Dashboard is a monitoring dashboard focused on AxeOS-based miners (Bitaxe,
 | [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md)                                | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
 
 Example configs: [documents/examples/AxeOS Dashboard/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/AxeOS%20Dashboard)
+
+---
+
+### GoSlimStratum User Client (GSSUC)
+
+GSSUC is a public-facing web dashboard for miners using a GoSlimStratum pool. Miners enter their wallet address to view their active rigs, hashrate, block discoveries, and payment history. Supports multiple coins and includes an admin panel for operators.
+
+| Document                                                                                                                  | Description                                                                           |
+|---------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-config-guide.md)                    | App server, GSS API connection, pools, web UI, logging, footer, and security settings |
+
+Example configs: [documents/examples/GSSUC/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GSSUC)
 
 ---
 
