@@ -321,21 +321,21 @@ collect_config() {
     1)
       COIN_ID="dgb";  COIN_ID_UPPER="DGB";  COIN_NAME="DigiByte"
       COIN_TYPE="digibyte";  COIN_NODE_TYPE="dgb";  COIN_NODE_ID="dgb1"
-      CONTAINER_NAME="dgb";  DATA_SUBDIR="dgb"
+      CONTAINER_NAME="dgb";  DATA_SUBDIR="dgb";  DEFAULT_RPC_USER="digibyterpc"
       RPC_PORT=9001;  ZMQ_PORT=28332;  STRATUM_PORT=3333
       NODE_CLI="digibyte-cli";  NODE_CONF="digibyte.conf"
       ;;
     2)
       COIN_ID="bch";  COIN_ID_UPPER="BCH";  COIN_NAME="Bitcoin Cash"
       COIN_TYPE="bitcoincash";  COIN_NODE_TYPE="bch";  COIN_NODE_ID="bch1"
-      CONTAINER_NAME="bch";  DATA_SUBDIR="bch"
+      CONTAINER_NAME="bch";  DATA_SUBDIR="bch";  DEFAULT_RPC_USER="bitcoincashrpc"
       RPC_PORT=9002;  ZMQ_PORT=28333;  STRATUM_PORT=3334
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
       ;;
     3)
       COIN_ID="btc";  COIN_ID_UPPER="BTC";  COIN_NAME="Bitcoin"
       COIN_TYPE="bitcoin";  COIN_NODE_TYPE="btc";  COIN_NODE_ID="btc1"
-      CONTAINER_NAME="btc";  DATA_SUBDIR="btc"
+      CONTAINER_NAME="btc";  DATA_SUBDIR="btc";  DEFAULT_RPC_USER="bitcoinrpc"
       RPC_PORT=9003;  ZMQ_PORT=28334;  STRATUM_PORT=3335
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
       ;;
@@ -360,7 +360,7 @@ collect_config() {
   success "GoSlimStratum DB password set"
 
   # Node RPC username
-  RPC_USER=$(prompt_value "Node RPC username" "digibyterpc")
+  RPC_USER=$(prompt_value "Node RPC username" "$DEFAULT_RPC_USER")
   success "RPC username: $RPC_USER"
 
   # Node RPC password
@@ -503,6 +503,15 @@ system_setup() {
     mkdir -p "$dir"
   done
   success "Directory structure created"
+
+  # Container processes run as non-root users — ensure all data dirs are writable
+  info "Setting directory permissions..."
+  chmod -R 777 "${DATA_DIR}/${DATA_SUBDIR}"
+  chmod -R 777 "${DATA_DIR}/goslimstratum"
+  chmod -R 777 "${DATA_DIR}/axeos-dashboard"
+  chmod -R 777 "${DATA_DIR}/mim"
+  chmod -R 777 "${DATA_DIR}/postgres18"
+  success "Directory permissions set"
 }
 
 # ── Step 7: Generate Configs ──────────────────────────────────────────────────
