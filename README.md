@@ -11,6 +11,7 @@ MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infra
 **Supported cryptocurrencies:** DigiByte (DGB), Bitcoin Cash (BCH), Bitcoin (BTC/Knots)
 
 **Deployed containers:**
+
 | Container        | Purpose                                             |
 |------------------|-----------------------------------------------------|
 | Coin Node        | Full or pruned blockchain node (DGB, BCH, or BTC)  |
