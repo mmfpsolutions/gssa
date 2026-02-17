@@ -181,7 +181,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 
 ### Quick Presets
 
-[!NOTE] Tuning VarDiff takes experiementation, each operator has their own preferences
+> **Note:**  Tuning VarDiff takes experiementation, each operator has their own preferences
 
 | Scenario | minDiff | maxDiff | targetTime | retargetTime |
 |---|:---:|:---:|:---:|:---:|
