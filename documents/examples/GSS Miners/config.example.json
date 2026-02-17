@@ -1,0 +1,178 @@
+{
+    "cookieMaxAge": 3600,
+    "cryptNodesEnabled": true,
+    "cryptoNodes": [
+        {
+            "id": "rB7xW0zK",
+            "nodeAlgo": "sha256d",
+            "nodeName": "Digibyte",
+            "nodeType": "DGB",
+            "rpcAddress": "192.168.1.110",
+            "rpcAuth": "{rpcUser}:{rpcPassword}",
+            "rpcPort": 9001
+        }
+    ],
+    "disableAuthentication": true,
+    "disableConfigurations": false,
+    "disableSettings": false,
+    "goslimstratumPools": [
+        {
+            "apiPort": "4004",
+            "coinType": "DGB",
+            "gssCoinKey": "DGB",
+            "host": "192.168.7.138",
+            "id": "qA6wV9yM",
+            "name": "Digibyte",
+            "webuiPort": "3003"
+        }
+    ],
+    "goslimstratumPoolsEnabled": true,
+    "logging": {
+        "compress": false,
+        "level": "info",
+        "logFilePath": "/app/logs/gssm.log",
+        "logToFile": true,
+        "maxAgeDays": 30,
+        "maxBackups": 10,
+        "maxSizeMb": 20
+    },
+    "miners": [
+        {
+            "address": "http://192.168.1.100",
+            "addressType": "http",
+            "deviceType": "axeos",
+            "id": "mXk9pQ2r",
+            "model": "bitaxe",
+            "name": "AxeOS1",
+            "port": 80
+        },
+        {
+            "address": "http://192.168.1.101",
+            "addressType": "http",
+            "deviceType": "axeos",
+            "id": "jW5vT9yC",
+            "model": "nerdqaxe",
+            "name": "NerdQAxe1",
+            "port": 80
+        },
+        {
+            "address": "192.168.1.102",
+            "addressType": "tcp",
+            "deviceType": "cgminer",
+            "id": "hR6wU0zD",
+            "name": "Antminer S9",
+            "port": 4028
+        },
+        {
+            "address": "192.168.1.103",
+            "addressType": "tcp",
+            "deviceType": "canaan",
+            "id": "pZ6wU0zD",
+            "model": "avalonq",
+            "name": "AvalonQ",
+            "port": 4028
+        },
+        {
+            "address": "192.168.1.104",
+            "addressType": "tcp",
+            "deviceType": "canaan",
+            "id": "4XNz3WzI",
+            "model": "nano3s",
+            "name": "Nano3s",
+            "port": 4028
+        }
+    ],
+    "refresh_intervals": {
+        "miners": 120,
+        "nodes": 120,
+        "pools": 120
+    },
+    "thresholds": {
+        "miners": {
+            "avalonq": {
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "temperature": {
+                    "critical": 85,
+                    "warning": 70
+                }
+            },
+            "axeos": {
+                "chipError": {
+                    "critical": 5,
+                    "warning": 2
+                },
+                "fanSpeed": {
+                    "critical": 100,
+                    "warning": 90
+                },
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "temperature": {
+                    "critical": 80,
+                    "warning": 65
+                }
+            },
+            "canaan": {
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "temperature": {
+                    "critical": 85,
+                    "warning": 70
+                }
+            },
+            "cgminer": {
+                "hwErrorRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "temperature": {
+                    "critical": 85,
+                    "warning": 70
+                }
+            },
+            "nano3s": {
+                "hwErrorRate": {
+                    "critical": 5,
+                    "warning": 2
+                },
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "temperature": {
+                    "critical": 100,
+                    "warning": 110
+                }
+            }
+        }
+    },
+    "title": "GSS Miners",
+    "webServerPort": 3000
+}

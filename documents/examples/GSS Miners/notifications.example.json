@@ -1,0 +1,95 @@
+{
+  "enabled": false,
+  "channels": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "use_tls": true,
+      "from_address": "alerts@example.com",
+      "to_addresses": [
+        "admin@example.com"
+      ]
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": "[TELEGRAM_BOT_TOKEN]",
+      "chat_id": "[YOUR_CHAT_ID]",
+      "message_prefix": "[GSS Miners] ",
+      "parse_mode": "HTML"
+    },
+    "webhooks": {
+      "discord-alerts": {
+        "enabled": false,
+        "type": "discord",
+        "url": "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN",
+        "message_prefix": "[GSS Miners] ",
+        "username": "GSS Miners",
+        "avatar_url": ""
+      },
+      "custom-webhook": {
+        "enabled": false,
+        "type": "generic",
+        "url": "https://api.example.com/webhook",
+        "message_prefix": "[GSS Miners] ",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer YOUR_TOKEN"
+        },
+        "timeout_seconds": 10
+      }
+    }
+  },
+  "polling": {
+    "miner_check_interval_seconds": 120,
+    "pool_check_interval_seconds": 120,
+    "node_check_interval_seconds": 120
+  },
+  "exclusions": {
+    "miners": [],
+    "pools": [],
+    "nodes": []
+  },
+  "events": {
+    "miners": {
+      "enabled": false,
+      "channels": ["telegram"],
+      "failover": true,
+      "offline": true,
+      "online": true,
+      "zero_hashrate": true,
+      "temp_high": true
+    },
+    "pools": {
+      "enabled": false,
+      "channels": ["telegram"],
+      "offline": true,
+      "online": true
+    },
+    "nodes": {
+      "enabled": false,
+      "channels": ["telegram"],
+      "offline": true,
+      "online": true
+    },
+    "system": {
+      "startup": {
+        "enabled": false,
+        "channels": ["telegram"]
+      },
+      "shutdown": {
+        "enabled": false,
+        "channels": ["telegram"]
+      }
+    }
+  },
+  "rate_limiting": {
+    "miner_events": {
+      "enabled": false,
+      "batch_window_seconds": 60,
+      "max_per_batch": 10
+    }
+  }
+}
