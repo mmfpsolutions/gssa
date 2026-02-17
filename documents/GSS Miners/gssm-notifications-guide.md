@@ -117,7 +117,7 @@ Notifications are configured in a separate file, `notifications.json`, which liv
 ## Top-Level
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Master switch for all notifications. Set to `true` to activate. Individual channels and events must also be enabled. |
 
 ---
@@ -131,7 +131,7 @@ Channels define *how* notifications are delivered. You must configure and enable
 ### Email
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable email notifications. |
 | `smtp_server` | `""` | SMTP server hostname (e.g., `smtp.gmail.com`). |
 | `smtp_port` | `587` | SMTP port. Common values: `587` (STARTTLS), `465` (SSL), `25` (plain). |
@@ -146,7 +146,7 @@ Channels define *how* notifications are delivered. You must configure and enable
 ### Telegram
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable Telegram notifications. |
 | `bot_token` | `""` | Your Telegram bot token. Obtain from [@BotFather](https://t.me/BotFather). Masked in the UI. |
 | `chat_id` | `""` | The Telegram chat, group, or channel ID to send messages to. The bot must be a member of the target chat. |
@@ -177,7 +177,7 @@ Two webhook types are supported:
 ```
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `enabled` | Enable this webhook. |
 | `type` | Must be `"discord"`. Sends a Discord-formatted embed payload. |
 | `url` | The full Discord webhook URL. Created in Discord Server Settings → Integrations → Webhooks. |
@@ -202,7 +202,7 @@ Two webhook types are supported:
 ```
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `enabled` | Enable this webhook. |
 | `type` | Must be `"generic"`. Sends a plain JSON POST body. |
 | `url` | The endpoint URL to POST the notification to. |
@@ -226,7 +226,7 @@ The notifications system runs its own background checks independently from the d
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miner_check_interval_seconds` | `120` | How often (in seconds) GSSM polls miners to detect alert conditions. |
 | `pool_check_interval_seconds` | `120` | How often GSSM polls GoSlimStratum pools for status changes. |
 | `node_check_interval_seconds` | `120` | How often GSSM polls blockchain nodes for status changes. |
@@ -248,7 +248,7 @@ Suppresses all notifications for specific miners, pools, or nodes by their ID. U
 ```
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `miners` | List of miner IDs to exclude from all alerts. IDs are found in `config.json` or the GSSM device list. |
 | `pools` | List of pool IDs to exclude from all alerts. |
 | `nodes` | List of node IDs to exclude from all alerts. |
@@ -282,7 +282,7 @@ Alerts for individual mining device state changes.
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable miner event notifications. |
 | `channels` | `[]` | Which channels to notify. Must match channel keys. |
 | `offline` | `true` | Alert when a miner stops responding to polls. |
@@ -309,7 +309,7 @@ Alerts for GoSlimStratum pool availability. Requires `goslimstratumPoolsEnabled:
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable pool event notifications. |
 | `channels` | `[]` | Which channels to notify. |
 | `offline` | `true` | Alert when a pool's API becomes unreachable. |
@@ -331,7 +331,7 @@ Alerts for blockchain node availability. Requires `cryptNodesEnabled: true` in `
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable node event notifications. |
 | `channels` | `[]` | Which channels to notify. |
 | `offline` | `true` | Alert when a blockchain node's RPC becomes unreachable. |
@@ -357,7 +357,7 @@ Alerts for GSSM application lifecycle events.
 ```
 
 | Event | Description |
-|---|---|
+|-----|-----------|
 | `startup` | Sent when the GSSM application starts successfully. Useful for confirming a restart completed. |
 | `shutdown` | Sent when GSSM is shutting down gracefully. |
 
@@ -382,7 +382,7 @@ Prevents notification floods when many miner events fire in a short window (e.g.
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miner_events.enabled` | `false` | Enable rate limiting for miner events. |
 | `miner_events.batch_window_seconds` | `60` | Time window in seconds. Events within this window are counted together. |
 | `miner_events.max_per_batch` | `10` | Maximum number of miner event notifications sent within one batch window. Events beyond this limit are suppressed until the next window. |

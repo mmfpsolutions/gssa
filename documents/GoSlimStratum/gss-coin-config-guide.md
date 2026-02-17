@@ -79,7 +79,7 @@ Here is a complete example of a coin configuration object in `config.json`:
 ## Top-Level Fields
 
 | Field | Description | Example |
-|---|---|---|
+|-----|-----------|-------|
 | `enabled` | Whether this coin is active. Set to `false` to disable without removing config. | `true` |
 | `coin_type` | The coin implementation to use. | `"digibyte"`, `"bitcoin"`, `"bitcoincash"`, `"ecash"` |
 | `display_name` | Human-readable name shown in the web dashboard. | `"DigiByte Mainnet"` |
@@ -91,7 +91,7 @@ Here is a complete example of a coin configuration object in `config.json`:
 Connection settings for your coin's node (full or pruned).
 
 | Field | Description | Guidelines |
-|---|---|---|
+|-----|-----------|----------|
 | `host` | IP address of your node | `"127.0.0.1"` for local, or remote IP |
 | `port` | RPC port of your node | Check your node's config (e.g., rpcport=X) |
 | `username` | RPC username from node's config file | Must match `rpcuser` in node config |
@@ -121,7 +121,7 @@ Then set `zmq_block_notify` to match: `"tcp://127.0.0.1:28332"`
 Settings for miners connecting to your pool.
 
 | Field | Description | Guidelines |
-|---|---|---|
+|-----|-----------|----------|
 | `host` | IP to listen on | `"0.0.0.0"` to accept all connections |
 | `port` | Port miners connect to | Pick unique port per coin (3333, 3334, etc.) |
 | `difficulty` | Starting difficulty for new miners | **See table below** |
@@ -132,7 +132,7 @@ Settings for miners connecting to your pool.
 ### Starting Difficulty Guidelines
 
 | Miner Type | Hashrate | Recommended Difficulty |
-|---|---|---|
+|----------|--------|----------------------|
 | Bitaxe (single) | ~500 GH/s | `256-512` |
 | Bitaxe (multiple) | 1-5 TH/s | `1024-4096` |
 | Small ASIC | 5-20 TH/s | `4096-8192` |
@@ -147,7 +147,7 @@ Settings for miners connecting to your pool.
 Block construction and coinbase settings.
 
 | Field | Description | Guidelines |
-|---|---|---|
+|-----|-----------|----------|
 | `address` | **Your Node wallet address for block rewards** | Must be a valid address for this coin. Use legacy format (not bech32) for best compatibility |
 | `network` | Which network to validate against | `"mainnet"` or `"testnet"` |
 | `coinbase_text` | Text embedded in blocks you mine | Max ~20 chars. Your pool name/signature - default GoSlimStratum* |
@@ -170,7 +170,7 @@ Block construction and coinbase settings.
 Automatic difficulty adjustment per miner. Adjusts difficulty so each miner submits shares at a consistent rate.
 
 | Field | Description | Guidelines |
-|---|---|---|
+|-----|-----------|----------|
 | `enabled` | Turn on automatic difficulty adjustment | `true` recommended for mixed miner sizes |
 | `useFloatDiff` | Allow GSS to use float64 diff values (i.e. 0.0001) | Default set to `false` if not defined |
 | `minDiff` | Lowest difficulty allowed | 256-512 for small miners (Bitaxe) |
@@ -184,7 +184,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 > **Note:**  Tuning VarDiff takes experiementation, each operator has their own preferences
 
 | Scenario | minDiff | maxDiff | targetTime | retargetTime |
-|---|:---:|:---:|:---:|:---:|
+|--------|:-----:|:-----:|:--------:|:----------:|
 | Bitaxe only | 256 | 32768 | 15 | 90 |
 | Mixed miners | 512 | 65536 | 15 | 180 |
 | Large ASICs only | 4096 | -1 * | 10 | 120 |
@@ -205,7 +205,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 Automatic payment processing settings.
 
 | Field | Description | Guidelines |
-|---|---|---|
+|-----|-----------|----------|
 | `enabled` | Enable automatic payouts | `true` for automatic, *`false` for manual payouts |
 | `pool_fee_percent` | Your pool's fee percentage | `1.0` = 1% fee. Range: 0-100 |
 | `maturity_confirmations` | Blocks before reward is spendable | **Coin-specific** - see table below |
@@ -220,7 +220,7 @@ Automatic payment processing settings.
 ### Maturity Confirmations by Coin
 
 | Coin | Typical Maturity | Notes |
-|---|:---:|---|
+|----|:--------------:|-----|
 | DGB (DigiByte) | 100 | Standard coinbase maturity |
 | BTC (Bitcoin) | 100 | Standard coinbase maturity |
 | BCH (Bitcoin Cash) | 100 | Standard coinbase maturity |

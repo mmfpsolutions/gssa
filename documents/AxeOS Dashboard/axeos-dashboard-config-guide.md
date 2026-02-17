@@ -13,7 +13,7 @@ Complete reference for all configuration files used by AxeOS Dashboard.
 AxeOS Dashboard uses multiple configuration files stored in the `config/` directory. Together they control which mining devices and pools are monitored, how authentication works, and how notifications are delivered.
 
 | File | Purpose | Required |
-|---|---|---|
+|----|-------|--------|
 | `config.json` | Main application configuration — devices, pools, nodes, UI settings | Yes |
 | `access.json` | Admin login credentials (hashed password) | Yes |
 | `jsonWebTokenKey.json` | JWT session token configuration | Yes |
@@ -82,7 +82,7 @@ The main configuration file. Controls device lists, pool integrations, UI behavi
 ### Application Settings
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `axeos_dashboard_version` | `3` | Internal version marker. Do not change — used by the app to detect config migrations. |
 | `web_server_port` | `3000` | Port the dashboard web server listens on. Can also be set via the `PORT` environment variable. |
 | `title` | `"AxeOS Dashboard"` | Title displayed in the browser tab and dashboard header. |
@@ -110,7 +110,7 @@ AxeOS-based devices (Bitaxe, NerdQAxe) communicate over HTTP. Include the `http:
 ```
 
 | Part | Description |
-|---|---|
+|----|-----------|
 | Key (e.g., `"AxeOS1"`) | Display name shown in the dashboard. |
 | Value (e.g., `"http://192.168.1.100"`) | Full HTTP address of the device. Port 80 is assumed by default — include a port if different (e.g., `http://192.168.1.100:8080`). |
 
@@ -125,7 +125,7 @@ CGMiner API-compatible devices (Antminer S-series and similar) communicate over 
 ```
 
 | Part | Description |
-|---|---|
+|----|-----------|
 | Key | Display name. |
 | Value | `host:port` in TCP format. Default CGMiner port is `4028`. |
 
@@ -140,7 +140,7 @@ Canaan AvalonQ devices also use the CGMiner TCP API.
 ```
 
 | Part | Description |
-|---|---|
+|----|-----------|
 | Key | Display name. |
 | Value | `host:port` in TCP format. Default port is `4028`. |
 
@@ -163,14 +163,14 @@ Canaan AvalonQ devices also use the CGMiner TCP API.
 #### GoSlimStratum
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `goslimstratum_enabled` | `false` | Enable GoSlimStratum pool monitoring. |
 | `goslimstratum_instances` | `[]` | Array of GoSlimStratum pool instances. |
 
 Each instance in `goslimstratum_instances`:
 
 | Field | Required | Description |
-|---|---|---|
+|-----|--------|-----------|
 | `name` | Yes | Display name for the pool. |
 | `host` | Yes | IP address or hostname of the GoSlimStratum server. |
 | `api_port` | Yes | Port for the GSS HTTP API (typically `"4004"`). |
@@ -182,14 +182,14 @@ Each instance in `goslimstratum_instances`:
 ### Blockchain Nodes
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `cryptNodesEnabled` | `false` | Enable blockchain node monitoring and network stats. |
 | `cryptoNodes` | `[]` | Array of node configuration objects. |
 
 Each entry in `cryptoNodes` contains a `Nodes` array. Each node in that array:
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `NodeType` | Coin ticker (e.g., `"dgb"`, `"btc"`, `"bch"`). Determines display icon and formatting. |
 | `NodeName` | Display name for this node (e.g., `"Digibyte"`). |
 | `NodeId` | Unique identifier that links this node to its RPC credentials in `rpcConfig.json`. Must match a `NodeId` in `rpcConfig.json`. |
@@ -212,7 +212,7 @@ Stores the admin login credentials for the dashboard. Passwords are stored as SH
 ```
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `admin` | SHA256 hash of the admin password. The key `"admin"` is the username. |
 
 The hash shown above is SHA256 of the string `"admin"` — **change this before deploying**.
@@ -243,7 +243,7 @@ Configures the JWT tokens used to maintain login sessions.
 ```
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `jsonWebTokenKey` | Secret key used to sign and verify JWT tokens. Use a long, random string in production. If this key changes, all existing sessions are invalidated. |
 | `expiresIn` | Token expiration duration in Go time format. Examples: `"1h"` (1 hour), `"30m"` (30 minutes), `"24h"` (24 hours). |
 
@@ -279,7 +279,7 @@ Stores connection credentials for blockchain nodes. This file is kept separate f
 Each entry in the `cryptoNodes` array:
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `NodeId` | Must exactly match the `NodeId` in the corresponding node entry in `config.json`. This is how the dashboard links display config to credentials. |
 | `NodeRPCAddress` | IP address or hostname of the blockchain node. |
 | `NodeRPCPort` | RPC port. Must match `rpcport` in the node's configuration file. Common defaults: DGB `9001`, BTC `8332`, BCH `8332`. |
@@ -320,7 +320,7 @@ Controls alert notifications for device, pool, and node events. Auto-generated w
 ### Top-Level
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Master switch. Set to `true` to enable all notifications. Individual channels and events must also be enabled. |
 
 ---
@@ -328,7 +328,7 @@ Controls alert notifications for device, pool, and node events. Auto-generated w
 ### Channels — Email
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable email notifications. |
 | `smtp_server` | `""` | SMTP server hostname. |
 | `smtp_port` | `587` | SMTP port. Common values: `587` (STARTTLS), `465` (SSL), `25` (plain). |
@@ -343,7 +343,7 @@ Controls alert notifications for device, pool, and node events. Auto-generated w
 ### Channels — Telegram
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable Telegram notifications. |
 | `bot_token` | `""` | Bot token from @BotFather. Masked in the UI. |
 | `chat_id` | `""` | Target chat, group, or channel ID. |
@@ -359,7 +359,7 @@ Webhooks are named — the key is the name referenced in event `channels` lists.
 #### Discord Webhook
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `enabled` | Enable this webhook. |
 | `type` | Must be `"discord"`. |
 | `url` | Discord webhook URL. |
@@ -370,7 +370,7 @@ Webhooks are named — the key is the name referenced in event `channels` lists.
 #### Generic HTTP Webhook
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `enabled` | Enable this webhook. |
 | `type` | Must be `"generic"`. |
 | `url` | Endpoint URL to POST to. |
@@ -386,7 +386,7 @@ Webhooks are named — the key is the name referenced in event `channels` lists.
 The notifications system checks devices on its own schedule, independent of the dashboard UI refresh.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miner_check_interval_seconds` | `120` | How often (seconds) to poll miners for alert conditions. |
 | `pool_check_interval_seconds` | `120` | How often to poll pools. |
 | `node_check_interval_seconds` | `120` | How often to poll nodes. |
@@ -398,7 +398,7 @@ The notifications system checks devices on its own schedule, independent of the 
 Suppress all notifications for specific devices by name. Useful for test devices or known-offline hardware.
 
 | Field | Description |
-|---|---|
+|-----|-----------|
 | `miners` | List of miner display names to exclude. |
 | `pools` | List of pool names to exclude. |
 | `nodes` | List of node IDs to exclude. |
@@ -412,7 +412,7 @@ Controls which events trigger notifications and which channels receive them. Cha
 #### Miner Events
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable miner event notifications. |
 | `channels` | `[]` | Channels to notify (e.g., `["telegram", "discord-alerts"]`). |
 | `offline` | `true` | Alert when a miner stops responding. |
@@ -424,7 +424,7 @@ Controls which events trigger notifications and which channels receive them. Cha
 #### Pool Events
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable pool event notifications. |
 | `channels` | `[]` | Channels to notify. |
 | `offline` | `true` | Alert when a pool becomes unreachable. |
@@ -433,7 +433,7 @@ Controls which events trigger notifications and which channels receive them. Cha
 #### Node Events
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable node event notifications. |
 | `channels` | `[]` | Channels to notify. |
 | `offline` | `true` | Alert when a node's RPC becomes unreachable. |
@@ -442,7 +442,7 @@ Controls which events trigger notifications and which channels receive them. Cha
 #### System Events
 
 | Event | Description |
-|---|---|
+|-----|-----------|
 | `system.startup` | Sent when the dashboard starts. Confirms a successful restart. |
 | `system.shutdown` | Sent when the dashboard shuts down gracefully. |
 
@@ -455,7 +455,7 @@ Each takes `enabled` (bool) and `channels` (list of channel names).
 Prevents alert floods when many devices go offline simultaneously (e.g., network outage).
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miner_events.enabled` | `false` | Enable rate limiting for miner events. |
 | `miner_events.batch_window_seconds` | `60` | Time window in seconds for grouping events. |
 | `miner_events.max_per_batch` | `10` | Max notifications sent per batch window. Events beyond this are suppressed until the next window. |

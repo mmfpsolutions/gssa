@@ -97,7 +97,7 @@ This guide covers the global sections of `config.json` and the full `notificatio
 Top-level pool identity settings.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `pool_name` | `"GoSlimStratum Pool"` | The display name of your pool. Shown in the web dashboard and used in notifications. |
 
 ---
@@ -107,7 +107,7 @@ Top-level pool identity settings.
 Controls how GSS writes log output — to the console, to a file, or both.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `level` | `"info"` | Log verbosity level. Controls what gets written to the log. See levels below. |
 | `share_log_level` | `"info"` | Separate verbosity level specifically for share validation events. See levels below. |
 | `log_to_file` | `false` | Set to `true` to write logs to a file in addition to console output. |
@@ -120,7 +120,7 @@ Controls how GSS writes log output — to the console, to a file, or both.
 ### Log Levels
 
 | Level | What Gets Logged |
-|---|---|
+|-----|----------------|
 | `debug` | Everything — connection details, job dispatches, share validation steps |
 | `info` | Normal operational events — starts, stops, connections, accepted shares |
 | `warn` | Recoverable issues — retries, stale shares, configuration fallbacks |
@@ -131,7 +131,7 @@ Controls how GSS writes log output — to the console, to a file, or both.
 Share logging can be tuned separately since high-hashrate setups generate extremely high share volume.
 
 | Level | What Gets Logged |
-|---|---|
+|-----|----------------|
 | `debug` | Every share received, including full validation details |
 | `info` | Accepted and rejected shares |
 | `error` | Rejected shares only |
@@ -149,7 +149,7 @@ GSS uses a PostgreSQL database to store share data, hashrate snapshots, block hi
 ### Database Connection
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `true` | Enable the metrics system. Required for the HTTP API and web UI. |
 | `database_host` | `"localhost"` | Hostname or IP address of the PostgreSQL server. |
 | `database_port` | `5432` | Port the PostgreSQL server is listening on. |
@@ -163,7 +163,7 @@ GSS uses a PostgreSQL database to store share data, hashrate snapshots, block hi
 #### SSL Mode Options
 
 | Mode | Description |
-|---|---|
+|----|-----------|
 | `disable` | No SSL. Safe for local connections. |
 | `require` | Use SSL, but do not verify the certificate. |
 | `verify-ca` | Verify the server certificate is signed by a trusted CA. |
@@ -174,7 +174,7 @@ GSS uses a PostgreSQL database to store share data, hashrate snapshots, block hi
 Shares are buffered in memory before being written to the database in batches. This reduces database write pressure on high-hashrate setups.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `batch_size` | `100` | Number of shares to accumulate before flushing to the database. |
 | `flush_interval_seconds` | `10` | Maximum seconds between flushes, even if the batch isn't full. |
 
@@ -183,14 +183,14 @@ Shares are buffered in memory before being written to the database in batches. T
 ### Data Retention & Cleanup
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `share_retention_hours` | `48` | How many hours of share data to keep in the database. Older shares are pruned. |
 | `cleanup_interval_hours` | `24` | How often (in hours) the cleanup job runs to remove expired data. |
 
 ### Snapshots & Polling
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `snapshot_interval_seconds` | `60` | How often GSS writes a hashrate snapshot to the database for charting. |
 | `network_poll_interval_seconds` | `60` | How often GSS polls the node for network difficulty and block height. |
 | `log_interval_seconds` | `30` | How often GSS logs a pool status summary to the console/log file. |
@@ -198,13 +198,13 @@ Shares are buffered in memory before being written to the database in batches. T
 ### Hashrate Windows
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `hashrate_windows` | `[60, 300, 900]` | Time windows (in seconds) used for calculating hashrate averages. These correspond to 1-minute, 5-minute, and 15-minute windows. Adjust or add windows as needed. |
 
 ### HTTP API
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enable_http_api` | `false` | Enable the HTTP REST API. Required for the web dashboard and external integrations. |
 | `http_api_port` | `4004` | Port the HTTP API server listens on. |
 
@@ -217,7 +217,7 @@ Shares are buffered in memory before being written to the database in batches. T
 Controls the built-in web dashboard served by GSS.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable the web dashboard. |
 | `host` | `"0.0.0.0"` | IP address to bind the web server to. `"0.0.0.0"` accepts connections on all interfaces. |
 | `port` | `3003` | Port the web dashboard is served on. |
@@ -264,7 +264,7 @@ Links to address lookups on an external explorer. Use `{address}` as the placeho
 Controls how often the web dashboard polls the API to update each section (in seconds).
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `pool_stats` | `5` | How often the pool summary stats (hashrate, miners, shares) refresh. |
 | `miners` | `10` | How often the active miners list refreshes. |
 | `blocks` | `30` | How often the recent blocks list refreshes. |
@@ -354,7 +354,7 @@ Notifications are configured in a separate file, `notifications.json`. This file
 ### Top-Level
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `true` | Master switch for the entire notifications system. Set to `false` to silence all alerts. |
 
 ---
@@ -362,7 +362,7 @@ Notifications are configured in a separate file, `notifications.json`. This file
 ### Channels — Email
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable email notifications. |
 | `from_address` | `""` | The sender email address. |
 | `to_addresses` | `[]` | List of recipient email addresses. |
@@ -377,7 +377,7 @@ Notifications are configured in a separate file, `notifications.json`. This file
 ### Channels — Telegram
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable Telegram notifications. |
 | `bot_token` | `""` | Your Telegram bot token from @BotFather. |
 | `chat_id` | `""` | The Telegram chat, group, or channel ID to send messages to. |
@@ -389,7 +389,7 @@ Notifications are configured in a separate file, `notifications.json`. This file
 The bot can also accept commands from Telegram users, allowing you to query pool status interactively.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `bot.enabled` | `false` | Enable command listening on the Telegram bot. |
 | `bot.poll_timeout_seconds` | `30` | Long-poll timeout when checking for new commands. |
 | `bot.rate_limit.commands_per_minute` | `10` | Max commands accepted per minute per user. |
@@ -402,7 +402,7 @@ The bot can also accept commands from Telegram users, allowing you to query pool
 Webhooks are defined as a named map, so you can configure multiple. Each webhook supports the following fields:
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `enabled` | `false` | Enable this webhook. |
 | `type` | `""` | Webhook type: `"discord"` for Discord-formatted payloads, `"generic"` for a plain JSON POST. |
 | `url` | `""` | The full webhook URL endpoint. |
@@ -420,7 +420,7 @@ Webhooks are defined as a named map, so you can configure multiple. Each webhook
 Prevents notification floods for high-frequency events (e.g., many miners connecting and disconnecting rapidly).
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miner_events.enabled` | `true` | Enable rate limiting for miner connection/disconnection events. |
 | `miner_events.batch_window_seconds` | `60` | Time window in seconds over which events are batched and counted. |
 | `miner_events.max_per_batch` | `10` | Maximum number of miner event notifications sent per batch window. |
@@ -432,7 +432,7 @@ Prevents notification floods for high-frequency events (e.g., many miners connec
 Controls which pool events trigger notifications and which channels receive them. Channel names must match keys defined in the `channels` section.
 
 | Event | Description |
-|---|---|
+|-----|-----------|
 | `blocks` | A block was found by the pool. |
 | `payouts` | A payment was sent to a miner. |
 | `nodes` | A node connection status change (connected, disconnected, error). |

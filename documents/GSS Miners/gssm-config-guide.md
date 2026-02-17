@@ -52,7 +52,7 @@ GSS Miners (GSSM) is a dashboard for monitoring mining devices, GoSlimStratum po
 General application settings.
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `webServerPort` | `3000` | Port the GSSM web dashboard is served on. Can also be set via the `PORT` environment variable. |
 | `title` | `"GSS Miners"` | Title shown in the browser tab and dashboard header. |
 | `cookieMaxAge` | `3600` | Session cookie lifetime in seconds. After this time, users are logged out. Default is 1 hour (3600). |
@@ -83,7 +83,7 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
 ```
 
 | Field | Required | Description |
-|---|---|---|
+|-----|--------|-----------|
 | `id` | Auto-generated | Unique 8-character identifier, base62. Generated automatically — do not edit manually. |
 | `name` | Yes | Display name for this miner in the dashboard. |
 | `address` | Yes | IP address or hostname of the miner. Include `http://` prefix for HTTP devices. |
@@ -95,7 +95,7 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
 ### Device Types
 
 | `deviceType` | Description | Protocol |
-|---|---|---|
+|------------|-----------|--------|
 | `axeos` | AxeOS-based miners (Bitaxe, NerdQAxe) | HTTP |
 | `cgminer` | CGMiner API-compatible miners (Antminer S-series, etc.) | TCP |
 | `canaan` | Canaan-based miners (AvalonQ, Nano3S) | TCP |
@@ -103,7 +103,7 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
 ### Models
 
 | `model` | Used With | Description |
-|---|---|---|
+|-------|---------|-----------|
 | `bitaxe` | `axeos` | Bitaxe single-chip miners |
 | `nerdqaxe` | `axeos` | NerdQAxe miners |
 | `avalonq` | `canaan` | Canaan AvalonQ series |
@@ -132,7 +132,7 @@ The `goslimstratumPools` array defines GoSlimStratum pool instances to monitor. 
 ```
 
 | Field | Required | Description |
-|---|---|---|
+|-----|--------|-----------|
 | `id` | Auto-generated | Unique 8-character identifier, base62. Generated automatically. |
 | `name` | Yes | Display name for this pool in the dashboard. |
 | `host` | Yes | IP address or hostname of the GoSlimStratum server. |
@@ -162,7 +162,7 @@ The `cryptoNodes` array defines blockchain nodes GSSM connects to for network st
 ```
 
 | Field | Required | Description |
-|---|---|---|
+|-----|--------|-----------|
 | `id` | Auto-generated | Unique 8-character identifier, base62. Generated automatically. |
 | `nodeName` | Yes | Display name for this node in the dashboard. |
 | `nodeType` | Yes | Blockchain ticker symbol: `"DGB"`, `"BTC"`, `"BCH"`, `"XEC"`, etc. |
@@ -177,7 +177,7 @@ The `cryptoNodes` array defines blockchain nodes GSSM connects to for network st
 ### Supported Node Algorithms
 
 | `nodeAlgo` | Coins |
-|---|---|
+|----------|-----|
 | `sha256d` | BTC, DGB (SHA256d algo), BCH, XEC, other SHA256d Nodes |
 
 
@@ -202,7 +202,7 @@ Controls how GSSM writes log output.
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `level` | `"info"` | Log verbosity. See levels below. |
 | `logToFile` | `false` | Set to `true` to write logs to a file in addition to console output. |
 | `logFilePath` | `"/app/logs/gssm.log"` | Path to the log file. Required if `logToFile` is `true`. |
@@ -214,7 +214,7 @@ Controls how GSSM writes log output.
 ### Log Levels
 
 | Level | What Gets Logged |
-|---|---|
+|-----|----------------|
 | `debug` | Everything — API calls, polling details, full request/response data |
 | `info` | Normal operational events — startup, connections, polling results |
 | `warn` | Recoverable issues — failed polls, retries |
@@ -252,7 +252,7 @@ Each threshold entry uses the same `warning` / `critical` structure:
 ### AxeOS (`axeos`) — Bitaxe, NerdQAxe
 
 | Metric | `warning` | `critical` | Description |
-|---|:---:|:---:|---|
+|------|:-------:|:--------:|-----------|
 | `temperature` | `65` | `80` | Chip temperature in °C |
 | `performance` | `95` | `80` | Hashrate as % of expected. Below warning = degraded; below critical = critical |
 | `chipError` | `2` | `5` | Chip error rate as a percentage |
@@ -263,7 +263,7 @@ Each threshold entry uses the same `warning` / `critical` structure:
 ### CGMiner (`cgminer`) — Antminer S-series and other CGMiner-compatible ASICs
 
 | Metric | `warning` | `critical` | Description |
-|---|:---:|:---:|---|
+|------|:-------:|:--------:|-----------|
 | `temperature` | `70` | `85` | Board/chip temperature in °C |
 | `performance` | `95` | `80` | Hashrate as % of expected |
 | `hwErrorRate` | `0.01` | `1` | Hardware error rate as a percentage |
@@ -272,7 +272,7 @@ Each threshold entry uses the same `warning` / `critical` structure:
 ### AvalonQ (`avalonq`) — Canaan AvalonQ series
 
 | Metric | `warning` | `critical` | Description |
-|---|:---:|:---:|---|
+|------|:-------:|:--------:|-----------|
 | `temperature` | `70` | `85` | Temperature in °C |
 | `performance` | `95` | `80` | Hashrate as % of expected |
 | `rejectRate` | `0.01` | `1` | Share reject rate as a percentage |
@@ -280,7 +280,7 @@ Each threshold entry uses the same `warning` / `critical` structure:
 ### Nano3S (`nano3s`) — Canaan Nano 3S
 
 | Metric | `warning` | `critical` | Description |
-|---|:---:|:---:|---|
+|------|:-------:|:--------:|-----------|
 | `temperature` | `110` | `100` | Temperature in °C — Note: Nano3S runs hot by design; thresholds are higher |
 | `performance` | `95` | `80` | Hashrate as % of expected |
 | `rejectRate` | `0.01` | `1` | Share reject rate as a percentage |
@@ -289,7 +289,7 @@ Each threshold entry uses the same `warning` / `critical` structure:
 ### Canaan (`canaan`) — Legacy Canaan fallback
 
 | Metric | `warning` | `critical` | Description |
-|---|:---:|:---:|---|
+|------|:-------:|:--------:|-----------|
 | `temperature` | `70` | `85` | Temperature in °C |
 | `performance` | `95` | `80` | Hashrate as % of expected |
 | `rejectRate` | `0.01` | `1` | Share reject rate as a percentage |
@@ -311,7 +311,7 @@ Controls how often the GSSM dashboard polls each category for updated data (in s
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `miners` | `120` | How often (in seconds) the dashboard polls all miners for updated stats. |
 | `pools` | `120` | How often the dashboard polls GoSlimStratum pools for updated stats. |
 | `nodes` | `120` | How often the dashboard polls blockchain nodes for updated stats. |

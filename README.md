@@ -11,15 +11,15 @@ MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infra
 **Supported cryptocurrencies:** DigiByte (DGB), Bitcoin Cash (BCH), Bitcoin (BTC/Knots)
 
 **Deployed containers:**
-| Container | Purpose |
-|---|---|
-| Coin Node | Full or pruned blockchain node (DGB, BCH, or BTC) |
-| GoSlimStratum | Mining stratum server and pool |
-| PostgreSQL 18 | Database for share tracking and metrics |
-| MIM | Infrastructure management dashboard |
-| AxeOS Dashboard | Miner monitoring dashboard |
-| Dozzle | Docker log viewer |
-| Watchtower | Automatic container updates |
+| Container        | Purpose                                             |
+|------------------|-----------------------------------------------------|
+| Coin Node        | Full or pruned blockchain node (DGB, BCH, or BTC)  |
+| GoSlimStratum    | Mining stratum server and pool                      |
+| PostgreSQL 18    | Database for share tracking and metrics             |
+| MIM              | Infrastructure management dashboard                 |
+| AxeOS Dashboard  | Miner monitoring dashboard                          |
+| Dozzle           | Docker log viewer                                   |
+| Watchtower       | Automatic container updates                         |
 
 ---
 
@@ -84,10 +84,10 @@ gssa/
 
 GoSlimStratum is the stratum mining server at the core of MMFP. It manages miner connections, share validation, difficulty adjustment, and block reward payouts.
 
-| Document | Description |
-|---|---|
-| [Global Config Guide](documents/GoSlimStratum/gss-global-config-guide.md) | Logging, metrics/database, web UI, and notifications configuration |
-| [Coin Config Guide](documents/GoSlimStratum/gss-coin-config-guide.md) | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
+| Document                                                                    | Description                                                             |
+|-----------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| [Global Config Guide](documents/GoSlimStratum/gss-global-config-guide.md)  | Logging, metrics/database, web UI, and notifications configuration      |
+| [Coin Config Guide](documents/GoSlimStratum/gss-coin-config-guide.md)      | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
 
 Example configs: [documents/examples/GoSlimStratum/](documents/examples/GoSlimStratum/)
 
@@ -97,10 +97,10 @@ Example configs: [documents/examples/GoSlimStratum/](documents/examples/GoSlimSt
 
 GSS Miners is a monitoring dashboard for mining devices (Bitaxe, Antminer, AvalonQ, Nano3S), GoSlimStratum pools, and blockchain nodes — all in one place.
 
-| Document | Description |
-|---|---|
-| [Config Guide](documents/GSS%20Miners/gssm-config-guide.md) | Device setup, pool/node integration, thresholds, refresh intervals |
-| [Notifications Guide](documents/GSS%20Miners/gssm-notifications-guide.md) | Email, Telegram, webhook alerting for device/pool/node events |
+| Document                                                                      | Description                                                        |
+|-------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [Config Guide](documents/GSS%20Miners/gssm-config-guide.md)                  | Device setup, pool/node integration, thresholds, refresh intervals |
+| [Notifications Guide](documents/GSS%20Miners/gssm-notifications-guide.md)    | Email, Telegram, webhook alerting for device/pool/node events      |
 
 Example configs: [documents/examples/GSS Miners/](documents/examples/GSS%20Miners/)
 
@@ -110,9 +110,9 @@ Example configs: [documents/examples/GSS Miners/](documents/examples/GSS%20Miner
 
 MIM is a Docker management dashboard that lets you start, stop, update, and monitor containers across one or more servers — all from a single web interface.
 
-| Document | Description |
-|---|---|
-| [Config Guide](documents/MIM/mim-config-guide.md) | Server definitions (SSH/Docker), timeouts, logging |
+| Document                                                  | Description                                        |
+|-----------------------------------------------------------|----------------------------------------------------|
+| [Config Guide](documents/MIM/mim-config-guide.md)        | Server definitions (SSH/Docker), timeouts, logging |
 
 Example configs: [documents/examples/MIM/](documents/examples/MIM/)
 
@@ -122,9 +122,9 @@ Example configs: [documents/examples/MIM/](documents/examples/MIM/)
 
 AxeOS Dashboard is a monitoring dashboard focused on AxeOS-based miners (Bitaxe, NerdQAxe), with optional integration for CGMiner devices, GoSlimStratum pools, and blockchain nodes.
 
-| Document | Description |
-|---|---|
-| [Config Guide](documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md) | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
+| Document                                                                                    | Description                                                                                |
+|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [Config Guide](documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md)                | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
 
 Example configs: [documents/examples/AxeOS Dashboard/](documents/examples/AxeOS%20Dashboard/)
 
@@ -132,9 +132,9 @@ Example configs: [documents/examples/AxeOS Dashboard/](documents/examples/AxeOS%
 
 ### Additional Guides
 
-| Document | Description |
-|---|---|
-| [Tailscale Install Guide](documents/tailscale-install.md) | Setting up Tailscale VPN for secure remote access to your mining infrastructure |
+| Document                                                    | Description                                                                     |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [Tailscale Install Guide](documents/tailscale-install.md)  | Setting up Tailscale VPN for secure remote access to your mining infrastructure |
 
 ---
 

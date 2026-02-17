@@ -66,7 +66,7 @@ The `servers` array defines every machine MIM connects to. MIM manages Docker co
 ### Server Fields
 
 | Field | Required | Default | Description |
-|---|---|---|---|
+|-----|--------|-------|-----------|
 | `id` | Auto-generated | — | Unique 8-character identifier, base62. Auto-generated on first load — do not edit manually. Used by the API and internally to reference this server. |
 | `name` | Yes | — | Display name shown in the MIM dashboard. |
 | `description` | No | — | Optional free-text description of the server (e.g., its role or location). |
@@ -93,7 +93,7 @@ MIM supports two authentication methods per server. Use whichever is appropriate
 `mim_host` identifies which server runs the MIM application itself. This is important because MIM's self-update behavior depends on knowing its own host.
 
 | Value | Meaning |
-|---|---|
+|-----|-------|
 | `true` (or omitted) | This server runs the MIM application. |
 | `false` | This is a managed remote server — MIM does not run here. |
 
@@ -126,14 +126,14 @@ Global application settings that apply across all servers.
 ### Timeouts
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `ssh_timeout` | `30` | Seconds to wait for an SSH connection or command to complete before timing out. Applies to all SSH operations across all servers. Increase if you have high-latency connections to remote servers. |
 | `docker_timeout` | `30` | Seconds to wait for a Docker operation (container start/stop, image pull, etc.) to complete. Increase for slow networks or large image operations. |
 
 ### Refresh Interval
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `refresh_interval` | `60` | How often (in seconds) the MIM dashboard polls servers for updated container and service status. Lower values give more real-time data but increase SSH and network load. |
 
 ---
@@ -155,7 +155,7 @@ Controls how MIM writes log output. Nested under `settings.logging`.
 ```
 
 | Field | Default | Description |
-|---|---|---|
+|-----|-------|-----------|
 | `level` | `"INFO"` | Log verbosity. See levels below. |
 | `log_to_file` | `false` | Set to `true` to write logs to a file in addition to console output. |
 | `log_file_path` | `"/app/logs/mim.log"` | Path to the log file. Required when `log_to_file` is `true`. |
@@ -167,7 +167,7 @@ Controls how MIM writes log output. Nested under `settings.logging`.
 ### Log Levels
 
 | Level | What Gets Logged |
-|---|---|
+|-----|----------------|
 | `DEBUG` | Everything — SSH commands, Docker operations, request details |
 | `INFO` | Normal operation — connections, container state changes, API calls |
 | `WARN` or `WARNING` | Recoverable issues — connection retries, timeouts |
