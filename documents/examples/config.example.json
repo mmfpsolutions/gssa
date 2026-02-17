@@ -1,0 +1,228 @@
+{
+  "global": {
+    "pool_name": "GoSlimStratum Pool",
+    "connection_timeout_seconds": 600
+  },
+  "coins": {
+    "DGB": {
+      "enabled": true,
+      "coin_type": "digibyte",
+      "display_name": "DigiByte Mainnet",
+      "node": {
+        "host": "127.0.0.1",
+        "port": 9001,
+        "username": "your_rpc_username",
+        "password": "your_rpc_password",
+        "use_ssl": false,
+        "wallet_name": "default",
+        "zmq_block_notify": "tcp://127.0.0.1:28332",
+        "template_refresh_interval": 15,
+        "zmq_enabled": true,
+        "zmq_stale_detection_time": 120,
+        "dual_node_comm": false
+      },
+      "stratum": {
+        "host": "0.0.0.0",
+        "port": 3333,
+        "difficulty": 4096,
+        "accept_miner_suggested_diff": true,
+        "connection_timeout_seconds": 600,
+        "ping_enabled": true
+      },
+      "mining": {
+        "address": "your_legacy_node_wallet_address",
+        "network": "mainnet",
+        "coinbase_text": "GoSlimStratum",
+        "extranonce_size": 8,
+        "max_job_history": 20,
+        "job_expiration_time": 300,
+        "stale_share_grace_period": 5
+      },
+      "vardiff": {
+        "enabled": true,
+        "minDiff": 512,
+        "maxDiff": 32768,
+        "targetTime": 15,
+        "retargetTime": 180,
+        "variancePercent": 30,
+        "useFloatDiff": false
+      },
+      "payout": {
+        "enabled": true,
+        "pool_fee_percent": 1.0,
+        "maturity_confirmations": 100,
+        "payment_interval_seconds": 600,
+        "minimum_confirmations": 6,
+        "maturity_check_interval_seconds": 60,
+        "confirmation_check_interval_seconds": 300,
+        "wallet_rpc_timeout_seconds": 30
+      }
+    },
+    "BTC": {
+      "enabled": true,
+      "coin_type": "bitcoin",
+      "display_name": "Bitcoin",
+      "node": {
+        "host": "localhost",
+        "port": 9003,
+        "username": "btcrpc",
+        "password": "your_btc_rpc_password",
+        "use_ssl": false,
+        "wallet_name": "pool_wallet",
+        "zmq_block_notify": "tcp://127.0.0.1:28333",
+        "template_refresh_interval": 30,
+        "zmq_enabled": true,
+        "zmq_stale_detection_time": 900,
+        "dual_node_comm": true
+      },
+      "stratum": {
+        "host": "0.0.0.0",
+        "port": 3335,
+        "difficulty": 65536,
+        "accept_miner_suggested_diff": false,
+        "connection_timeout_seconds": 600,
+        "ping_enabled": true
+      },
+      "mining": {
+        "address": "bc1qYourBitcoinAddressHere",
+        "network": "mainnet",
+        "coinbase_text": "GoSlimStratum/BTC",
+        "extranonce_size": 8,
+        "max_job_history": 20,
+        "job_expiration_time": 300,
+        "stale_share_grace_period": 5
+      },
+      "vardiff": {
+        "enabled": true,
+        "minDiff": 65536,
+        "maxDiff": 4194304,
+        "targetTime": 20,
+        "retargetTime": 600,
+        "variancePercent": 30,
+        "useFloatDiff": false
+      },
+      "payout": {
+        "enabled": true,
+        "pool_fee_percent": 1.0,
+        "maturity_confirmations": 100,
+        "payment_interval_seconds": 3600,
+        "minimum_confirmations": 6,
+        "maturity_check_interval_seconds": 60,
+        "confirmation_check_interval_seconds": 300,
+        "wallet_rpc_timeout_seconds": 30
+      }
+    },
+    "BCH": {
+      "enabled": true,
+      "coin_type": "bitcoincash",
+      "display_name": "Bitcoin Cash",
+      "node": {
+        "host": "localhost",
+        "port": 9002,
+        "username": "bchrpc",
+        "password": "your_bch_rpc_password",
+        "use_ssl": false,
+        "wallet_name": "pool_wallet",
+        "zmq_block_notify": "tcp://127.0.0.1:28334",
+        "template_refresh_interval": 30,
+        "zmq_enabled": true,
+        "zmq_stale_detection_time": 900,
+        "dual_node_comm": true
+      },
+      "stratum": {
+        "host": "0.0.0.0",
+        "port": 3334,
+        "difficulty": 32768,
+        "accept_miner_suggested_diff": false,
+        "connection_timeout_seconds": 600,
+        "ping_enabled": true
+      },
+      "mining": {
+        "address": "bitcoincash:qYourBitcoinCashAddressHere",
+        "network": "mainnet",
+        "coinbase_text": "GoSlimStratum/BCH",
+        "extranonce_size": 8,
+        "max_job_history": 20,
+        "job_expiration_time": 300,
+        "stale_share_grace_period": 5
+      },
+      "vardiff": {
+        "enabled": true,
+        "minDiff": 32768,
+        "maxDiff": 2097152,
+        "targetTime": 20,
+        "retargetTime": 600,
+        "variancePercent": 30,
+        "useFloatDiff": false
+      },
+      "payout": {
+        "enabled": true,
+        "pool_fee_percent": 1.0,
+        "maturity_confirmations": 10,
+        "payment_interval_seconds": 1800,
+        "minimum_confirmations": 6,
+        "maturity_check_interval_seconds": 60,
+        "confirmation_check_interval_seconds": 300,
+        "wallet_rpc_timeout_seconds": 30
+      }
+    }
+  },
+  "logging": {
+    "level": "info",
+    "share_log_level": "info",
+    "log_to_file": true,
+    "log_file_path": "/app/logs/goslimstratum.log",
+    "max_size_mb": 20,
+    "max_age_days": 30,
+    "max_backups": 10,
+    "compress": false
+  },
+  "metrics": {
+    "enabled": true,
+    "database_host": "127.0.0.1",
+    "database_port": 5432,
+    "database_name": "goslimstratum",
+    "database_user": "db_username",
+    "database_password": "db_password",
+    "database_ssl_mode": "disable",
+    "database_max_connections": 20,
+    "database_connection_timeout": 30,
+    "batch_size": 100,
+    "flush_interval_seconds": 10,
+    "share_retention_hours": 48,
+    "snapshot_interval_seconds": 60,
+    "network_poll_interval_seconds": 60,
+    "cleanup_interval_hours": 24,
+    "hashrate_windows": [60, 300, 900],
+    "log_interval_seconds": 30,
+    "enable_http_api": true,
+    "http_api_port": 4004
+  },
+  "web": {
+    "enabled": true,
+    "host": "0.0.0.0",
+    "port": 3003,
+    "api_base_url": "http://your.ip.address:4004/api/v1",
+    "block_explorer_urls": {
+      "DGB": "https://chainz.cryptoid.info/dgb/block.dws?{hash}",
+      "BTC": "https://chainz.cryptoid.info/btc/block.dws?{hash}",
+      "BCH": "https://blockchair.com/bitcoin-cash/block/{hash}"
+    },
+    "tx_explorer_urls": {
+      "DGB": "https://chainz.cryptoid.info/dgb/tx.dws?{txid}",
+      "BTC": "https://chainz.cryptoid.info/btc/tx.dws?{txid}",
+      "BCH": "https://blockchair.com/bitcoin-cash/transaction/{txid}"
+    },
+    "address_explorer_urls": {
+      "DGB": "https://chainz.cryptoid.info/dgb/address.dws?{address}",
+      "BTC": "https://chainz.cryptoid.info/btc/address.dws?{address}",
+      "BCH": "https://blockchair.com/bitcoin-cash/address/{address}"
+    },
+    "refresh_intervals": {
+      "pool_stats": 5,
+      "miners": 10,
+      "blocks": 30,
+      "network": 30
+    }
+  }
+}
