@@ -66,6 +66,10 @@ gssa/
 │   ├── MIM/
 │   ├── AxeOS Dashboard/
 │   ├── examples/             # Example configuration files for each product
+│   │   ├── GoSlimStratum/    # gss-config.example.json, coins.example.json
+│   │   ├── GSS Miners/       # config.example.json, notifications.example.json
+│   │   ├── MIM/              # servers.example.json
+│   │   └── AxeOS Dashboard/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
 │   └── diagrams/
 ├── design-documents/         # Internal technical specifications
 ├── cli-installer.md          # CLI installer reference
