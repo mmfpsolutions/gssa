@@ -1,139 +1,157 @@
-# GSSA - GoSlimStratum Assets
+# GSSA — GoSlimStratum Assets
 
-Online repository for publishing install scripts for MMFP Products.
+Public repository for MMFP Solutions deployment scripts, configuration templates, and product documentation. Assets are served via GitHub Pages at [get.mmfpsolutions.io](https://get.mmfpsolutions.io).
 
-## Installers
+---
 
-### CLI Installer (`install-cli.sh`) - RECOMMENDED - FASTEST
+## What Is MMFP?
 
-Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no web UI required. Supports **DigiByte (DGB)**, **Bitcoin Cash (BCH)**, and **Bitcoin (BTC)**.
+MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infrastructure stack. A single installer deploys 7 Docker containers that together provide a fully operational mining pool with monitoring, management, and automatic updates.
+
+**Supported cryptocurrencies:** DigiByte (DGB), Bitcoin Cash (BCH), Bitcoin (BTC/Knots)
+
+**Deployed containers:**
+| Container | Purpose |
+|---|---|
+| Coin Node | Full or pruned blockchain node (DGB, BCH, or BTC) |
+| GoSlimStratum | Mining stratum server and pool |
+| PostgreSQL 18 | Database for share tracking and metrics |
+| MIM | Infrastructure management dashboard |
+| AxeOS Dashboard | Miner monitoring dashboard |
+| Dozzle | Docker log viewer |
+| Watchtower | Automatic container updates |
+
+---
+
+## Quick Start
+
+### CLI Installer (Recommended)
+
+Full deployment via terminal prompts — fastest method, supports all coins.
 
 ```bash
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 ```
 
-**What it deploys (7 containers):**
-- Coin node (DigiByte, Bitcoin Cash, or Bitcoin Knots — user selects during install)
-- GoSlimStratum mining stratum server
-- PostgreSQL 18 database
-- MIM management dashboard
-- AxeOS monitoring dashboard
-- Dozzle log viewer
-- Watchtower auto-updater
+### Uninstaller
 
-**What it does:**
-1. Preflight checks (root, Ubuntu 24.04+, ARM64/AMD64, memory, openssl)
-2. Creates `/data` directory
-3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Coin selection (DGB/BCH/BTC) + collects configuration (passwords, RPC credentials, pruning, server IP)
-5. Downloads config templates from GitHub (base + coin-specific)
-6. Creates MIM system user with sudo/docker access
-7. Generates all config files from templates
-8. Starts coin node, creates wallet, saves address
-9. Starts PostgreSQL, creates GoSlimStratum database and role
-10. Brings up the full 7-container stack
-
-### Uninstaller (`uninstall.sh`)
-
-Removes MMFP components with tiered prompts — choose what to keep and what to remove.
+Tiered removal — choose what to keep and what to remove.
 
 ```bash
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 ```
 
-**Prompts to remove (in order):**
-1. Stop and remove all MMFP containers (+ optionally remove Docker images)
-2. Delete `/data` directory (wallet warning, defaults to No)
-3. Remove `mim` system user (defaults to No)
-4. Remove Docker Engine entirely (defaults to No)
+**System Requirements:** Ubuntu Server 24.04+, ARM64 or AMD64, root access, 16 GB RAM minimum, internet connection.
 
-## Requirements
+For full installer details, see [cli-installer.md](cli-installer.md).
 
-- Ubuntu Server 24.04 or later
-- Root access
-- Internet connection
-- ARM64 or AMD64 architecture
-- 16 GB RAM minimum (configurable via `MIN_MEMORY_GB`)
+---
 
-## Manual testing
-
-```bash
-# CLI installer
-sudo bash scripts/install-cli.sh
-
-# Uninstaller
-sudo bash scripts/uninstall.sh
-
-# Web installer (optional)
-sudo bash scripts/install-web.sh
-```
-
-## Project Structure
+## Repository Structure
 
 ```
 gssa/
-├── README.md
-├── scripts/
-│   ├── install-cli.sh          # Full CLI installer (multi-coin)
-│   ├── uninstall.sh            # Tiered uninstaller
-│   └── install-web.sh          # Web installer (MIM Bootstrap, optional)
-├── templates/                   # Config templates (served via GitHub Pages)
-│   ├── docker-compose.yml       # Base services (GSS, Postgres, MIM, AxeOS, etc.)
+├── scripts/                  # Deployment and removal scripts
+├── templates/                # Configuration templates (served via GitHub Pages)
+│   ├── docker-compose.yml
 │   ├── env.template
-│   ├── goslimstratum/
-│   │   └── config.json.template
 │   ├── axeos-dashboard/
-│   │   ├── config.json.template
-│   │   ├── rpcConfig.json.template
-│   │   ├── access.json
-│   │   └── jsonWebTokenKey.json
+│   ├── goslimstratum/
 │   ├── mim-config/
-│   │   └── servers.json.template
 │   ├── postgres/
-│   │   └── user-db-setup.sql.template
-│   └── coins/                   # Per-coin templates
-│       ├── dgb/                 # DigiByte
-│       │   ├── docker-compose.yml
-│       │   ├── node.conf.template
-│       │   └── gss-coin.json.template
-│       ├── bch/                 # Bitcoin Cash
-│       │   ├── docker-compose.yml
-│       │   ├── node.conf.template
-│       │   └── gss-coin.json.template
-│       └── btc/                 # Bitcoin (Knots)
-│           ├── docker-compose.yml
-│           ├── node.conf.template
-│           └── gss-coin.json.template
-└── design-documents/
-    └── install-cli-design.md
+│   └── coins/                # Per-coin templates (dgb/, bch/, btc/)
+├── documents/                # Product documentation and configuration guides
+│   ├── GoSlimStratum/
+│   ├── GSS Miners/
+│   ├── MIM/
+│   ├── AxeOS Dashboard/
+│   ├── examples/             # Example configuration files for each product
+│   └── diagrams/
+├── design-documents/         # Internal technical specifications
+├── cli-installer.md          # CLI installer reference
+└── README.md                 # This file
 ```
 
-## Deployment
+---
 
-This is a public GitHub repo. Scripts and templates are served via GitHub Pages at `get.mmfpsolutions.io`.
+## Documentation
 
-```bash
-# CLI installer
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
+### GoSlimStratum (GSS)
 
-# Uninstaller
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
+GoSlimStratum is the stratum mining server at the core of MMFP. It manages miner connections, share validation, difficulty adjustment, and block reward payouts.
 
-# Web installer (optional)
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
+| Document | Description |
+|---|---|
+| [Global Config Guide](documents/GoSlimStratum/gss-global-config-guide.md) | Logging, metrics/database, web UI, and notifications configuration |
+| [Coin Config Guide](documents/GoSlimStratum/gss-coin-config-guide.md) | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
 
-### Web Installer — Optional (`install-web.sh`) - SLOWEST - ONLY SUPPORTS DGB
+Example configs: [documents/examples/GoSlimStratum/](documents/examples/GoSlimStratum/)
 
-Alternative installer that launches the MIM Bootstrap web UI for guided setup. Use this if you prefer a browser-based workflow.
+---
 
-```bash
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
+### GSS Miners (GSSM)
 
-**What it does:**
-1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
-2. Creates `/data` directory
-3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Pulls and starts MIM Bootstrap container on port 3002
-5. Prints the web installer URL
+GSS Miners is a monitoring dashboard for mining devices (Bitaxe, Antminer, AvalonQ, Nano3S), GoSlimStratum pools, and blockchain nodes — all in one place.
+
+| Document | Description |
+|---|---|
+| [Config Guide](documents/GSS%20Miners/gssm-config-guide.md) | Device setup, pool/node integration, thresholds, refresh intervals |
+| [Notifications Guide](documents/GSS%20Miners/gssm-notifications-guide.md) | Email, Telegram, webhook alerting for device/pool/node events |
+
+Example configs: [documents/examples/GSS Miners/](documents/examples/GSS%20Miners/)
+
+---
+
+### MIM (Mining Infrastructure Manager)
+
+MIM is a Docker management dashboard that lets you start, stop, update, and monitor containers across one or more servers — all from a single web interface.
+
+| Document | Description |
+|---|---|
+| [Config Guide](documents/MIM/mim-config-guide.md) | Server definitions (SSH/Docker), timeouts, logging |
+
+Example configs: [documents/examples/MIM/](documents/examples/MIM/)
+
+---
+
+### AxeOS Dashboard
+
+AxeOS Dashboard is a monitoring dashboard focused on AxeOS-based miners (Bitaxe, NerdQAxe), with optional integration for CGMiner devices, GoSlimStratum pools, and blockchain nodes.
+
+| Document | Description |
+|---|---|
+| [Config Guide](documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md) | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
+
+Example configs: [documents/examples/AxeOS Dashboard/](documents/examples/AxeOS%20Dashboard/)
+
+---
+
+### Additional Guides
+
+| Document | Description |
+|---|---|
+| [Tailscale Install Guide](documents/tailscale-install.md) | Setting up Tailscale VPN for secure remote access to your mining infrastructure |
+
+---
+
+## Architecture
+
+Architecture diagrams for GoSlimStratum are available in [documents/diagrams/GoSlimStratum-Architecture/](documents/diagrams/GoSlimStratum-Architecture/):
+
+- `highlevel-architecture.png` — Overall system overview
+- `payout-system-design.png` — Payout system architecture
+- `payout-system-details.png` — Detailed payout flow
+
+---
+
+## Templates
+
+Configuration templates in `templates/` are served via GitHub Pages and consumed by the installer scripts. They contain placeholder variables (e.g., `{{RPC_USER}}`) that are substituted during installation.
+
+Templates are versioned — archived releases preserve backward compatibility with older installer versions.
+
+---
+
+## License
+
+© 2026 MMFP Solutions, LLC. Proprietary license. Free to use.
