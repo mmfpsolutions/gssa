@@ -566,7 +566,7 @@ generate_configs() {
   sed -e "s|{COIN_NODE_ID}|${COIN_NODE_ID}|g" \
       -e "s|{COIN_NAME}|${COIN_NAME}|g" \
       -e "s|{COIN_NODE_TYPE}|${COIN_NODE_TYPE}|g" \
-      -e "s|{COIN_TYPE}|${COIN_TYPE}|g" \
+      -e "s|{COIN_ID}|${COIN_ID}|g" \
       -e "s|{COIN_ID_UPPER}|${COIN_ID_UPPER}|g" \
       -e "s|{SERVER_IP}|${SERVER_IP}|g" \
       "${TEMPLATE_DIR}/axeos-dashboard/config.json.template" > "${DATA_DIR}/axeos-dashboard/config/config.json"

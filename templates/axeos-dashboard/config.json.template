@@ -24,7 +24,7 @@
     "goslimstratum_instances": [
         {
             "api_port": "4004",
-            "coin_type": "{COIN_TYPE}",
+            "coin_type": "{COIN_ID}",
             "host": "{SERVER_IP}",
             "name": "GSS-{COIN_ID_UPPER}",
             "webui_port": "3003"
