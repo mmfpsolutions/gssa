@@ -4,7 +4,7 @@ Online repository for publishing install scripts for MMFP Products.
 
 ## Installers
 
-### CLI Installer (`install-cli.sh`)
+### CLI Installer (`install-cli.sh`) - RECOMMENDED - FASTEST
 
 Full deployment of the MMFP mining infrastructure entirely via terminal prompts — no web UI required. Supports **DigiByte (DGB)**, **Bitcoin Cash (BCH)**, and **Bitcoin (BTC)**.
 
@@ -46,21 +46,6 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 2. Delete `/data` directory (wallet warning, defaults to No)
 3. Remove `mim` system user (defaults to No)
 4. Remove Docker Engine entirely (defaults to No)
-
-### Web Installer — Optional (`install-web.sh`)
-
-Alternative installer that launches the MIM Bootstrap web UI for guided setup. Use this if you prefer a browser-based workflow.
-
-```bash
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
-
-**What it does:**
-1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
-2. Creates `/data` directory
-3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Pulls and starts MIM Bootstrap container on port 3002
-5. Prints the web installer URL
 
 ## Requirements
 
@@ -137,3 +122,18 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 # Web installer (optional)
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
 ```
+
+### Web Installer — Optional (`install-web.sh`) - SLOWEST - ONLY SUPPORTS DGB
+
+Alternative installer that launches the MIM Bootstrap web UI for guided setup. Use this if you prefer a browser-based workflow.
+
+```bash
+sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
+```
+
+**What it does:**
+1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
+2. Creates `/data` directory
+3. Checks for Docker Engine — installs official Docker if needed (interactive)
+4. Pulls and starts MIM Bootstrap container on port 3002
+5. Prints the web installer URL
