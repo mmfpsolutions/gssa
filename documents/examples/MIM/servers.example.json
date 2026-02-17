@@ -1,0 +1,30 @@
+{
+  "servers": [
+    {
+      "description": "MIM Server",
+      "docker_host": "ssh://mim@192.168.1.100",
+      "enabled": true,
+      "id": "qCwwociO",
+      "mim_host": true,
+      "name": "MIM Server",
+      "ssh_host": "192.168.1.100",
+      "ssh_password": "password",
+      "ssh_port": 22,
+      "ssh_user": "mim"
+    }
+  ],
+  "settings": {
+    "docker_timeout": 30,
+    "logging": {
+      "compress": false,
+      "level": "INFO",
+      "log_file_path": "/app/logs/mim.log",
+      "log_to_file": false,
+      "max_age_days": 30,
+      "max_backups": 10,
+      "max_size_mb": 20
+    },
+    "refresh_interval": 60,
+    "ssh_timeout": 30
+  }
+}

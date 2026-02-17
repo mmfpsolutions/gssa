@@ -1,0 +1,49 @@
+{
+    "axeos_dashboard_version": 3,
+    "web_server_port": 3000,
+    "title": "AxeOS Dashboard",
+    "axeos_instances": [
+        {
+            "AxeOS1": "http://192.168.1.100"
+        },
+        {
+            "NerdQAxe1": "http://192.168.1.102"
+        }
+
+    ],
+    "cgminer_instances": [
+        {
+            "CGTest": "192.168.1.101:4028"
+        }
+    ],
+    "mining_core_enabled": false,
+    "mining_core_url": [{}],
+    "goslimstratum_enabled": true,
+    "goslimstratum_instances": [
+        {
+            "name": "DigiByte",
+            "host": "192.168.1.104",
+            "api_port": "4004",
+            "webui_port": "3003",
+            "coin_type":"dgb"
+        }
+
+    ],
+    "cryptNodesEnabled": true,
+    "cryptoNodes": [
+        {
+            "Nodes": [
+                {
+                    "NodeType": "dgb",
+                    "NodeName": "Digibyte",
+                    "NodeId": "dgb1",
+                    "NodeAlgo": "sha256d"
+                }
+            ]
+        }
+    ],
+    "disable_authentication": true,
+    "disable_settings": false,
+    "disable_configurations": false,
+    "cookie_max_age": 3600
+}
