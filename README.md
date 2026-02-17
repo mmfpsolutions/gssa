@@ -44,7 +44,7 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 
 **System Requirements:** Ubuntu Server 24.04+, ARM64 or AMD64, root access, 16 GB RAM minimum, internet connection.
 
-For full installer details, see [cli-installer.md](cli-installer.md).
+For full installer details, see [cli-installer.md](https://github.com/mmfpsolutions/gssa/blob/main/cli-installer.md).
 
 ---
 
@@ -85,12 +85,12 @@ gssa/
 
 GoSlimStratum is the stratum mining server at the core of MMFP. It manages miner connections, share validation, difficulty adjustment, and block reward payouts.
 
-| Document                                                                    | Description                                                             |
-|-----------------------------------------------------------------------------|-------------------------------------------------------------------------|
-| [Global Config Guide](documents/GoSlimStratum/gss-global-config-guide.md)  | Logging, metrics/database, web UI, and notifications configuration      |
-| [Coin Config Guide](documents/GoSlimStratum/gss-coin-config-guide.md)      | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
+| Document                                                                                                                                               | Description                                                              |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
+| [Global Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-global-config-guide.md)                             | Logging, metrics/database, web UI, and notifications configuration       |
+| [Coin Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-coin-config-guide.md)                                 | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
 
-Example configs: [documents/examples/GoSlimStratum/](documents/examples/GoSlimStratum/)
+Example configs: [documents/examples/GoSlimStratum/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GoSlimStratum)
 
 ---
 
@@ -98,12 +98,12 @@ Example configs: [documents/examples/GoSlimStratum/](documents/examples/GoSlimSt
 
 GSS Miners is a monitoring dashboard for mining devices (Bitaxe, Antminer, AvalonQ, Nano3S), GoSlimStratum pools, and blockchain nodes — all in one place.
 
-| Document                                                                      | Description                                                        |
-|-------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| [Config Guide](documents/GSS%20Miners/gssm-config-guide.md)                  | Device setup, pool/node integration, thresholds, refresh intervals |
-| [Notifications Guide](documents/GSS%20Miners/gssm-notifications-guide.md)    | Email, Telegram, webhook alerting for device/pool/node events      |
+| Document                                                                                                                                               | Description                                                        |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-config-guide.md)                                           | Device setup, pool/node integration, thresholds, refresh intervals |
+| [Notifications Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-notifications-guide.md)                             | Email, Telegram, webhook alerting for device/pool/node events      |
 
-Example configs: [documents/examples/GSS Miners/](documents/examples/GSS%20Miners/)
+Example configs: [documents/examples/GSS Miners/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GSS%20Miners)
 
 ---
 
@@ -111,11 +111,11 @@ Example configs: [documents/examples/GSS Miners/](documents/examples/GSS%20Miner
 
 MIM is a Docker management dashboard that lets you start, stop, update, and monitor containers across one or more servers — all from a single web interface.
 
-| Document                                                  | Description                                        |
-|-----------------------------------------------------------|----------------------------------------------------|
-| [Config Guide](documents/MIM/mim-config-guide.md)        | Server definitions (SSH/Docker), timeouts, logging |
+| Document                                                                                                                  | Description                                        |
+|---------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-config-guide.md)                        | Server definitions (SSH/Docker), timeouts, logging |
 
-Example configs: [documents/examples/MIM/](documents/examples/MIM/)
+Example configs: [documents/examples/MIM/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/MIM)
 
 ---
 
@@ -123,25 +123,25 @@ Example configs: [documents/examples/MIM/](documents/examples/MIM/)
 
 AxeOS Dashboard is a monitoring dashboard focused on AxeOS-based miners (Bitaxe, NerdQAxe), with optional integration for CGMiner devices, GoSlimStratum pools, and blockchain nodes.
 
-| Document                                                                                    | Description                                                                                |
-|---------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| [Config Guide](documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md)                | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
+| Document                                                                                                                                                    | Description                                                                                 |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/AxeOS%20Dashboard/axeos-dashboard-config-guide.md)                                | All five config files: main config, authentication, JWT, RPC credentials, and notifications |
 
-Example configs: [documents/examples/AxeOS Dashboard/](documents/examples/AxeOS%20Dashboard/)
+Example configs: [documents/examples/AxeOS Dashboard/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/AxeOS%20Dashboard)
 
 ---
 
 ### Additional Guides
 
-| Document                                                    | Description                                                                     |
-|-------------------------------------------------------------|---------------------------------------------------------------------------------|
-| [Tailscale Install Guide](documents/tailscale-install.md)  | Setting up Tailscale VPN for secure remote access to your mining infrastructure |
+| Document                                                                                                                       | Description                                                                     |
+|--------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| [Tailscale Install Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/tailscale-install.md)                     | Setting up Tailscale VPN for secure remote access to your mining infrastructure |
 
 ---
 
 ## Architecture
 
-Architecture diagrams for GoSlimStratum are available in [documents/diagrams/GoSlimStratum-Architecture/](documents/diagrams/GoSlimStratum-Architecture/):
+Architecture diagrams for GoSlimStratum are available in [documents/diagrams/GoSlimStratum-Architecture/](https://github.com/mmfpsolutions/gssa/tree/main/documents/diagrams/GoSlimStratum-Architecture):
 
 - `highlevel-architecture.png` — Overall system overview
 - `payout-system-design.png` — Payout system architecture
