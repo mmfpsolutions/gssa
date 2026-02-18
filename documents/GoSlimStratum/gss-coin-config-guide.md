@@ -60,7 +60,13 @@ Here is a complete example of a coin configuration object in `config.json`:
         "maxDiff": 32768,
         "targetTime": 15,
         "retargetTime": 180,
-        "variancePercent": 30
+        "variancePercent": 30,
+        "floodProtection": {
+            "enabled": false,
+            "sharesToCheck": 4,
+            "triggerThreshold": 0.25,
+            "maxAdjustmentMultiplier": 16
+        }
     },
     "payout": {
         "enabled": true,
@@ -183,6 +189,26 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 | `retargetTime` | Seconds between difficulty adjustments | 90-180 typical. Lower = faster response |
 | `variancePercent` | Acceptable deviation before adjusting | 30 typical. Higher = less frequent changes |
 
+### Flood Protection (Sub-Section) - AS OF Version 3.0.15
+
+Flood protection addresses a specific problem: when a powerful miner connects at a low starting difficulty, varDiff can only adjust difficulty at job boundaries (when a new block is found). With a 4x max increase per retarget, ramping from a very low difficulty to an appropriate level can take a long time — during which the miner floods the pool with trivial shares.
+
+When enabled, flood protection monitors share submission rate during initial connection ramp-up. If shares arrive significantly faster than `targetTime`, it sends an emergency `mining.set_difficulty` immediately (out-of-band, without waiting for a new block) and re-sends the current job so the miner begins working at the new difficulty right away.
+
+Flood protection automatically deactivates after the miner's first normal varDiff retarget, meaning the miner has settled into a normal share rate. If the miner reconnects, flood protection re-enables.
+
+| Field | Description | Guidelines |
+|-----|-----------|----------|
+| `enabled` | Enable flood protection during initial ramp-up | `false` by default. Enable for pools with wide difficulty ranges or low starting difficulty |
+| `sharesToCheck` | Minimum shares to analyze before triggering | `4` default. Lower values trigger faster but with less data |
+| `triggerThreshold` | Trigger when avg share time < `targetTime * triggerThreshold` | `0.25` default (triggers when shares arrive 4x faster than target). Range: 0.01-1.0 |
+| `maxAdjustmentMultiplier` | Maximum difficulty multiplier per emergency adjustment | `16` default. Emergency diff is capped at `currentDiff * multiplier` and also by `maxDiff` |
+
+> [!TIP]
+> - Flood protection is most useful when `useFloatDiff` is `true` and starting difficulty is very low (e.g., 0.001 for BTC/BCH). In this scenario, ramp-up from 0.001 to an appropriate difficulty happens in seconds instead of hours.
+> - For pools where all miners are similar size and starting difficulty is close to optimal, flood protection can be left disabled.
+> - The `maxAdjustmentMultiplier` of 16 means each emergency adjustment can jump up to 16x. Starting at 0.001: 0.001 → 0.016 → 0.256 → 4.096 → 65.5 → 1048 (5 iterations, seconds).
+
 ### Quick Presets
 
 > **Note:**  Tuning VarDiff takes experiementation, each operator has their own preferences
@@ -263,7 +289,7 @@ All amounts are in satoshis (the smallest unit):
 
 **Problem:** Pool flooded with shares, high CPU/bandwidth usage
 
-**Solution:** Increase starting difficulty or lower vardiff `minDiff`
+**Solution:** Increase starting difficulty or lower vardiff `minDiff`. If you need low starting difficulty for small miners, enable `floodProtection` to handle powerful miners that connect at the low difficulty
 
 ### 5. Maturity Too Low
 

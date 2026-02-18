@@ -45,7 +45,13 @@
         "targetTime": 15,
         "retargetTime": 180,
         "variancePercent": 30,
-        "useFloatDiff": false
+        "useFloatDiff": false,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
       },
       "payout": {
         "enabled": true,
@@ -99,7 +105,13 @@
         "targetTime": 20,
         "retargetTime": 600,
         "variancePercent": 30,
-        "useFloatDiff": false
+        "useFloatDiff": false,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
       },
       "payout": {
         "enabled": true,
@@ -153,7 +165,13 @@
         "targetTime": 20,
         "retargetTime": 600,
         "variancePercent": 30,
-        "useFloatDiff": false
+        "useFloatDiff": false,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
       },
       "payout": {
         "enabled": true,

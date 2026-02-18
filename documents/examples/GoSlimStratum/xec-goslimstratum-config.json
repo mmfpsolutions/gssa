@@ -40,7 +40,13 @@
         "maxDiff": 262144,
         "targetTime": 20,
         "retargetTime": 600,
-        "variancePercent": 30
+        "variancePercent": 30,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
       },
       "payout": {
         "enabled": true,
