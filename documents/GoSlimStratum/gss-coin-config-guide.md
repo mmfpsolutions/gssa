@@ -129,6 +129,10 @@ Settings for miners connecting to your pool.
 | `connection_timeout_seconds` | Disconnect idle miners after this many seconds | 600 (10 min) typical. No change recommended |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
 
+> [!TIP]
+> - use d=xxx or diff=xxx in the password field for miner suggested difficulty if your miner does not have a specific way to send mining.suggest_difficulty
+> - AxOS devices have this as Suggested Difficulty in settings for some devices
+
 ### Starting Difficulty Guidelines
 
 | Miner Type | Hashrate | Recommended Difficulty |
