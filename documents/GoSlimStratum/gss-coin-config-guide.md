@@ -131,7 +131,7 @@ Settings for miners connecting to your pool.
 
 > [!TIP]
 > - use d=xxx or diff=xxx in the password field for miner suggested difficulty if your miner does not have a specific way to send mining.suggest_difficulty
-> - AxOS devices have this as Suggested Difficulty in settings for some devices
+> - AxeOS devices have this as Suggested Difficulty in settings for some devices
 
 ### Starting Difficulty Guidelines
 
