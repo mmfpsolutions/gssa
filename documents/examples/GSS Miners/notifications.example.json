@@ -60,7 +60,8 @@
       "offline": true,
       "online": true,
       "zero_hashrate": true,
-      "temp_high": true
+      "temp_high": true,
+      "temp_normal":true
     },
     "pools": {
       "enabled": false,

@@ -51,6 +51,7 @@ This guide covers the global sections of `config.json` and the full `notificatio
         "share_retention_hours": 48,
         "snapshot_interval_seconds": 60,
         "network_poll_interval_seconds": 60,
+        "network_stats_retention_days": 7,
         "cleanup_interval_hours": 24,
         "hashrate_windows": [60, 300, 900],
         "log_interval_seconds": 30,
@@ -186,6 +187,8 @@ Shares are buffered in memory before being written to the database in batches. T
 |-----|-------|-----------|
 | `share_retention_hours` | `48` | How many hours of share data to keep in the database. Older shares are pruned. |
 | `cleanup_interval_hours` | `24` | How often (in hours) the cleanup job runs to remove expired data. |
+| `network_stats_retention_days`|`7`| How many days of network stats to keep in the database. Older stats are pruned. |
+
 
 ### Snapshots & Polling
 

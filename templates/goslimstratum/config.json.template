@@ -27,6 +27,7 @@ __COIN_CONFIG__
     "share_retention_hours": 48,
     "snapshot_interval_seconds": 60,
     "network_poll_interval_seconds": 60,
+    "network_stats_retention_days": 7,
     "cleanup_interval_hours": 24,
     "hashrate_windows": [60, 300, 900],
     "log_interval_seconds": 30,

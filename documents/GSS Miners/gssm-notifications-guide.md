@@ -277,7 +277,8 @@ Alerts for individual mining device state changes.
     "offline": true,
     "online": true,
     "zero_hashrate": true,
-    "temp_high": true
+    "temp_high": true,
+    "temp_normal": true
 }
 ```
 
@@ -289,6 +290,7 @@ Alerts for individual mining device state changes.
 | `online` | `true` | Alert when a previously offline miner comes back online. |
 | `zero_hashrate` | `true` | Alert when a miner is reachable but reporting 0 hashrate. Indicates a mining issue without a full outage. |
 | `temp_high` | `true` | Alert when a miner's temperature exceeds the critical threshold defined in `thresholds`. |
+|  `temp_normal` | `true` | Alert when a miner's temperature falls below the critical threshold defined in `thresholds`. |
 | `failover` | `true` | Alert when a miner switches to a backup/failover pool. |
 
 > **Note:** Miner events can be noisy on fleets with many devices or unstable network connections. Use `rate_limiting` (below) to prevent alert floods.
