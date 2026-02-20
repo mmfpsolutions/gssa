@@ -41,6 +41,12 @@ Here is a complete example of a coin configuration object in `config.json`:
         "port": 3333,
         "difficulty": 4096,
         "accept_miner_suggested_diff":false,
+        "probe_difficulty": 65536,
+        "user_agent_difficulty_map": {
+          "nerdqaxe": 50000,
+          "bitaxe": 9000,
+          "nerdoctopus": 24000
+        },
         "connection_timeout_seconds": 600,
         "ping_enabled": true
     },
@@ -56,6 +62,7 @@ Here is a complete example of a coin configuration object in `config.json`:
     "vardiff": {
         "enabled": true,
         "useFloatDiff":false,
+        "floatDiffPrecision": 4,
         "minDiff": 512,
         "maxDiff": 32768,
         "targetTime": 15,
@@ -132,6 +139,8 @@ Settings for miners connecting to your pool.
 | `port` | Port miners connect to | Pick unique port per coin (3333, 3334, etc.) |
 | `difficulty` | Starting difficulty for new miners | **See table below** |
 | `accept_miner_suggested_diff`| Accept starting diff value sent from miner | Default set to `false` if not defined |
+| `probe_difficulty`| High difficulty sent with the initial mining.subscribe response before miner identity is known | `65536` typical. Set to `0` to disable. See Smart Initial Difficulty below |
+| `user_agent_difficulty_map` | Map of user agent substring to starting difficulty | Case-insensitive substring match. e.g., `{"bitaxe": 9000, "nerdqaxe": 50000}` |
 | `connection_timeout_seconds` | Disconnect idle miners after this many seconds | 600 (10 min) typical. No change recommended |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
 
@@ -149,6 +158,20 @@ Settings for miners connecting to your pool.
 | Large ASIC | 50+ TH/s | `16384-65536` |
 
 > **Note:** If vardiff is enabled, this is just the starting point - it will auto-adjust based on miner performance.
+
+### Smart Initial Difficulty - AS OF Version 3.0.18
+
+When a miner connects, GSS uses a cascade to determine the best starting difficulty:
+
+1. **Probe difficulty** — A high difficulty (e.g., 65536) is sent immediately with the `mining.subscribe` response, before the miner's identity is known. This prevents a share flood from powerful miners during the brief window before authorization completes.
+2. **Password `d=` / `mining.suggest_difficulty`** — If the miner sends a suggested difficulty (via `mining.suggest_difficulty` or `d=XXX`/`diff=XXX` in the password field), and `accept_miner_suggested_diff` is `true`, GSS uses that value.
+3. **Historical difficulty** — If the miner (identified by worker name) has connected before during this GSS session, GSS remembers its last vardiff-settled difficulty and uses that. This avoids ramp-up on reconnects.
+4. **User agent map** — If the miner's user agent string contains a substring matching a key in `user_agent_difficulty_map`, GSS uses the mapped difficulty. The match is case-insensitive.
+5. **Stratum default** — Falls back to the `difficulty` value in the stratum section.
+
+The cascade stops at the first match. After the resolved difficulty is applied, the probe difficulty is replaced with the real starting difficulty and a new job is sent with `clean_jobs: true` so the miner immediately begins working at the correct difficulty.
+
+> **Note:** Historical difficulty is stored in memory and is lost when GSS restarts. Miners that always send `mining.suggest_difficulty` (e.g., Bitaxe, NerdQAxe++) will override historical difficulty — this is by design.
 
 ---
 
@@ -183,6 +206,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 |-----|-----------|----------|
 | `enabled` | Turn on automatic difficulty adjustment | `true` recommended for mixed miner sizes |
 | `useFloatDiff` | Allow GSS to use float64 diff values (i.e. 0.0001) | Default set to `false` if not defined |
+| `floatDiffPrecision` | Decimal places for float difficulty values | `4` default. Range: 0-15. Only applies when `useFloatDiff` is `true`. Some firmware (e.g., Canaan Nano3S) can't handle more than ~4-5 decimal places |
 | `minDiff` | Lowest difficulty allowed | 256-512 for small miners (Bitaxe) |
 | `maxDiff` | Highest difficulty allowed | 32768-65536 typical. Use `-1` for unlimited, caution -1 could set a pool diff higher than network diff - resulting in lost blocks! |
 | `targetTime` | Target seconds between shares | 10-15 for responsive feedback, 30 for less traffic |

@@ -55,6 +55,8 @@ This guide covers the global sections of `config.json` and the full `notificatio
         "cleanup_interval_hours": 24,
         "hashrate_windows": [60, 300, 900],
         "log_interval_seconds": 30,
+        "connection_flush_interval_seconds": 2,
+        "enable_api_cache": true,
         "enable_http_api": true,
         "http_api_port": 4004
     },
@@ -178,6 +180,8 @@ Shares are buffered in memory before being written to the database in batches. T
 |-----|-------|-----------|
 | `batch_size` | `100` | Number of shares to accumulate before flushing to the database. |
 | `flush_interval_seconds` | `10` | Maximum seconds between flushes, even if the batch isn't full. |
+| `connection_flush_interval_seconds` | `2` | How many connections before they are flushed to the connections table in the database. |
+| `enable_api_cache` | `true` | Enabled cache layer for API, improve performance and reduce DB load. |
 
 > **Tip:** Lower `flush_interval_seconds` means more real-time data but more frequent DB writes. Higher values reduce load but delay dashboard updates.
 

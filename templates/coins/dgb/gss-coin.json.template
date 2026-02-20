@@ -20,6 +20,8 @@
         "port": 3333,
         "difficulty": 512,
         "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 7200,
         "ping_enabled": true
       },
@@ -35,6 +37,7 @@
       "vardiff": {
         "enabled": true,
         "useFloatDiff": false,
+        "floatDiffPrecision": 4,
         "minDiff": 512,
         "maxDiff": 32768,
         "targetTime": 15,

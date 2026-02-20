@@ -20,7 +20,9 @@
         "host": "0.0.0.0",
         "port": 3337,
         "difficulty": 4096,
-        "accept_miner_suggested_diff":false,
+        "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 1800,
         "ping_enabled": true
       },
@@ -35,7 +37,8 @@
       },
       "vardiff": {
         "enabled": true,
-        "useFloatDiff":false,
+        "useFloatDiff": false,
+        "floatDiffPrecision": 4,
         "minDiff": 4096,
         "maxDiff": 262144,
         "targetTime": 20,

@@ -26,6 +26,8 @@
         "port": 3333,
         "difficulty": 4096,
         "accept_miner_suggested_diff": true,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
         "ping_enabled": true
       },
@@ -46,6 +48,7 @@
         "retargetTime": 180,
         "variancePercent": 30,
         "useFloatDiff": false,
+        "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,
           "sharesToCheck": 4,
@@ -86,6 +89,8 @@
         "port": 3335,
         "difficulty": 65536,
         "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
         "ping_enabled": true
       },
@@ -106,6 +111,7 @@
         "retargetTime": 600,
         "variancePercent": 30,
         "useFloatDiff": false,
+        "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,
           "sharesToCheck": 4,
@@ -146,6 +152,8 @@
         "port": 3334,
         "difficulty": 32768,
         "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
         "ping_enabled": true
       },
@@ -166,6 +174,7 @@
         "retargetTime": 600,
         "variancePercent": 30,
         "useFloatDiff": false,
+        "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,
           "sharesToCheck": 4,
