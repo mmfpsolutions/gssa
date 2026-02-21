@@ -1,5 +1,19 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.19
+## v3.0.15 through v3.0.20
+
+---
+
+## v3.0.20
+
+**Dashboard — Faster Miner Table Updates After Delete**
+
+When deleting an individual inactive worker or resetting all miner statistics, the dashboard now immediately clears the coin's metrics cache before refreshing the miner table. Previously there was a lag where the deleted worker could still appear in the table until the next cache refresh cycle.
+
+Both confirmation modals also now include an optional "Re-prime cache after delete/reset" checkbox (unchecked by default). When checked, the cache is repopulated immediately after clearing so the table refresh reflects fresh database data rather than waiting for the next snapshot interval.
+
+**Bug Fix — Telegram Bot Token Not Saving**
+
+Changing the Telegram bot token on the Notifications configuration page was silently discarded — the old token was always kept regardless of what was typed. The issue was that the hidden raw field (used to preserve the masked token when no changes are made) was never cleared when the user edited the visible field, causing the backend to always pick up the old value. This is now fixed — editing the token field clears the raw field so the newly typed value is saved correctly. The same fix applies to the email password field.
 
 ---
 
