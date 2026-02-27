@@ -1,5 +1,21 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.20
+## v3.0.15 through v3.0.23
+
+---
+
+## v3.0.23
+
+**Improved Miner Device Identification**
+
+The dashboard now correctly identifies miners that report their device information in non-standard formats. Previously, some firmware — such as Braiins OS — would display as a long unreadable string instead of a friendly device name. These miners are now recognized and labeled properly in the miner table.
+
+**Cleaner Hashrate and Difficulty Display**
+
+Hashrate and difficulty values throughout the dashboard now use a consistent, streamlined formatting system. Large values scale cleanly across all magnitudes (kH/s through ZH/s), and very small difficulty values for low-hashrate miners continue to display with full precision.
+
+**API Security Improvements**
+
+Hardened security controls across API endpoints to strengthen protection against unauthorized access.
 
 ---
 

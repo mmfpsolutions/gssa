@@ -64,7 +64,7 @@ This guide covers the global sections of `config.json` and the full `notificatio
         "enabled": true,
         "host": "0.0.0.0",
         "port": 3003,
-        "api_base_url": "http://your.ip.address:4004/api/v1",
+        "api_base_url": "/api/v1",
         "block_explorer_urls": {
             "DGB": "https://chainz.cryptoid.info/dgb/block.dws?{hash}",
             "BTC": "https://chainz.cryptoid.info/btc/block.dws?{hash}",

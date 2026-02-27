@@ -11,7 +11,7 @@
         "use_ssl": false,
         "wallet_name": "default",
         "zmq_block_notify": "tcp://127.0.0.1:28337",
-        "template_refresh_interval": 900,
+        "template_refresh_interval": 15,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 2000,
         "dual_node_comm": true
@@ -23,7 +23,7 @@
         "accept_miner_suggested_diff": false,
         "probe_difficulty": 0,
         "user_agent_difficulty_map": {},
-        "connection_timeout_seconds": 1800,
+        "connection_timeout_seconds": 600,
         "ping_enabled": true
       },
       "mining": {
