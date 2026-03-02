@@ -1,5 +1,32 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.23
+## v3.0.15 through v3.0.25
+
+---
+
+## v3.0.25
+
+**Dashboard — Miner Table Pagination and Filtering**
+
+The miners table on the coin pool dashboard now supports server-side pagination and active/inactive filtering. Previously, the table loaded all miners at once — which became unmanageable beyond about 20 miners and would time out entirely at 100+.
+
+- **Active / Inactive / All filter** — Three toggle buttons above the miners table let you switch between viewing active miners only, inactive miners only, or all miners. The default is Active only, so inactive miners no longer clutter the table. Each button shows its count (e.g., "Active (5)"). The selected filter is remembered across page reloads.
+- **Pagination controls** — Previous / Next buttons below the table, with a configurable page size selector (5, 10, 20, 30, 50, or 100 per page). Page size preference is remembered across page reloads.
+- **Server-side sorting** — Active miners are sorted by hashrate (highest first), inactive miners by last seen time (most recent first). Sorting is handled server-side for consistent pagination order.
+- **Remove Inactive Miners button** — A new trash icon button in the miners card header lets you permanently remove all inactive miners and their data in one action, with a confirmation modal matching the existing reset modal style.
+
+The 10-second auto-refresh continues to work with pagination — it stays on your current page and filter selection, and automatically adjusts if the page count changes (e.g., a miner goes offline).
+
+---
+
+## v3.0.24
+
+**Duplicate Worker Name Disambiguation**
+
+When multiple miners connect with the same wallet address and worker ID (e.g., `address.worker1`), the pool now disambiguates them automatically. Previously, duplicate worker names could cause metrics to be merged or misattributed across different physical miners. Each connection now maintains its own distinct identity in the miner table.
+
+**VarDiff — Miner Suggest Difficulty Limited to Initial Connection**
+
+The pool now only honors a miner's suggested difficulty (`mining.suggest_difficulty` or `d=` password field) on initial connection, before the first VarDiff adjustment. Once VarDiff has begun managing the miner's difficulty, further suggest difficulty requests from the miner are ignored. This prevents miners from overriding the pool's difficulty management after VarDiff has already found the optimal level.
 
 ---
 
