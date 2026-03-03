@@ -48,6 +48,8 @@ Here is a complete example of a coin configuration object in `config.json`:
           "nerdoctopus": 24000
         },
         "connection_timeout_seconds": 600,
+        "disambiguation_enabled": false,
+        "consolidation_threshold_seconds": 3,
         "ping_enabled": true
     },
     "mining": {
@@ -142,6 +144,8 @@ Settings for miners connecting to your pool.
 | `probe_difficulty`| High difficulty sent with the initial mining.subscribe response before miner identity is known | `65536` typical. Set to `0` to disable. See Smart Initial Difficulty below |
 | `user_agent_difficulty_map` | Map of user agent substring to starting difficulty | Case-insensitive substring match. e.g., `{"bitaxe": 9000, "nerdqaxe": 50000}` |
 | `connection_timeout_seconds` | Disconnect idle miners after this many seconds | 600 (10 min) typical. No change recommended |
+| `disambiguation_enabled` | Append `-1`, `-2`, etc. when multiple connections share the same worker name | Default `false`. Enable if multiple physical miners use the same worker name and you want unique identifiers per connection |
+| `consolidation_threshold_seconds` | Grace period (seconds) for consolidating rapid reconnects under the same worker name | Default `3`. Set to `0` to disable. Only applies when `disambiguation_enabled` is `true` |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
 
 > [!TIP]
@@ -172,6 +176,24 @@ When a miner connects, GSS uses a cascade to determine the best starting difficu
 The cascade stops at the first match. After the resolved difficulty is applied, the probe difficulty is replaced with the real starting difficulty and a new job is sent with `clean_jobs: true` so the miner immediately begins working at the correct difficulty.
 
 > **Note:** Historical difficulty is stored in memory and is lost when GSS restarts. Miners that always send `mining.suggest_difficulty` (e.g., Bitaxe, NerdQAxe++) will override historical difficulty — this is by design.
+
+### Worker Name Disambiguation & Consolidation - AS OF Version 3.0.24
+
+When multiple physical miners connect with the same worker name (e.g., two Bitaxes both configured as `wallet.worker1`), disambiguation controls whether GSS appends a numeric suffix to distinguish them.
+
+**Disambiguation (`disambiguation_enabled`):**
+- When `true`, GSS appends `-1`, `-2`, etc. to duplicate worker names so each connection gets a unique identity (e.g., `worker1-1`, `worker1-2`).
+- When `false` (default), all connections keep the original worker name. Hashrate, shares, and stats are aggregated under the shared name on the dashboard and miner detail page.
+
+**Consolidation (`consolidation_threshold_seconds`):**
+- Only applies when `disambiguation_enabled` is `true`.
+- When a miner disconnects and reconnects within the threshold (default 3 seconds), GSS reuses the same disambiguated name instead of assigning a new suffix. This prevents suffix churn from brief network interruptions.
+- Set to `0` to disable consolidation — every new connection always gets a fresh suffix.
+
+> [!TIP]
+> - Most operators should leave `disambiguation_enabled` at `false` (the default). The dashboard and miner detail page will show combined hashrate and stats for all connections sharing a worker name.
+> - Enable disambiguation if you need to track each physical miner individually even when they share a worker name.
+> - If disambiguation is enabled, the default 3-second consolidation window is usually sufficient. Increase it only if your miners experience longer reconnect cycles.
 
 ---
 
