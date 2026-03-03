@@ -1,5 +1,21 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.25
+## v3.0.15 through v3.0.26
+
+---
+
+## v3.0.26
+
+**Duplicate Worker Name Aggregation**
+
+When multiple physical miners connect with the same worker name (e.g., two Bitaxes both configured as `wallet.worker1`), the pool now aggregates their data under a single identity by default. Previously, disambiguation was enabled by default and appended `-1`, `-2` suffixes to create unique names per connection. Starting in v3.0.26, disambiguation is disabled by default and the pool treats all connections sharing a worker name as one logical miner.
+
+With disambiguation disabled:
+- **Hashrate** — The dashboard and miner detail page show the combined hashrate across all connections sharing the worker name. The hashrate chart on the miner detail page aggregates per-timestamp snapshots so the chart line represents total output, not interleaved per-connection values.
+- **Shares** — Valid, invalid, and stale share counts are summed across all connections. Efficiency percentage reflects the combined totals.
+- **Device display** — When multiple connections share a worker name, the dashboard miners table shows "N Devices" instead of a single user agent string. The miner detail page shows "N connections" under the worker name.
+- **Per-connection charts** — The share submission and difficulty adjustment charts on the miner detail page are per-connection by nature. When more than one connection shares the worker name, these charts display a message explaining the data is not available in aggregated mode.
+
+Operators who need per-connection tracking can re-enable disambiguation by setting `disambiguation_enabled` to `true` in the coin's stratum config.
 
 ---
 
