@@ -49,6 +49,8 @@ Here is a complete example of a coin configuration object in `config.json`:
         },
         "connection_timeout_seconds": 600,
         "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
         "consolidation_threshold_seconds": 3,
         "ping_enabled": true
     },
@@ -145,6 +147,8 @@ Settings for miners connecting to your pool.
 | `user_agent_difficulty_map` | Map of user agent substring to starting difficulty | Case-insensitive substring match. e.g., `{"bitaxe": 9000, "nerdqaxe": 50000}` |
 | `connection_timeout_seconds` | Disconnect idle miners after this many seconds | 600 (10 min) typical. No change recommended |
 | `disambiguation_enabled` | Append `-1`, `-2`, etc. when multiple connections share the same worker name | Default `false`. Enable if multiple physical miners use the same worker name and you want unique identifiers per connection |
+| `auto_worker_id` | Auto-assign a workerID when a miner connects with just a wallet address (no `.workerID` suffix) | Default `true`. When `false`, miners with no suffix use the bare wallet address as their worker name |
+| `default_worker_id` | Custom workerID to assign to no-suffix miners (only used when `auto_worker_id` is `true`) | Default `""` (empty = use unique connection ID). Set to a string like `"default"` to group all no-suffix miners under the same name |
 | `consolidation_threshold_seconds` | Grace period (seconds) for consolidating rapid reconnects under the same worker name | Default `3`. Set to `0` to disable. Only applies when `disambiguation_enabled` is `true` |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
 
@@ -190,10 +194,28 @@ When multiple physical miners connect with the same worker name (e.g., two Bitax
 - When a miner disconnects and reconnects within the threshold (default 3 seconds), GSS reuses the same disambiguated name instead of assigning a new suffix. This prevents suffix churn from brief network interruptions.
 - Set to `0` to disable consolidation — every new connection always gets a fresh suffix.
 
+**Auto Worker ID (`auto_worker_id` and `default_worker_id`) - AS OF Version 3.0.27:**
+- When a miner connects with just a wallet address (no `.workerID` suffix), GSS can auto-assign a workerID.
+- When `auto_worker_id` is `true` (default), GSS assigns a workerID: the `default_worker_id` value if set, otherwise a unique connection ID.
+- When `auto_worker_id` is `false`, no workerID is assigned — the bare wallet address becomes the worker name. All miners connecting with the same address are automatically aggregated.
+- Setting `default_worker_id` to a custom value like `"default"` means all no-suffix miners for the same address share the same worker name and aggregate (when disambiguation is off).
+
+**Behavior Matrix** — how these three settings interact for miners connecting with just a wallet address (no `.workerID` suffix):
+
+| `auto_worker_id` | `default_worker_id` | `disambiguation_enabled` | Worker Name Result | Behavior |
+|:-:|:-:|:-:|---|---|
+| `true` | `""` | any | `address.0001A1B2C3D4` | **Default** — each connection gets a unique 12-char hex ID |
+| `true` | `"dgb"` | `true` | `address.dgb`, `address.dgb-1`, `address.dgb-2` | Named but disambiguated — each connection is individually tracked |
+| `true` | `"dgb"` | `false` | `address.dgb` | **Aggregated** — all no-suffix miners share one logical miner |
+| `false` | *(ignored)* | `true` | `address`, `address-1`, `address-2` | Bare address, disambiguated per connection |
+| `false` | *(ignored)* | `false` | `address` | **Aggregated** — all same-address miners merge under the bare address |
+
 > [!TIP]
 > - Most operators should leave `disambiguation_enabled` at `false` (the default). The dashboard and miner detail page will show combined hashrate and stats for all connections sharing a worker name.
 > - Enable disambiguation if you need to track each physical miner individually even when they share a worker name.
 > - If disambiguation is enabled, the default 3-second consolidation window is usually sufficient. Increase it only if your miners experience longer reconnect cycles.
+> - Set `auto_worker_id` to `false` if you want miners connecting with just a wallet address to be grouped together under the bare address.
+> - Use `default_worker_id` with a custom name (e.g., `"miner"`) to give all no-suffix connections a readable shared name instead of individual connection IDs.
 
 ---
 
