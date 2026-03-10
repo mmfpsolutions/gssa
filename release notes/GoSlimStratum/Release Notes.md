@@ -27,6 +27,10 @@ The `ping_interval_seconds` setting allows operators to control how frequently `
 
 Ping is also now used for dead connection detection. If a miner that previously responded to pings fails to reply (no PONG) before the next ping interval, GSS closes the connection automatically. This means ghost connections from miners that disconnect without a clean TCP close (e.g., power loss, network failure, unplugged devices) are detected within 1-2 ping intervals (~30-60 seconds at default settings) instead of waiting for the full connection timeout (default: 600 seconds).
 
+**Adaptive Share Acceptance for Ultra-Low Hashrate Devices**
+
+Miners operating below 1 difficulty (e.g., NerdMiners, ESP32-based hobby miners) now benefit from adaptive share validation. The pool's share handler recognizes when a miner's assigned difficulty is sub-1 and applies a streamlined acceptance path that eliminates unnecessary rejection overhead. These devices contribute negligible hashrate relative to the pool, and their shares are accepted without the standard difficulty comparison — reducing log noise and improving the mining experience for hobbyist devices. Block candidate evaluation remains fully intact regardless of share difficulty, so any share that meets the network target is still submitted normally.
+
 **Mid-Block VarDiff Adjustments**
 
 A new `onNewBlock` setting in the vardiff config controls when difficulty changes are delivered to miners. When `true` (the default, matching previous behavior), difficulty adjustments are queued and sent alongside the next new block job. When `false`, difficulty changes are sent immediately — `mining.set_difficulty` followed by a `mining.notify` with the same block template and `clean_jobs=false`. The miner applies the new difficulty without discarding work. No hash power is wasted in either mode.

@@ -13,7 +13,8 @@
         "template_refresh_interval": 15,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 2000,
-        "dual_node_comm": true
+        "dual_node_comm": true,
+        "wallet_passphrase": ""
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -23,7 +24,11 @@
         "probe_difficulty": 0,
         "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
-        "ping_enabled": true
+        "ping_enabled": true,
+        "ping_interval_seconds": 30,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "disambiguation_enabled": false
       },
       "mining": {
         "address": "{WALLET_ADDRESS}",
@@ -43,6 +48,7 @@
         "targetTime": 15,
         "retargetTime": 600,
         "variancePercent": 30,
+        "onNewBlock": true,
         "floodProtection": {
           "enabled": false,
           "sharesToCheck": 4,
