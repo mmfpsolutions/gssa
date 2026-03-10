@@ -1,5 +1,52 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.26
+## v3.0.15 through v3.0.28
+
+---
+
+## v3.0.28
+
+**Bech32 Coinbase Output Script Support**
+
+The pool now supports Bech32 (SegWit) mining addresses for coinbase outputs. Previously, only legacy and P2SH addresses were supported for the `mining.address` field. Starting in v3.0.28, operators can use native SegWit addresses — both P2WPKH (`bc1q...`, `dgb1q...`) and P2WSH (`bc1q...` 62-char, `dgb1q...` 62-char) — as their payout address. The pool detects the address type automatically and constructs the correct coinbase output script. This applies to the DigiByte and Generic coin handlers. Bitcoin and Bitcoin Cash handlers already supported SegWit via their existing implementations.
+
+**Password-Protected Node Wallet Support**
+
+Operators whose node wallets are encrypted (password-protected) can now configure the wallet passphrase in `config.json`. Previously, the payout system would fail with a "wallet locked" error because `signrawtransactionwithwallet` requires an unlocked wallet.
+
+How it works:
+- Add the wallet passphrase to the `wallet_passphrase` field in the coin's node section.
+- On first startup, GSS automatically encrypts the plaintext passphrase in-place using AES-256-GCM. The config file is rewritten with the encrypted value (prefixed with `ENC:`), so the plaintext passphrase never persists on disk after the first run.
+- During payouts, GSS decrypts the passphrase, unlocks the wallet for the minimum time needed (fund + sign + broadcast), then immediately re-locks it.
+- If a passphrase is configured but the wallet is not actually encrypted, GSS logs a warning and proceeds normally.
+
+The `wallet_passphrase` field is also available in the Web UI configuration page and the Add Coin form.
+
+**Configurable Ping Interval with Dead Connection Detection**
+
+The `ping_interval_seconds` setting allows operators to control how frequently `mining.ping` keep-alive messages are sent to miners. Previously, the interval was always half the connection timeout. Now it can be set explicitly per coin. Default: 30 seconds. Set to `0` to use the legacy behavior (half the connection timeout).
+
+Ping is also now used for dead connection detection. If a miner that previously responded to pings fails to reply (no PONG) before the next ping interval, GSS closes the connection automatically. This means ghost connections from miners that disconnect without a clean TCP close (e.g., power loss, network failure, unplugged devices) are detected within 1-2 ping intervals (~30-60 seconds at default settings) instead of waiting for the full connection timeout (default: 600 seconds).
+
+**Mid-Block VarDiff Adjustments**
+
+A new `onNewBlock` setting in the vardiff config controls when difficulty changes are delivered to miners. When `true` (the default, matching previous behavior), difficulty adjustments are queued and sent alongside the next new block job. When `false`, difficulty changes are sent immediately — `mining.set_difficulty` followed by a `mining.notify` with the same block template and `clean_jobs=false`. The miner applies the new difficulty without discarding work. No hash power is wasted in either mode.
+
+This is useful on slow blockchains (e.g., BTC at ~10 minute blocks) where waiting for a new block before adjusting difficulty means miners can be at the wrong difficulty for minutes. The job resend ensures compatibility with ASIC miners (e.g., bitaxe) that only apply difficulty changes when they receive a new job. The existing `previousDifficulty` grace period handles any in-flight shares at the old difficulty, so no shares are rejected during the transition.
+
+---
+
+## v3.0.27
+
+**Auto Worker ID and Default Worker ID**
+
+Two new stratum settings give operators control over how miners connecting without a `.workerID` suffix are identified:
+
+- `auto_worker_id` (default: `true`) — When enabled, GSS auto-assigns a workerID to miners that connect with just a wallet address. When disabled, the bare wallet address becomes the worker name.
+- `default_worker_id` (default: `""`) — When `auto_worker_id` is `true` and this is set to a custom value (e.g., `"default"`), all no-suffix miners for the same address share that worker name and aggregate under it. When empty, each connection gets a unique 12-character hex ID.
+
+**Disambiguation Default Changed**
+
+`disambiguation_enabled` now defaults to `false`. Previously it defaulted to `true`, meaning duplicate worker names were automatically suffixed with `-1`, `-2`, etc. With the new default, all connections sharing a worker name are treated as one logical miner with aggregated hashrate and stats. Operators who need per-connection tracking can re-enable it.
 
 ---
 
@@ -171,3 +218,5 @@ The connections table is now included in the automated database cleanup routine,
 - v3.0.16 includes a database schema update (V16). The pool will apply this automatically on first start.
 - All new config fields have safe defaults — existing `config.json` files do not need to be updated to upgrade. New fields will use defaults until explicitly configured.
 - Float difficulty precision (`floatDiffPrecision`) defaults to 4 decimal places. If you are running Canaan ASIC miners with `useFloatDiff: true`, this default is recommended. If you were previously seeing stale shares on those miners, this is the fix.
+- v3.0.27 changes `disambiguation_enabled` default from `true` to `false`. If you relied on the old default behavior (per-connection `-1`, `-2` suffixes), add `"disambiguation_enabled": true` to your stratum config.
+- v3.0.28: If you add a `wallet_passphrase` value to config.json, it will be auto-encrypted on the next startup. The original plaintext is replaced with an `ENC:` prefixed encrypted value. This is a one-way config rewrite — back up your config before testing if desired.

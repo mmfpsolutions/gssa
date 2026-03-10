@@ -30,6 +30,7 @@ Here is a complete example of a coin configuration object in `config.json`:
         "password": "your_rpc_password",
         "use_ssl": false,
         "wallet_name": "default",
+        "wallet_passphrase": "",
         "zmq_block_notify": "tcp://127.0.0.1:28332",
         "template_refresh_interval": 15,
         "zmq_enabled": true,
@@ -52,7 +53,8 @@ Here is a complete example of a coin configuration object in `config.json`:
         "auto_worker_id": true,
         "default_worker_id": "",
         "consolidation_threshold_seconds": 3,
-        "ping_enabled": true
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
     },
     "mining": {
         "address": "your_legacy_node_wallet_address",
@@ -72,6 +74,7 @@ Here is a complete example of a coin configuration object in `config.json`:
         "targetTime": 15,
         "retargetTime": 180,
         "variancePercent": 30,
+        "onNewBlock": true,
         "floodProtection": {
             "enabled": false,
             "sharesToCheck": 4,
@@ -115,6 +118,7 @@ Connection settings for your coin's node (full or pruned).
 | `password` | RPC password from node's config file | Must match `rpcpassword` in node config |
 | `use_ssl` | Use HTTPS for RPC connection | `false` for local, `true` if node requires SSL |
 | `wallet_name` | Name of the wallet to use for payouts | `"default"` unless you created a named wallet |
+| `wallet_passphrase` | Passphrase for encrypted (password-protected) node wallets | Leave empty (`""`) if wallet is not encrypted. On first startup, GSS auto-encrypts the plaintext value in config.json using AES-256-GCM |
 | `zmq_block_notify` | ZMQ endpoint for instant block notifications | Format: `"tcp://IP:PORT"`. Requires node ZMQ config. |
 | `template_refresh_interval` | Seconds between block template polls | 15-30 seconds typical. Lower = more network traffic |
 | `zmq_enabled` | Use ZMQ for instant new block detection | `true` recommended if node supports ZMQ |
@@ -151,6 +155,7 @@ Settings for miners connecting to your pool.
 | `default_worker_id` | Custom workerID to assign to no-suffix miners (only used when `auto_worker_id` is `true`) | Default `""` (empty = use unique connection ID). Set to a string like `"default"` to group all no-suffix miners under the same name |
 | `consolidation_threshold_seconds` | Grace period (seconds) for consolidating rapid reconnects under the same worker name | Default `3`. Set to `0` to disable. Only applies when `disambiguation_enabled` is `true` |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
+| `ping_interval_seconds` | Seconds between `mining.ping` keep-alive messages | Default `30`. Set to `0` to use legacy behavior (half of `connection_timeout_seconds`) |
 
 > [!TIP]
 > - use d=xxx or diff=xxx in the password field for miner suggested difficulty if your miner does not have a specific way to send mining.suggest_difficulty
@@ -235,8 +240,8 @@ Block construction and coinbase settings.
 
 ### Address Format Notes
 
-- **DGB:** Use legacy `D...` address (not `dgb1...` bech32)
-- **BTC:** Use legacy `1...` or `3...` address (not `bc1...` bech32)
+- **DGB:** Legacy `D...` or Bech32 `dgb1q...` (P2WPKH/P2WSH supported as of v3.0.28)
+- **BTC:** Legacy `1...`, P2SH `3...`, or Bech32 `bc1q...` (all supported)
 - **BCH:** Use CashAddr format `bitcoincash:q...`
 - **XEC:** Use eCash format `ecash:q...`
 
@@ -256,6 +261,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 | `targetTime` | Target seconds between shares | 10-15 for responsive feedback, 30 for less traffic |
 | `retargetTime` | Seconds between difficulty adjustments | 90-180 typical. Lower = faster response |
 | `variancePercent` | Acceptable deviation before adjusting | 30 typical. Higher = less frequent changes |
+| `onNewBlock` | Only apply vardiff changes on new block/job boundaries | Default `true`. Set to `false` to send difficulty changes immediately without waiting for a new block (useful on slow blockchains like BTC). No hash power is wasted — miner keeps working on the same block template |
 
 ### Flood Protection (Sub-Section) - AS OF Version 3.0.15
 
@@ -375,7 +381,7 @@ All amounts are in satoshis (the smallest unit):
 
 **Problem:** Payouts fail with "wallet locked" error
 
-**Solution:** Unlock wallet with `walletpassphrase` command before starting pool, or use unencrypted wallet
+**Solution:** Set `wallet_passphrase` in the coin's node config section. GSS will automatically unlock the wallet for each payout and re-lock it immediately after. The passphrase is auto-encrypted in config.json on first startup. Alternatively, use an unencrypted wallet.
 
 ---
 

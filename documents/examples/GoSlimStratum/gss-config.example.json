@@ -15,6 +15,7 @@
         "password": "your_rpc_password",
         "use_ssl": false,
         "wallet_name": "default",
+        "wallet_passphrase": "",
         "zmq_block_notify": "tcp://127.0.0.1:28332",
         "template_refresh_interval": 15,
         "zmq_enabled": true,
@@ -29,7 +30,12 @@
         "probe_difficulty": 0,
         "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
-        "ping_enabled": true
+        "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "consolidation_threshold_seconds": 3,
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
       },
       "mining": {
         "address": "your_legacy_node_wallet_address",
@@ -47,6 +53,7 @@
         "targetTime": 15,
         "retargetTime": 180,
         "variancePercent": 30,
+        "onNewBlock": true,
         "useFloatDiff": false,
         "floatDiffPrecision": 4,
         "floodProtection": {
@@ -78,6 +85,7 @@
         "password": "your_btc_rpc_password",
         "use_ssl": false,
         "wallet_name": "pool_wallet",
+        "wallet_passphrase": "",
         "zmq_block_notify": "tcp://127.0.0.1:28333",
         "template_refresh_interval": 30,
         "zmq_enabled": true,
@@ -92,7 +100,12 @@
         "probe_difficulty": 0,
         "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
-        "ping_enabled": true
+        "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "consolidation_threshold_seconds": 3,
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
       },
       "mining": {
         "address": "bc1qYourBitcoinAddressHere",
@@ -110,6 +123,7 @@
         "targetTime": 20,
         "retargetTime": 600,
         "variancePercent": 30,
+        "onNewBlock": true,
         "useFloatDiff": false,
         "floatDiffPrecision": 4,
         "floodProtection": {
@@ -141,6 +155,7 @@
         "password": "your_bch_rpc_password",
         "use_ssl": false,
         "wallet_name": "pool_wallet",
+        "wallet_passphrase": "",
         "zmq_block_notify": "tcp://127.0.0.1:28334",
         "template_refresh_interval": 30,
         "zmq_enabled": true,
@@ -155,7 +170,12 @@
         "probe_difficulty": 0,
         "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
-        "ping_enabled": true
+        "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "consolidation_threshold_seconds": 3,
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
       },
       "mining": {
         "address": "bitcoincash:qYourBitcoinCashAddressHere",
@@ -173,6 +193,7 @@
         "targetTime": 20,
         "retargetTime": 600,
         "variancePercent": 30,
+        "onNewBlock": true,
         "useFloatDiff": false,
         "floatDiffPrecision": 4,
         "floodProtection": {
