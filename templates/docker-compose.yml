@@ -14,6 +14,11 @@ services:
      - /data/goslimstratum/config:/app/config
      - /data/goslimstratum/logs:/app/logs
      - /data/goslimstratum/data:/app/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
     environment:
       - TZ=America/New_York
@@ -33,6 +38,7 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   # ============================================================
@@ -48,6 +54,11 @@ services:
       - /data/mim/data:/app/data
       - /data/mim/config:/app/config
       - /data/mim/logs:/app/logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"  
     restart: always
 
   axeos-dashboard:
@@ -57,6 +68,11 @@ services:
     volumes:
       - /data/axeos-dashboard/data:/app/data
       - /data/axeos-dashboard/config:/app/config
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   dozzle:
@@ -70,6 +86,7 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   watchtower:
@@ -86,4 +103,5 @@ services:
       driver: "json-file"
       options:
         max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
