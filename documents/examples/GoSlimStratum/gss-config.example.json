@@ -55,6 +55,7 @@
         "variancePercent": 30,
         "onNewBlock": true,
         "useFloatDiff": false,
+        "floatDiffBelowOne": true,
         "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,
@@ -125,6 +126,7 @@
         "variancePercent": 30,
         "onNewBlock": true,
         "useFloatDiff": false,
+        "floatDiffBelowOne": true,
         "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,
@@ -195,6 +197,7 @@
         "variancePercent": 30,
         "onNewBlock": true,
         "useFloatDiff": false,
+        "floatDiffBelowOne": true,
         "floatDiffPrecision": 4,
         "floodProtection": {
           "enabled": false,

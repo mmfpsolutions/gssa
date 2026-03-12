@@ -1,5 +1,23 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.28
+## v3.0.15 through v3.0.29
+
+---
+
+## v3.0.29
+
+**Float Diff Below One — Firmware-Safe Float Difficulty**
+
+When `useFloatDiff` is enabled, the pool can now restrict float precision to sub-1 difficulty values only, sending integer difficulty for values >= 1. This is controlled by the new `floatDiffBelowOne` setting (default: `true`).
+
+This resolves a firmware compatibility issue discovered on Canaan Nano3S (and potentially other ASIC devices) where float difficulty at high magnitudes (100K+) caused CRC/COM_CRC errors on the chip data bus. The root cause is that embedded miner firmware typically uses float32 internally, which only supports ~7 significant digits. A difficulty like `103297.0000` (10+ significant digits) exceeds float32 precision, causing the firmware to misinterpret the value and produce hardware errors.
+
+With `floatDiffBelowOne` enabled:
+- Difficulty < 1 (e.g., `0.0038`, `0.022`) — sent as float with configured precision. Ideal for tiny miners like NerdMiner and ESP32 devices.
+- Difficulty >= 1 (e.g., `4096`, `103297`) — rounded to integer. Safe for all ASIC firmware including Canaan and AxeOS devices that truncate or can't process float difficulty.
+
+This gives operators the best of both worlds: precise sub-1 difficulty for low-hashrate hobby miners, and clean integers for everything else.
+
+The setting is available in the vardiff config, the Web UI config page, and the Add Coin form.
 
 ---
 
@@ -224,3 +242,4 @@ The connections table is now included in the automated database cleanup routine,
 - Float difficulty precision (`floatDiffPrecision`) defaults to 4 decimal places. If you are running Canaan ASIC miners with `useFloatDiff: true`, this default is recommended. If you were previously seeing stale shares on those miners, this is the fix.
 - v3.0.27 changes `disambiguation_enabled` default from `true` to `false`. If you relied on the old default behavior (per-connection `-1`, `-2` suffixes), add `"disambiguation_enabled": true` to your stratum config.
 - v3.0.28: If you add a `wallet_passphrase` value to config.json, it will be auto-encrypted on the next startup. The original plaintext is replaced with an `ENC:` prefixed encrypted value. This is a one-way config rewrite — back up your config before testing if desired.
+- v3.0.29: `floatDiffBelowOne` defaults to `true`. If you have `useFloatDiff` enabled and want float difficulty at all magnitudes (previous behavior), set `"floatDiffBelowOne": false` in your vardiff config. Most operators should leave it at `true` — it prevents firmware issues on Canaan and AxeOS devices.

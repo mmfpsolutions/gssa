@@ -68,6 +68,7 @@ Here is a complete example of a coin configuration object in `config.json`:
     "vardiff": {
         "enabled": true,
         "useFloatDiff":false,
+        "floatDiffBelowOne": true,
         "floatDiffPrecision": 4,
         "minDiff": 512,
         "maxDiff": 32768,
@@ -255,6 +256,7 @@ Automatic difficulty adjustment per miner. Adjusts difficulty so each miner subm
 |-----|-----------|----------|
 | `enabled` | Turn on automatic difficulty adjustment | `true` recommended for mixed miner sizes |
 | `useFloatDiff` | Allow GSS to use float64 diff values (i.e. 0.0001) | Default set to `false` if not defined |
+| `floatDiffBelowOne` | Only use float difficulty for sub-1 values, integer for >= 1 | Default `true`. Prevents firmware precision issues on Canaan/AxeOS devices at high difficulty magnitudes. Only applies when `useFloatDiff` is `true` |
 | `floatDiffPrecision` | Decimal places for float difficulty values | `4` default. Range: 0-15. Only applies when `useFloatDiff` is `true`. Some firmware (e.g., Canaan Nano3S) can't handle more than ~4-5 decimal places |
 | `minDiff` | Lowest difficulty allowed | 256-512 for small miners (Bitaxe) |
 | `maxDiff` | Highest difficulty allowed | 32768-65536 typical. Use `-1` for unlimited, caution -1 could set a pool diff higher than network diff - resulting in lost blocks! |

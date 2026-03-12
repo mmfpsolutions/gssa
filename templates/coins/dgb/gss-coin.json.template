@@ -42,6 +42,7 @@
       "vardiff": {
         "enabled": true,
         "useFloatDiff": false,
+        "floatDiffBelowOne": true,
         "floatDiffPrecision": 4,
         "minDiff": 512,
         "maxDiff": 32768,
