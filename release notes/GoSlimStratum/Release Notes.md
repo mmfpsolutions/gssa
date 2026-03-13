@@ -1,5 +1,19 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.29
+## v3.0.15 through v3.0.30
+
+---
+
+## v3.0.30
+
+**BIP34 Coinbase Height Encoding Fix**
+
+Fixed a bug in `serializeHeight()` where block heights with the high bit set in the most significant byte were encoded incorrectly in the coinbase scriptSig. In Bitcoin's script number encoding, the high bit is the sign bit — a raw `0x80` byte is interpreted as negative zero, not 128. The fix appends a `0x00` padding byte when the high bit is set, keeping the value positive per the BIP34 specification.
+
+Without this fix, blocks found at affected heights are rejected by the node with `bad-cb-height, block height mismatch in coinbase`. On mainnet, the block reward is silently lost (other miners advance the chain past the affected height). On regtest, the chain stalls entirely if the pool is the sole miner.
+
+Affected heights follow the pattern where the MSB of the final encoded byte has bit 7 set: 128–255, 32768–65535, 8,388,608–16,777,215, etc. Current mainnet chains (BTC ~940K, BCH ~942K, DGB ~23M, XEC ~940K) are not at affected heights today. The next affected height for BTC/BCH/XEC is 8,388,608 (~14 years at 10-minute blocks). DGB's next affected height is 2,147,483,648 (~10,900 years at 15-second blocks).
+
+The fix was applied to all five coin implementations: Bitcoin, Bitcoin Cash, DigiByte, eCash, and Generic.
 
 ---
 
@@ -243,3 +257,4 @@ The connections table is now included in the automated database cleanup routine,
 - v3.0.27 changes `disambiguation_enabled` default from `true` to `false`. If you relied on the old default behavior (per-connection `-1`, `-2` suffixes), add `"disambiguation_enabled": true` to your stratum config.
 - v3.0.28: If you add a `wallet_passphrase` value to config.json, it will be auto-encrypted on the next startup. The original plaintext is replaced with an `ENC:` prefixed encrypted value. This is a one-way config rewrite — back up your config before testing if desired.
 - v3.0.29: `floatDiffBelowOne` defaults to `true`. If you have `useFloatDiff` enabled and want float difficulty at all magnitudes (previous behavior), set `"floatDiffBelowOne": false` in your vardiff config. Most operators should leave it at `true` — it prevents firmware issues on Canaan and AxeOS devices.
+- v3.0.30: No config changes required. This is a bug fix to coinbase transaction construction. Rebuild and redeploy to apply.
