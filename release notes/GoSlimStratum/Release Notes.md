@@ -1,5 +1,53 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.0.30
+## v3.0.15 through v3.1.0
+
+---
+
+## v3.1.0
+
+**Direct-to-Miner (DTM) Mode**
+
+Block rewards now go directly to the miner's wallet — no payout system, no waiting. When your pool finds a block, the reward is embedded in the coinbase transaction with your wallet address as the primary output. You see the funds in your wallet immediately (spendable after maturity confirmations). Pool operators can collect a configurable fee as a second coinbase output, automatically deducted from each block.
+
+DTM can be enabled per coin, so you can run some coins in pool mode and others in DTM mode on the same instance.
+
+**How to enable DTM:**
+- **With a license**: Toggle DTM on in the coin's configuration page — done.
+- **Without a license**: Toggle DTM on and accept a 0.5% revenue share on block rewards. The revenue share is automatic and tamper-proof — it's a coinbase output, not a fee you can skip. Available for built-in coins (DGB, BTC, BCH, XEC) only.
+- **Custom coins** (coins.json): DTM requires a license. Revenue share is not available for custom coins.
+
+Toggling DTM off resets the revenue share acceptance — you'll need to re-accept if you turn it back on.
+
+See the [DTM Best Practices Guide](v3.1.0-Direct-to-Miner-Best-Practicess.md) for recommended settings and screenshots.
+
+**Earnings Page — Direct Payouts**
+
+When running in DTM mode, the earnings page shows a "Direct Payouts" table listing every block your miners found, with the miner's address, worker name, reward amount, and maturity status (Immature → Spendable). If you switch between pool mode and DTM mode, historical records from both modes are preserved and visible in collapsible sections.
+
+**Dashboard — Block Odds Card**
+
+A new "Block Odds" card on the coin pool dashboard shows your pool's share of the network hashrate, estimated time to find a block, and projected blocks per day and per month. Updates every 30 seconds. Collapsible if you don't want to see it.
+
+**Wallet Address Mismatch Warning**
+
+If the payout address in your coin configuration doesn't belong to the node wallet, a red warning banner appears on the dashboard with a direct link to fix the configuration. This catches a common setup mistake where operators accidentally overwrite the node wallet address with their personal wallet address. The warning only appears in pool mode — DTM mode intentionally allows external addresses.
+
+**UI Improvements**
+
+- **Best Share on mobile** — tap the Best Share value in the miners table to see when it was submitted, the block difficulty, and the block height. Previously this was hover-only (desktop).
+- **Earnings tables on mobile** — all payment tables now scroll horizontally on small screens so you can see all columns.
+- **Network charts** — removed the 7-day time range option from difficulty and hashrate charts. The 1-hour, 6-hour, and 24-hour options remain, consistent with the miner detail page charts.
+- **Better validation feedback** — configuration errors stay visible until you fix them, and save errors now list the specific fields with problems instead of a generic message.
+
+**Database**
+
+This release includes an automatic database schema update (v17). The GSS applies it on first start — no manual steps needed. Existing pool mode data is unaffected.
+
+**Upgrade Notes**
+
+- Existing configurations work without changes. DTM is off by default (`enable_dtm` defaults to `false`).
+- If you enable DTM, we recommend lowering `max_job_history` to 5 and `check_interval_seconds` to 120 for faster maturity status updates. See the [DTM Best Practices Guide](v3.1.0-Direct-to-Miner-Best-Practicess.md) for details.
+- Pool mode is completely unaffected by DTM changes. All DTM code paths are behind authorization checks — they don't activate unless you explicitly enable DTM and have a license or accepted revenue share.
 
 ---
 
