@@ -1,5 +1,37 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.1.0
+## v3.0.15 through v3.2.2
+
+---
+
+## v3.2.2
+
+**New Built-in Coin: Bitcoin II (BC2)**
+
+Bitcoin II is now a built-in coin with full support for DTM mode and revenue share. If you previously had BC2 configured via `coins.json`, you can migrate to the built-in implementation by setting `"coin_type": "bitcoinii"` in your config. The `coins.json` entry is no longer needed.
+
+**Early Orphan Detection**
+
+Orphaned blocks are now detected immediately on every maturity check cycle, not just when the block reaches full maturity (100+ confirmations). Previously, if your block was replaced by a chain reorganization, you wouldn't know until the maturity confirmations were reached. Now the dashboard updates within seconds of the orphan occurring.
+
+**Block Submission — Version Rolling Compatibility**
+
+Fixed a rare block submission failure that could occur when a miner doesn't support BIP310 version rolling. Miners that send empty version bits in their share submissions (e.g., older firmware or CPU miners) now submit blocks correctly. This fix has been applied to all coin implementations.
+
+**DTM Configuration Warning**
+
+A yellow warning banner now appears on the coin pool dashboard when DTM settings have been changed in the configuration but the pool hasn't been restarted yet. This prevents the situation where you think DTM is active because the badge shows, but the pool is actually still running with the previous settings. Unload and reload the coin pool to apply DTM changes.
+
+**Miner Detail Page — Spendable Status**
+
+Fixed DTM blocks showing as "Pending" (blue badge) on the miner detail page even after they had matured. DTM blocks now correctly show "Spendable" (green badge) on the miner detail page, matching the dashboard, blocks page, and earnings page.
+
+**Payout Mode Gating**
+
+Fixed payout mode determination to use the actual runtime DTM state instead of the raw configuration value. This prevents incorrect payout mode assignment when DTM is configured in `config.json` but not authorized (no license and no revenue share acceptance).
+
+**Estimated Time to Block — Large Value Fix**
+
+Fixed the estimated time-to-block display showing incorrect negative values (e.g., "-59m") when the estimate exceeded ~292 years. Solo miners on high-difficulty coins now see correctly formatted estimates like "259y 46d" instead of nonsensical negative values.
 
 ---
 
