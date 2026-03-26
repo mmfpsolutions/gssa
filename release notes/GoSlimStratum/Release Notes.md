@@ -1,85 +1,142 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v3.2.2
+## v3.0.15 through v4.0.0
 
 ---
 
-## v3.2.2
+## v4.0.0
 
-**New Built-in Coin: Bitcoin II (BC2)**
+### Multi-Algorithm Mining Support
 
-Bitcoin II is now a built-in coin with full support for DTM mode and revenue share. If you previously had BC2 configured via `coins.json`, you can migrate to the built-in implementation by setting `"coin_type": "bitcoinii"` in your config. The `coins.json` entry is no longer needed.
+GoSlimStratum now supports multiple mining algorithms. Run SHA256d, Scrypt, Skein, and Qubit on the same instance — each with independent share validation, difficulty tracking, and metrics.
 
-**Early Orphan Detection**
+| Algorithm | Coins | Typical Miners |
+|-----------|-------|----------------|
+| SHA256d | BTC, DGB, BCH, XEC, BC2, custom coins | Bitaxe, Antminer, NerdQAxe++, Canaan Nano3S |
+| Scrypt | DGB, LTC, DOGE | Antminer L7/L9, Goldshell Mini-DOGE, GPU, CPU |
+| Skein | DGB | Baikal BK-G28, GPU |
+| Qubit | DGB | Baikal BK-G28, GPU |
 
-Orphaned blocks are now detected immediately on every maturity check cycle, not just when the block reaches full maturity (100+ confirmations). Previously, if your block was replaced by a chain reorganization, you wouldn't know until the maturity confirmations were reached. Now the dashboard updates within seconds of the orphan occurring.
+**DigiByte Multi-Algorithm**: Run up to 4 algorithm pools for DGB on a single instance sharing one node. Each pool has its own stratum port and difficulty settings. Select the algorithm in the coin configuration page.
 
-**Block Submission — Version Rolling Compatibility**
+**Configuration**: Set `"algorithm": "scrypt"` (or `"skein"`, `"qubit"`) in the coin config. DGB defaults to SHA256d. LTC and DOGE default to scrypt automatically.
 
-Fixed a rare block submission failure that could occur when a miner doesn't support BIP310 version rolling. Miners that send empty version bits in their share submissions (e.g., older firmware or CPU miners) now submit blocks correctly. This fix has been applied to all coin implementations.
+### New Built-in Coins
 
-**DTM Configuration Warning**
+**Litecoin (LTC)** — Full scrypt mining support with MWEB (MimbleWimble Extension Block) block submission. DTM mode and pool mode with payouts. Revenue share available. Address validation for P2PKH (`L`), P2SH (`M`), and Bech32 (`ltc1q`). 100 confirmation maturity.
 
-A yellow warning banner now appears on the coin pool dashboard when DTM settings have been changed in the configuration but the pool hasn't been restarted yet. This prevents the situation where you think DTM is active because the badge shows, but the pool is actually still running with the previous settings. Unload and reload the coin pool to apply DTM changes.
+**Dogecoin (DOGE)** — Scrypt mining support. DTM mode only (pool mode payouts not supported due to DOGE Core legacy RPC). Revenue share available. Address validation for P2PKH (`D` mainnet). 240 confirmation maturity. No SegWit.
 
-**Miner Detail Page — Spendable Status**
+**Bitcoin II (BC2)** — SHA256d mining support as a built-in coin with DTM mode and revenue share. If you previously had BC2 configured via `coins.json`, set `"coin_type": "bitcoinii"` in your config — the `coins.json` entry is no longer needed.
 
-Fixed DTM blocks showing as "Pending" (blue badge) on the miner detail page even after they had matured. DTM blocks now correctly show "Spendable" (green badge) on the miner detail page, matching the dashboard, blocks page, and earnings page.
+### Direct-to-Miner (DTM) Mode
 
-**Payout Mode Gating**
+Block rewards go directly to the miner's wallet via the coinbase transaction. No payout system, no waiting. When your pool finds a block, the reward is embedded in the coinbase with your wallet address as the primary output. Spendable after maturity confirmations. Pool operators collect fees as a second coinbase output, automatically deducted from each block.
 
-Fixed payout mode determination to use the actual runtime DTM state instead of the raw configuration value. This prevents incorrect payout mode assignment when DTM is configured in `config.json` but not authorized (no license and no revenue share acceptance).
-
-**Estimated Time to Block — Large Value Fix**
-
-Fixed the estimated time-to-block display showing incorrect negative values (e.g., "-59m") when the estimate exceeded ~292 years. Solo miners on high-difficulty coins now see correctly formatted estimates like "259y 46d" instead of nonsensical negative values.
-
----
-
-## v3.1.0
-
-**Direct-to-Miner (DTM) Mode**
-
-Block rewards now go directly to the miner's wallet — no payout system, no waiting. When your pool finds a block, the reward is embedded in the coinbase transaction with your wallet address as the primary output. You see the funds in your wallet immediately (spendable after maturity confirmations). Pool operators can collect a configurable fee as a second coinbase output, automatically deducted from each block.
-
-DTM can be enabled per coin, so you can run some coins in pool mode and others in DTM mode on the same instance.
+DTM can be enabled per coin — run some coins in pool mode and others in DTM on the same instance. Works with all algorithms.
 
 **How to enable DTM:**
 - **With a license**: Toggle DTM on in the coin's configuration page — done.
-- **Without a license**: Toggle DTM on and accept a 0.5% revenue share on block rewards. The revenue share is automatic and tamper-proof — it's a coinbase output, not a fee you can skip. Available for built-in coins (DGB, BTC, BCH, XEC) only.
+- **Without a license**: Toggle DTM on and accept a 0.5% revenue share on block rewards. Available for built-in coins (DGB, BTC, BCH, XEC, LTC, DOGE, BC2) only.
 - **Custom coins** (coins.json): DTM requires a license. Revenue share is not available for custom coins.
 
-Toggling DTM off resets the revenue share acceptance — you'll need to re-accept if you turn it back on.
+See the [DTM Best Practices Guide](v4.0.0-Direct-to-Miner-Best-Practices.md) for recommended settings and screenshots.
 
-See the [DTM Best Practices Guide](v3.1.0-Direct-to-Miner-Best-Practicess.md) for recommended settings and screenshots.
+### API Key Authentication (Port 4004)
 
-**Earnings Page — Direct Payouts**
+Operators can protect the `:4004` API with a simple API key, useful when exposing the API externally for ETL scripts or monitoring.
 
-When running in DTM mode, the earnings page shows a "Direct Payouts" table listing every block your miners found, with the miner's address, worker name, reward amount, and maturity status (Immature → Spendable). If you switch between pool mode and DTM mode, historical records from both modes are preserved and visible in collapsible sections.
+- Configured via separate `apikey.json` file (never exposed via API)
+- Disabled by default. Missing file = disabled
+- When enabled, all non-exempt API calls require `X-API-Key` header
+- Companion app auth (GSSM/GSSUC) always passes regardless of API key
+- Requires a valid license — the API key is an additional security layer, not a license bypass
 
-**Dashboard — Block Odds Card**
+```json
+{
+  "enabled": true,
+  "key": "your-secret-api-key"
+}
+```
 
-A new "Block Odds" card on the coin pool dashboard shows your pool's share of the network hashrate, estimated time to find a block, and projected blocks per day and per month. Updates every 30 seconds. Collapsible if you don't want to see it.
+```bash
+curl -H "X-API-Key: your-secret-api-key" http://host:4004/api/v1/DGB/metrics/pool
+```
 
-**Wallet Address Mismatch Warning**
+### Web UI Authentication (Port 3003)
 
-If the payout address in your coin configuration doesn't belong to the node wallet, a red warning banner appears on the dashboard with a direct link to fix the configuration. This catches a common setup mistake where operators accidentally overwrite the node wallet address with their personal wallet address. The warning only appears in pool mode — DTM mode intentionally allows external addresses.
+Operators can require username/password login for the web dashboard. Protects all pages and API proxy calls on port 3003.
 
-**UI Improvements**
+- Configured via separate `userauth.json` file (not in config.json)
+- Disabled by default. Missing file = disabled
+- Requires a valid license
+- Multiple users supported with bcrypt-hashed passwords
+- Session-based with configurable timeout (default 24 hours)
+- After login, redirects to the originally requested page
 
-- **Best Share on mobile** — tap the Best Share value in the miners table to see when it was submitted, the block difficulty, and the block height. Previously this was hover-only (desktop).
-- **Earnings tables on mobile** — all payment tables now scroll horizontally on small screens so you can see all columns.
-- **Network charts** — removed the 7-day time range option from difficulty and hashrate charts. The 1-hour, 6-hour, and 24-hour options remain, consistent with the miner detail page charts.
-- **Better validation feedback** — configuration errors stay visible until you fix them, and save errors now list the specific fields with problems instead of a generic message.
+**Security Note:** Credentials are transmitted over HTTP. For internet-facing deployments, place a reverse proxy with HTTPS in front of GSS.
 
-**Database**
+```json
+{
+  "enabled": true,
+  "session_timeout_minutes": 1440,
+  "users": [
+    {
+      "uid": "user1",
+      "username": "admin",
+      "password": "$2a$10$BCRYPT_HASH_HERE"
+    }
+  ]
+}
+```
 
-This release includes an automatic database schema update (v17). The GSS applies it on first start — no manual steps needed. Existing pool mode data is unaffected.
+**Generating a bcrypt password hash:**
+```bash
+python3 -c "import bcrypt; print(bcrypt.hashpw(b'your-password', bcrypt.gensalt()).decode())"
+```
 
-**Upgrade Notes**
+### Earnings Page — Direct Payouts
 
-- Existing configurations work without changes. DTM is off by default (`enable_dtm` defaults to `false`).
-- If you enable DTM, we recommend lowering `max_job_history` to 5 and `check_interval_seconds` to 120 for faster maturity status updates. See the [DTM Best Practices Guide](v3.1.0-Direct-to-Miner-Best-Practicess.md) for details.
-- Pool mode is completely unaffected by DTM changes. All DTM code paths are behind authorization checks — they don't activate unless you explicitly enable DTM and have a license or accepted revenue share.
+When running in DTM mode, the earnings page shows a "Direct Payouts" table listing every block your miners found, with the miner's address, worker name, reward amount, and maturity status (Immature → Spendable).
+
+### Dashboard — Block Odds Card
+
+A new "Block Odds" card shows your pool's share of the network hashrate, estimated time to find a block, and projected blocks per day/month. Updates every 30 seconds. Collapsible.
+
+### Wallet Address Mismatch Warning
+
+If the payout address doesn't belong to the node wallet, a red warning banner appears on the dashboard. This catches a common setup mistake. The warning only appears in pool mode — DTM mode intentionally allows external addresses.
+
+### Bug Fixes
+
+- **Early orphan detection** — Orphaned blocks detected immediately on every maturity check, not just at full maturity
+- **Version rolling compatibility** — Fixed block submission failure for miners without BIP310 version rolling support. Applied to all coin implementations
+- **DTM config warning** — Yellow banner when DTM settings changed but pool not restarted
+- **Miner detail page** — DTM blocks now show "Spendable" instead of stuck on "Pending"
+- **Payout mode gating** — Fixed payout mode to use runtime DTM state instead of raw config value
+- **Time-to-block overflow** — Fixed negative display values for very large estimates (>292 years)
+- **Block matured notification** — DTM blocks now show "Spendable" instead of "Ready for payout" in notifications
+
+### UI Improvements
+
+- **Algorithm badge** — Non-SHA256d pools show a purple algorithm badge on the dashboard
+- **Algorithm selector** — DGB coin config shows Mining Algorithm dropdown (SHA256d, Scrypt, Skein, Qubit)
+- **Best Share on mobile** — tap to see submission details (previously hover-only)
+- **Earnings tables on mobile** — horizontal scroll on small screens
+- **Network charts** — removed 7-day option, consistent with miner detail charts
+- **Better validation feedback** — save errors list specific fields
+
+### Database
+
+This release includes automatic database schema updates. Applied on first start — no manual steps needed. Existing data is unaffected.
+
+### Upgrade Notes
+
+- Existing configurations work without changes. New features (DTM, multi-algo, auth) are all off by default.
+- LTC and DOGE coin types automatically default to scrypt algorithm.
+- DGB defaults to SHA256d — change via config page or `"algorithm"` field in config.json.
+- If you enable DTM, lower `max_job_history` to 5 and `check_interval_seconds` to 120. See the [DTM Best Practices Guide](v4.0.0-Direct-to-Miner-Best-Practices.md).
+- DOGE is DTM mode only — pool mode payouts are not supported.
+- API key and web UI auth require separate config files (`apikey.json`, `userauth.json`). See examples above.
 
 ---
 
