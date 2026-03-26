@@ -48,7 +48,6 @@ Operators can protect the `:4004` API with a simple API key, useful when exposin
 - Configured via separate `apikey.json` file (never exposed via API)
 - Disabled by default. Missing file = disabled
 - When enabled, all non-exempt API calls require `X-API-Key` header
-- Companion app auth (GSSM/GSSUC) always passes regardless of API key
 - Requires a valid license — the API key is an additional security layer, not a license bypass
 
 ```json
