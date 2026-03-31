@@ -1,5 +1,46 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.0.0
+## v3.0.15 through v4.0.1
+
+---
+
+## v4.0.1
+
+### P2SH / P2TR / Taproot (Bech32m) Address Support
+
+Added P2SH (Pay-to-Script-Hash) and Taproot (P2TR / Bech32m) address support across all coin implementations. Miners can now use any standard address type as their mining or payout address in both pool mode and DTM mode.
+
+**Complete address type support by coin:**
+
+| Address Type | BTC | DGB | BCH | XEC | BC2 | LTC | DOGE |
+|---|---|---|---|---|---|---|---|
+| P2PKH (legacy) | `1...` | `D...` | CashAddr `q...` | CashAddr `q...` | `1...` | `L...` | `D...` |
+| P2SH | `3...` | `S...` | CashAddr `p...` | CashAddr `p...` | `3...` | `M...` | `9/A...` |
+| P2WPKH (Bech32) | `bc1q...` | `dgb1q...` | — | — | `bc1q...` | `ltc1q...` | — |
+| P2WSH (Bech32) | `bc1q...` | `dgb1q...` | — | — | `bc1q...` | `ltc1q...` | — |
+| P2TR (Bech32m) | `bc1p...` | `dgb1p...` | — | — | `bc1p...` | `ltc1p...` | — |
+
+Generic coins (`coins.json`) support all of the above based on configuration — P2PKH and P2SH are always available, and P2WPKH/P2WSH/P2TR are available when `segwit: true` with a Bech32 HRP configured.
+
+**What changed:**
+- Bech32m encoding/decoding added alongside existing Bech32 (BIP350 compliant)
+- Address validators accept witness version 1 (Taproot) with 32-byte programs
+- Coinbase output script generation for P2TR: `OP_1 <32-byte tweaked public key>`
+- BTC and BC2 accept `bcrt1` regtest addresses under testnet config
+
+### Pool Violation Shutdown — Wallet Address Mismatch Enforcement
+
+In pool mode (non-DTM), the health monitor now enforces wallet address ownership. If the configured payout address does not belong to the node wallet, the coin pool is automatically stopped to prevent misconfiguration issues.
+
+- **Pool mode + external address** — pool is stopped, miners disconnected, dashboard shows "Pool Stopped — Wallet Address Mismatch"
+- **Pool mode + node wallet address** — pool runs normally
+- **DTM mode** — completely unaffected, external addresses are expected
+- **Recovery** — fix the payout address in `config.json` and restart the pool
+
+### Upgrade Notes
+
+- No configuration changes required. All changes are backward compatible.
+- P2SH and P2TR address support is automatic — miners can start using these address types immediately after upgrading.
+- Pool violation shutdown is automatic in pool mode. If you are running pool mode with an external address (not in the node wallet), the pool will stop on the next health check. Switch to DTM mode or fix the payout address before upgrading.
 
 ---
 
