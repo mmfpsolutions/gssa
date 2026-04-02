@@ -1,5 +1,23 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.0.1
+## v3.0.15 through v4.0.2
+
+---
+
+## v4.0.2
+
+### Scrypt Display Scaling Fixes
+
+Fixed display formatting for scrypt coins (e.g., DGB-SCRYPT) across the dashboard and miner detail pages. Scrypt and SHA256d use different difficulty scales (ratio of 2^16 = 65536), so raw values needed UI-side conversion for consistent display.
+
+- **Best share** — divided by 65536 for scrypt coins on both dashboard miners table and miner detail page
+- **Block difficulty** — multiplied by 65536 for scrypt coins on both dashboard miners table and miner detail page
+- **Recent Blocks card** — share difficulty divided by 65536, block difficulty multiplied by 65536 for scrypt coins on both dashboard and miner detail page
+
+All changes are display-only — backend values are unchanged.
+
+### Bug Fix: Blocks Found Card Missing DTM Rewards
+
+The "Blocks Found" card on the coin pool dashboard showed the correct block count but displayed incorrect for the paid rewards amount when running in DTM (Direct-to-Miner) mode. DTM block rewards are now included in the total alongside pool-mode payouts. Previously was only showing non-DTM rewards amount.
 
 ---
 
