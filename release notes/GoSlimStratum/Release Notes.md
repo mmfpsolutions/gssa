@@ -1,5 +1,22 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.0.2
+## v3.0.15 through v4.0.3
+
+---
+
+## v4.0.3
+
+### LTC / DOGE Scrypt Support — Hashrate and Display Fixes
+
+Fixed hashrate calculation and difficulty display for Litecoin and Dogecoin. These single-algo scrypt coins report difficulty differently than DGB-SCRYPT (a multi-algo coin), which caused hashrate to be inflated by 65,536× and difficulty values to display incorrectly.
+
+- **Hashrate** — now uses the correct scrypt multiplier (2^16) for all scrypt coins including LTC and DOGE
+- **Best share** — correctly scaled for LTC and DOGE on both dashboard and miner detail page
+- **Block difficulty** — no longer incorrectly scaled for LTC and DOGE (values were already in the correct scale)
+- **Recent Blocks** — share difficulty and block difficulty now display correctly for all scrypt coins
+
+Added `difficulty_algorithm` field to the coin config API to allow the UI to distinguish between scrypt coins that need different display scaling (DGB-SCRYPT vs LTC/DOGE).
+
+DGB-SCRYPT display scaling from v4.0.2 is unchanged.
 
 ---
 
