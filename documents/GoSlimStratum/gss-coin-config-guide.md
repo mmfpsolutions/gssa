@@ -21,7 +21,10 @@ Here is a complete example of a coin configuration object in `config.json`:
 ```json
 "DGB": {
     "enabled": true,
+    "enable_dtm": false,
+    "dtm_revenue_share_accepted": false,
     "coin_type": "digibyte",
+    "algorithm": "sha256d",
     "display_name": "DigiByte Mainnet",
     "node": {
         "host": "127.0.0.1",
@@ -35,7 +38,9 @@ Here is a complete example of a coin configuration object in `config.json`:
         "template_refresh_interval": 15,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 120,
-        "dual_node_comm": true
+        "dual_node_comm": true,
+        "alternate_host": "",
+        "enable_failover": false
     },
     "stratum": {
         "host": "0.0.0.0",
@@ -92,6 +97,10 @@ Here is a complete example of a coin configuration object in `config.json`:
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
         "wallet_rpc_timeout_seconds": 30
+    },
+    "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
     }
 }
 ```
@@ -102,7 +111,10 @@ Here is a complete example of a coin configuration object in `config.json`:
 | Field | Description | Example |
 |-----|-----------|-------|
 | `enabled` | Whether this coin is active. Set to `false` to disable without removing config. | `true` |
-| `coin_type` | The coin implementation to use. | `"digibyte"`, `"bitcoin"`, `"bitcoincash"`, `"ecash"` |
+| `enable_dtm` | Enable Direct-to-Miner mode. Block rewards go directly to the miner's wallet address via the coinbase transaction. | `false` |
+| `dtm_revenue_share_accepted` | Accept 0.5% revenue share in lieu of a license for DTM mode. Only applies to built-in coins without a license. | `false` |
+| `coin_type` | The coin implementation to use. | `"digibyte"`, `"bitcoin"`, `"bitcoincash"`, `"ecash"`, `"litecoin"`, `"dogecoin"`, `"bitcoinii"` |
+| `algorithm` | Mining algorithm. Set automatically for most coins. DGB supports multiple algorithms on the same instance. | `"sha256d"` (default), `"scrypt"`, `"skein"`, `"qubit"` |
 | `display_name` | Human-readable name shown in the web dashboard. | `"DigiByte Mainnet"` |
 
 ---
@@ -125,6 +137,8 @@ Connection settings for your coin's node (full or pruned).
 | `zmq_enabled` | Use ZMQ for instant new block detection | `true` recommended if node supports ZMQ |
 | `zmq_stale_detection_time` | Seconds before falling back to polling if ZMQ silent | 120 default. Adjust to block time for defined coin |
 | `dual_node_comm` | Enable ZMQ + Polling, recommended | Default set to `false` if not defined |
+| `alternate_host` | Optional alternate node for block explorer queries and node failover | `"10.0.0.50"` or `"10.0.0.50:14022"`. If no port specified, uses the primary node's port |
+| `enable_failover` | Enable automatic failover to `alternate_host` when the primary node goes down (v4.1.0+) | `false` default. Requires `alternate_host` to be set and a license with the node failover scope. See **Node Failover** below |
 
 ### ZMQ Setup
 
@@ -135,6 +149,130 @@ zmqpubhashblock=tcp://0.0.0.0:28332
 ```
 
 Then set `zmq_block_notify` to match: `"tcp://127.0.0.1:28332"`
+
+### Node Failover - AS OF Version 4.1.0
+
+When `enable_failover` is `true` and `alternate_host` is set, GSS will automatically switch to the backup node if the primary becomes unreachable. Mining continues without interruption — miners stay connected, no reconnection required. Once the primary recovers, GSS fails back on the next natural block boundary.
+
+```json
+"node": {
+    "host": "192.168.1.100",
+    "port": 14022,
+    "username": "rpc_user",
+    "password": "rpc_password",
+    "alternate_host": "192.168.1.101",
+    "enable_failover": true
+}
+```
+
+**Behavior:**
+
+- **Failover trigger:** 3 consecutive health check failures on the primary node
+- **Failback trigger:** 5 consecutive successful primary checks, then waits for the next block boundary to switch back (avoids disruption mid-work)
+- **Anti-flapping:** An unstable primary resets the recovery counter, preventing premature failback
+- **ZMQ dual subscription:** GSS subscribes to ZMQ on both primary and backup simultaneously from startup, so block detection on the backup is instant — no polling lag during failover. If the backup doesn't have ZMQ configured, it falls back to polling-only on the backup node.
+- **Both nodes down:** If the backup is also unreachable when failover is attempted, GSS falls through to standard offline behavior (stop stratum, wait for reconnect).
+- **Dashboard banner:** The coin pool dashboard shows an orange "mining on backup node" banner while failover is active. The banner updates to "failback pending" when the primary recovers and is waiting for the next block.
+- **Notifications:** Failover and failback events are sent via the existing `nodes` notification channel (Telegram, Discord, email, webhook).
+
+**Requirements:**
+
+- Both nodes must use the **same RPC username, password, and port**
+- Both nodes must be on the **same chain tip** (this is automatic in normal operation — the failover relies on chain validity being node-agnostic, so in-flight work from the primary remains valid on the backup)
+- Wallet must be loaded on the backup node for payouts to continue
+- Requires a license with the **node failover scope**. The Config UI checkbox is disabled without the license, and the engine silently ignores the setting if the license is missing.
+- `alternate_host` is required when `enable_failover` is `true` — config save is rejected otherwise.
+
+> **Tip:** If you only need an alternate host for explorer queries (not mining failover), set `alternate_host` and leave `enable_failover` as `false`. The two settings are independent.
+
+### Merged Mining (AuxPoW) - AS OF Version 4.1.0
+
+Merged mining lets your miners simultaneously mine a parent chain and one or more aux (auxiliary) chains using the same hashrate — no extra work, no extra hardware. The classic example is **LTC → DOGE**: scrypt miners hashing for Litecoin can also produce Dogecoin blocks, since DOGE accepts AuxPoW (Auxiliary Proof of Work) blocks proven by LTC's parent chain.
+
+GSS implements full AuxPoW merged mining with **per-miner DTM coinbases on both chains**, including pool fee splits — most stratum pool implementations limit the aux chain coinbase to a single address. GSS uses the aux node's `submitblock` RPC with a fully constructed block, giving complete control over the aux chain's coinbase outputs.
+
+**Configuration:**
+
+Merged mining is configured per-coin via a `merged_mining` block. The parent chain declares its aux chains, and each aux chain points back to its parent.
+
+```json
+"coins": {
+    "LTC": {
+        "enabled": true,
+        "enable_dtm": true,
+        "coin_type": "litecoin",
+        "algorithm": "scrypt",
+        "merged_mining": {
+            "role": "parent",
+            "aux_chains": ["DOGE"]
+        },
+        "node": { "...": "..." },
+        "stratum": { "port": 4335, "...": "..." },
+        "mining": { "...": "..." }
+    },
+    "DOGE": {
+        "enabled": true,
+        "enable_dtm": true,
+        "coin_type": "dogecoin",
+        "algorithm": "scrypt",
+        "merged_mining": {
+            "role": "aux",
+            "aux_of": "LTC"
+        },
+        "node": { "...": "..." },
+        "stratum": { "port": 4336, "...": "..." },
+        "mining": { "...": "..." }
+    }
+}
+```
+
+**Fields:**
+
+| Field | Description | Required When |
+|-----|-----------|----------|
+| `role` | The chain's role in the merged mining relationship: `"parent"` or `"aux"` | Always (when `merged_mining` is set) |
+| `aux_chains` | List of aux chain config keys this parent embeds AuxPoW commitments for | `role` is `"parent"` |
+| `aux_of` | Config key of the parent chain this aux is mined alongside | `role` is `"aux"` |
+
+**Validation rules:**
+
+- Both the parent and every aux chain must have **DTM enabled** (license or revenue share)
+- The parent and aux chains must use the **same mining algorithm** (scrypt for LTC → DOGE)
+- Each aux chain referenced in `aux_chains` must exist, be enabled, and have its own `merged_mining` block declaring `role: "aux"` with `aux_of` pointing back to the parent
+- The coin pool dashboard shows an orange warning banner if any of these rules are violated, with a list of specific misconfigurations
+- Both LTC and DOGE remain fully functional **standalone** pools — merged mining is an additive layer, not a replacement. Removing the `merged_mining` config field leaves both pools running exactly as before.
+
+**Username format:**
+
+Miners point at the **parent chain's stratum port only** (no changes to miner hardware or firmware). To mine both chains, use a **pipe-delimited** username with both addresses:
+
+```
+ltc1qXXX|DXXX.workername    — LTC address + DOGE address + worker name
+ltc1qXXX.workername         — LTC only (no merged mining for this miner)
+```
+
+If the DOGE address is omitted, GSS falls back to the DOGE pool's `mining.address` config field. Backward compatible — existing miners without pipe syntax continue working unchanged.
+
+**How it works:**
+
+1. The aux chain (DOGE) is polled for new block templates via `getblocktemplate`
+2. GSS embeds an AuxPoW commitment (DOGE block hash) in the parent chain's (LTC) coinbase scriptSig
+3. Miners hash LTC headers as normal
+4. Every accepted LTC share is also checked against the DOGE difficulty target
+5. When a share meets the DOGE target, GSS constructs a full DOGE AuxPoW block and submits it via the DOGE node's `submitblock` RPC
+6. Block found notifications fire independently for both LTC and DOGE blocks
+
+**Dashboard:**
+
+- **Parent dashboard (LTC):** Orange `Merged → DOGE` badge in the status area. Each connected miner shows an orange `(M)` indicator next to their worker ID.
+- **Aux dashboard (DOGE):** Orange `AuxPoW ← LTC` badge in the status area. DOGE blocks found via merged mining appear in the Recent Blocks card with the same display as standalone-mined blocks.
+
+**Graceful degradation:**
+
+- If the aux node (DOGE) goes offline, jobs are built without the AuxPoW commitment and LTC-only mining continues. When the aux node comes back, the commitment resumes automatically.
+- If `merged_mining` is not set on either coin, behavior is identical to standalone pools — there is zero performance or correctness impact.
+
+> **Note:** Merged mining requires DTM mode on both chains. If you don't have a license, you can use revenue share (0.5%) on built-in coins. LTC and DOGE are both built-in coins.
 
 ---
 
@@ -241,10 +379,19 @@ Block construction and coinbase settings.
 
 ### Address Format Notes
 
-- **DGB:** Legacy `D...` or Bech32 `dgb1q...` (P2WPKH/P2WSH supported as of v3.0.28)
-- **BTC:** Legacy `1...`, P2SH `3...`, or Bech32 `bc1q...` (all supported)
-- **BCH:** Use CashAddr format `bitcoincash:q...`
-- **XEC:** Use eCash format `ecash:q...`
+All standard address types are supported for each coin:
+
+| Coin | P2PKH (Legacy) | P2SH | Bech32 (SegWit) | Bech32m (Taproot) | CashAddr |
+|------|---------------|------|-----------------|-------------------|----------|
+| **BTC** | `1...` | `3...` | `bc1q...` | `bc1p...` | — |
+| **DGB** | `D...` | `S...` | `dgb1q...` | `dgb1p...` | — |
+| **LTC** | `L...` | `M...` | `ltc1q...` | `ltc1p...` | — |
+| **DOGE** | `D...` | `9/A...` | — | — | — |
+| **BCH** | `1...` | `3...` | — | — | `bitcoincash:q/p...` |
+| **XEC** | `1...` | `3...` | — | — | `ecash:q/p...` |
+| **BC2** | `1...` | `3...` | `bc1q...` | `bc1p...` | — |
+
+BTC and BC2 also accept `bcrt1` regtest addresses when `network` is set to `"testnet"`.
 
 ---
 
@@ -331,6 +478,9 @@ Automatic payment processing settings.
 | BTC (Bitcoin) | 100 | Standard coinbase maturity |
 | BCH (Bitcoin Cash) | 100 | Standard coinbase maturity |
 | XEC (eCash) | 10 | Uses Avalanche finalization (faster) |
+| LTC (Litecoin) | 100 | Standard coinbase maturity |
+| DOGE (Dogecoin) | 240 | Higher maturity requirement |
+| BC2 (Bitcoin II) | 100 | Standard coinbase maturity |
 
 ### Understanding Satoshis
 
@@ -338,6 +488,21 @@ All amounts are in satoshis (the smallest unit):
 
 - `100000000` satoshis = 1 coin (for 8-decimal coins like BTC, DGB, BCH)
 - `100` satoshis = 1 XEC (XEC uses 2 decimals, so 100 satoshis = 1 XEC)
+
+---
+
+## Explorer Section
+
+Settings for the built-in block explorer (v4.1.0+). The explorer queries the coin's blockchain node to display block details, block lists, mempool info, and transaction details within the GSS web UI — no external block explorer required.
+
+| Field | Description | Guidelines |
+|-----|-----------|----------|
+| `use_rest_api` | Use the node's REST API instead of JSON-RPC for explorer calls | `false` default (uses RPC). Set to `true` if your node has `rest=1` enabled — REST is simpler and requires no authentication |
+| `use_alternate_host` | Route explorer calls to the alternate host instead of the primary node | `false` default. Set to `true` to offload explorer queries to a secondary node, keeping the primary node dedicated to mining |
+
+> **Note:** The explorer feature is available to all users — no license required. Data is fetched live from the node on each page hit (no polling, no database). Explorer pages are accessible at `/coin/{COIN}/explorer`.
+
+> **Tip:** For operators running high-hashrate pools, configure an alternate host for explorer calls to avoid adding load to the mining-critical primary node.
 
 ---
 

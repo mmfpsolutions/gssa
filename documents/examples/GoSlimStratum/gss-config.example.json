@@ -6,7 +6,10 @@
   "coins": {
     "DGB": {
       "enabled": true,
+      "enable_dtm": false,
+      "dtm_revenue_share_accepted": false,
       "coin_type": "digibyte",
+      "algorithm": "sha256d",
       "display_name": "DigiByte Mainnet",
       "node": {
         "host": "127.0.0.1",
@@ -20,7 +23,8 @@
         "template_refresh_interval": 15,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 120,
-        "dual_node_comm": false
+        "dual_node_comm": false,
+        "alternate_host": ""
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -73,10 +77,16 @@
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
         "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
       }
     },
     "BTC": {
       "enabled": true,
+      "enable_dtm": false,
+      "dtm_revenue_share_accepted": false,
       "coin_type": "bitcoin",
       "display_name": "Bitcoin",
       "node": {
@@ -91,7 +101,8 @@
         "template_refresh_interval": 30,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 900,
-        "dual_node_comm": true
+        "dual_node_comm": true,
+        "alternate_host": ""
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -144,10 +155,16 @@
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
         "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
       }
     },
     "BCH": {
       "enabled": true,
+      "enable_dtm": false,
+      "dtm_revenue_share_accepted": false,
       "coin_type": "bitcoincash",
       "display_name": "Bitcoin Cash",
       "node": {
@@ -162,7 +179,8 @@
         "template_refresh_interval": 30,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 900,
-        "dual_node_comm": true
+        "dual_node_comm": true,
+        "alternate_host": ""
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -209,12 +227,174 @@
       "payout": {
         "enabled": true,
         "pool_fee_percent": 1.0,
-        "maturity_confirmations": 10,
+        "maturity_confirmations": 100,
         "payment_interval_seconds": 1800,
         "minimum_confirmations": 6,
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
         "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
+      }
+    },
+    "LTC": {
+      "enabled": false,
+      "enable_dtm": true,
+      "dtm_revenue_share_accepted": true,
+      "coin_type": "litecoin",
+      "algorithm": "scrypt",
+      "display_name": "Litecoin",
+      "node": {
+        "host": "127.0.0.1",
+        "port": 9332,
+        "username": "ltcrpc",
+        "password": "your_ltc_rpc_password",
+        "use_ssl": false,
+        "wallet_name": "default",
+        "wallet_passphrase": "",
+        "zmq_block_notify": "tcp://127.0.0.1:28335",
+        "template_refresh_interval": 30,
+        "zmq_enabled": true,
+        "zmq_stale_detection_time": 300,
+        "dual_node_comm": true,
+        "alternate_host": ""
+      },
+      "stratum": {
+        "host": "0.0.0.0",
+        "port": 3336,
+        "difficulty": 65536,
+        "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
+        "connection_timeout_seconds": 600,
+        "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "consolidation_threshold_seconds": 3,
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
+      },
+      "mining": {
+        "address": "LYourLitecoinAddressHere",
+        "network": "mainnet",
+        "coinbase_text": "GoSlimStratum/LTC",
+        "extranonce_size": 8,
+        "max_job_history": 5,
+        "job_expiration_time": 300,
+        "stale_share_grace_period": 5
+      },
+      "vardiff": {
+        "enabled": true,
+        "minDiff": 65536,
+        "maxDiff": 4194304,
+        "targetTime": 15,
+        "retargetTime": 180,
+        "variancePercent": 30,
+        "onNewBlock": true,
+        "useFloatDiff": false,
+        "floatDiffBelowOne": true,
+        "floatDiffPrecision": 4,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
+      },
+      "payout": {
+        "enabled": false,
+        "pool_fee_percent": 1.0,
+        "maturity_confirmations": 100,
+        "payment_interval_seconds": 1800,
+        "minimum_confirmations": 6,
+        "maturity_check_interval_seconds": 60,
+        "confirmation_check_interval_seconds": 300,
+        "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
+      }
+    },
+    "DOGE": {
+      "enabled": false,
+      "enable_dtm": true,
+      "dtm_revenue_share_accepted": true,
+      "coin_type": "dogecoin",
+      "algorithm": "scrypt",
+      "display_name": "Dogecoin",
+      "node": {
+        "host": "127.0.0.1",
+        "port": 22555,
+        "username": "dogerpc",
+        "password": "your_doge_rpc_password",
+        "use_ssl": false,
+        "wallet_name": "default",
+        "wallet_passphrase": "",
+        "zmq_block_notify": "tcp://127.0.0.1:28338",
+        "template_refresh_interval": 15,
+        "zmq_enabled": true,
+        "zmq_stale_detection_time": 120,
+        "dual_node_comm": true,
+        "alternate_host": ""
+      },
+      "stratum": {
+        "host": "0.0.0.0",
+        "port": 3338,
+        "difficulty": 65536,
+        "accept_miner_suggested_diff": false,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {},
+        "connection_timeout_seconds": 600,
+        "disambiguation_enabled": false,
+        "auto_worker_id": true,
+        "default_worker_id": "",
+        "consolidation_threshold_seconds": 3,
+        "ping_enabled": true,
+        "ping_interval_seconds": 30
+      },
+      "mining": {
+        "address": "DYourDogecoinAddressHere",
+        "network": "mainnet",
+        "coinbase_text": "GoSlimStratum/DOGE",
+        "extranonce_size": 8,
+        "max_job_history": 5,
+        "job_expiration_time": 300,
+        "stale_share_grace_period": 5
+      },
+      "vardiff": {
+        "enabled": true,
+        "minDiff": 65536,
+        "maxDiff": 4194304,
+        "targetTime": 15,
+        "retargetTime": 180,
+        "variancePercent": 30,
+        "onNewBlock": true,
+        "useFloatDiff": false,
+        "floatDiffBelowOne": true,
+        "floatDiffPrecision": 4,
+        "floodProtection": {
+          "enabled": false,
+          "sharesToCheck": 4,
+          "triggerThreshold": 0.25,
+          "maxAdjustmentMultiplier": 16
+        }
+      },
+      "payout": {
+        "enabled": false,
+        "pool_fee_percent": 1.0,
+        "maturity_confirmations": 240,
+        "payment_interval_seconds": 1800,
+        "minimum_confirmations": 6,
+        "maturity_check_interval_seconds": 60,
+        "confirmation_check_interval_seconds": 300,
+        "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": false,
+        "use_alternate_host": false
       }
     }
   },
@@ -257,6 +437,7 @@
     "host": "0.0.0.0",
     "port": 3003,
     "api_base_url": "/api/v1",
+    "animated_background": "hash-drift",
     "block_explorer_urls": {
       "DGB": "https://chainz.cryptoid.info/dgb/block.dws?{hash}",
       "BTC": "https://chainz.cryptoid.info/btc/block.dws?{hash}",

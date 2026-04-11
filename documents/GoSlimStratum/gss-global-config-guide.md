@@ -65,6 +65,7 @@ This guide covers the global sections of `config.json` and the full `notificatio
         "host": "0.0.0.0",
         "port": 3003,
         "api_base_url": "/api/v1",
+        "animated_background": "hash-drift",
         "block_explorer_urls": {
             "DGB": "https://chainz.cryptoid.info/dgb/block.dws?{hash}",
             "BTC": "https://chainz.cryptoid.info/btc/block.dws?{hash}",
@@ -102,6 +103,7 @@ Top-level pool identity settings.
 | Field | Default | Description |
 |-----|-------|-----------|
 | `pool_name` | `"GoSlimStratum Pool"` | The display name of your pool. Shown in the web dashboard and used in notifications. |
+| `connection_timeout_seconds` | `600` | Default connection timeout for all coins (seconds). Can be overridden per coin in the stratum section. |
 
 ---
 
@@ -228,11 +230,13 @@ Controls the built-in web dashboard served by GSS.
 | `enabled` | `false` | Enable the web dashboard. |
 | `host` | `"0.0.0.0"` | IP address to bind the web server to. `"0.0.0.0"` accepts connections on all interfaces. |
 | `port` | `3003` | Port the web dashboard is served on. |
-| `api_base_url` | `"http://localhost:4004/api/v1"` | URL the web frontend uses to fetch data from the HTTP API. Must be reachable from the browser — use your server's public IP or hostname, not `localhost`, if accessing remotely. |
+| `api_base_url` | `"/api/v1"` | URL the web frontend uses to fetch data from the HTTP API. Auto-rewritten to `/api/v1` at startup — the web UI proxies API calls through port 3003 to the backend on port 4004 internally. No need to configure an external URL. |
 
 ### Block Explorer URLs
 
-Configures external block explorer links in the dashboard. Use the coin ticker symbol as the key. Use `{hash}` as a placeholder for the block hash.
+> **Note (v4.1.0+):** Block hash and height links in the Blocks and Earnings dashboards now use the built-in block explorer instead of external URLs. These settings are no longer used for block lookups. They remain in the config for backward compatibility but can be removed.
+
+Configures external block explorer links. Use the coin ticker symbol as the key. Use `{hash}` as a placeholder for the block hash.
 
 ```json
 "block_explorer_urls": {
@@ -244,7 +248,7 @@ Configures external block explorer links in the dashboard. Use the coin ticker s
 
 ### Transaction Explorer URLs
 
-Links to transaction details on an external explorer. Use `{txid}` as the placeholder.
+Links to transaction details on an external explorer. Use `{txid}` as the placeholder. Still used for pool-mode payout transactions (which are not in blocks mined by the pool).
 
 ```json
 "tx_explorer_urls": {
@@ -256,7 +260,7 @@ Links to transaction details on an external explorer. Use `{txid}` as the placeh
 
 ### Address Explorer URLs
 
-Links to address lookups on an external explorer. Use `{address}` as the placeholder.
+Links to address lookups on an external explorer. Use `{address}` as the placeholder. Still used — address lookups require `txindex` which most nodes don't run.
 
 ```json
 "address_explorer_urls": {

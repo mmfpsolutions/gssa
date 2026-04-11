@@ -1,22 +1,182 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.0.3
+## v3.0.15 through v4.1.0
 
 ---
 
-## v4.0.3
+## v4.1.0
 
-### LTC / DOGE Scrypt Support — Hashrate and Display Fixes
+### Built-in Block Explorer
 
-Fixed hashrate calculation and difficulty display for Litecoin and Dogecoin. These single-algo scrypt coins report difficulty differently than DGB-SCRYPT (a multi-algo coin), which caused hashrate to be inflated by 65,536× and difficulty values to display incorrectly.
+GSS now includes a built-in block explorer that queries your coin's blockchain node directly. No external block explorer needed — ideal for testnet, regtest, and obscure coins where public explorers don't exist.
 
-- **Hashrate** — now uses the correct scrypt multiplier (2^16) for all scrypt coins including LTC and DOGE
-- **Best share** — correctly scaled for LTC and DOGE on both dashboard and miner detail page
-- **Block difficulty** — no longer incorrectly scaled for LTC and DOGE (values were already in the correct scale)
-- **Recent Blocks** — share difficulty and block difficulty now display correctly for all scrypt coins
+**Pages:**
+- **Explorer Dashboard** — chain info, mempool summary, recent blocks, search by height or hash
+- **Block Detail** — full block header info, all transactions with clickable txids, previous/next navigation
+- **Transaction Detail** — inputs, outputs (address, value, type), coinbase hex-to-ASCII decoding
+- **Blocks List** — recent blocks with "Load More" pagination, DGB multi-algo column when applicable
+- **Mempool** — dynamic stat cards for all fields the node returns
 
-Added `difficulty_algorithm` field to the coin config API to allow the UI to distinguish between scrypt coins that need different display scaling (DGB-SCRYPT vs LTC/DOGE).
+**Configuration (per coin):**
+- `alternate_host` — optional secondary node for explorer queries (avoids load on the mining-critical primary node)
+- `use_rest_api` — use REST API instead of JSON-RPC (requires `rest=1` on the node)
+- `use_alternate_host` — route explorer calls to the alternate host
 
-DGB-SCRYPT display scaling from v4.0.2 is unchanged.
+Block hash and height links on the Blocks and Earnings dashboards now navigate to the internal explorer. Transaction and address links remain external. No license required — available to all users.
+
+### Pool Topology Visualization
+
+New animated canvas page showing the live pool data flow: miners → GSS hub → coin node. Access via the lightning bolt icon on the dashboard header.
+
+- **Miners** — displayed as colored nodes sized by relative hashrate, color-coded by tier
+- **GSS Hub** — center circle with concentric pulsing rings, showing pool hashrate, active miners, shares, and blocks found
+- **Coin Node** — circle showing block height, difficulty, network hashrate, and ZMQ connection state
+- **Animated particles** — shares (blue, miner → hub), jobs (amber, hub → miner), ZMQ notifications (green, node → hub), GBT polls (gray, hub → node)
+- **Block found burst** — gold rings emanate from the hub with a victory chime sound when a new block is detected
+- **Hover tooltips** — miner device type, hashrate, shares, best difficulty
+- Top 20 miners by hashrate displayed; larger pools show "... and N more miners"
+
+
+### Animated Background
+
+Three configurable animated canvas backgrounds themed around mining concepts. Selectable from the Global Configuration page.
+
+- **Hash Drift** (default) — hex string fragments drift upward, characters mutate to simulate live computation
+- **Node Mesh** — floating nodes with connecting lines evoking a network topology
+- **Share Pulse** — radial rings expand outward simulating share submissions
+- **Off** — no animation
+
+Respects `prefers-reduced-motion` and pauses when the tab is hidden. Set via `animated_background` in the `web` section of config.json.
+
+### LTC / DOGE Scrypt Support
+
+Fixed hashrate calculation and difficulty display for Litecoin and Dogecoin. These single-algo scrypt coins report difficulty differently than DGB-SCRYPT, which caused hashrate to be inflated by 65,536x and difficulty values to display incorrectly.
+
+- **Hashrate** — now uses the correct scrypt multiplier for all scrypt coins including LTC and DOGE
+- **Best share** — correctly scaled on both dashboard and miner detail page
+- **Block difficulty** — no longer incorrectly scaled for LTC and DOGE
+- **Recent Blocks** — share difficulty and block difficulty display correctly for all scrypt coins
+
+### Node Failover
+
+When a blockchain node goes down, GSS now automatically fails over to the configured `alternate_host` and continues mining without interruption. No stratum disconnect, no miner reconnection needed. Once the primary node recovers, GSS fails back on the next natural block boundary.
+
+- **Automatic detection** — 3 consecutive health check failures trigger failover
+- **Seamless mining** — miners receive `cleanJobs=true` and continue working on the backup node's templates
+- **Smart failback** — requires 5 consecutive successful primary checks before switching back, then waits for the next block to avoid disruption mid-work
+- **ZMQ dual subscription** — GSS subscribes to ZMQ on both nodes simultaneously for near-instant block detection on the backup, no polling lag
+- **Dashboard banner** — orange banner appears during failover showing the active backup host, updates to "failback pending" when primary recovers
+- **Notifications** — failover and failback events sent to configured notification channels (Telegram, Discord, email, webhook)
+- **Payouts continue** — metrics and payout RPC clients are updated automatically (requires wallet loaded on backup node)
+
+**Configuration (per coin, node section):**
+```json
+{
+    "alternate_host": "192.168.1.100",
+    "enable_failover": true
+}
+```
+
+RPC username, password, and port must be the same on both nodes. Requires a license with node failover scope. The checkbox is disabled in the config UI without the license, and the engine silently ignores the setting if the license is missing.
+
+### Merged Mining (AuxPoW) — LTC → DOGE
+
+GSS now supports AuxPoW (Auxiliary Proof of Work) merged mining. Miners hashing for a parent chain like Litecoin can simultaneously produce blocks on aux chains like Dogecoin — the same hashrate, no extra hardware, no extra electricity. GSS handles the AuxPoW block construction and submission entirely on the pool side.
+
+**How it works:**
+
+- Miners connect to the **parent chain's stratum port only** — no firmware or hardware changes
+- A **pipe-delimited username** provides addresses for both chains: `ltc1qXXX|DXXX.workername`
+- GSS embeds an AuxPoW commitment in every parent chain coinbase
+- Every accepted parent share is checked against the aux chain's difficulty target — if it meets it, GSS constructs and submits a full AuxPoW block to the aux node
+- LTC and DOGE block found events fire independently
+- DTM mode is required on both the parent and aux chains (via license or revenue share). LTC and DOGE are both built-in coins.
+
+**Per-Miner DTM on Both Chains:**
+
+GSS submits AuxPoW blocks via the aux node's `submitblock` RPC with a fully constructed block, giving full control over the aux chain's coinbase outputs — per-miner DTM addresses, pool fee splits, and revenue share outputs all work on the aux chain. Most stratum pool implementations limit the aux chain coinbase to a single address.
+
+**Configuration:**
+
+```json
+"coins": {
+    "LTC": {
+        "enabled": true,
+        "enable_dtm": true,
+        "merged_mining": { "role": "parent", "aux_chains": ["DOGE"] }
+    },
+    "DOGE": {
+        "enabled": true,
+        "enable_dtm": true,
+        "merged_mining": { "role": "aux", "aux_of": "LTC" }
+    }
+}
+```
+
+**Validation:**
+
+- Both parent and aux must have DTM enabled
+- Parent and aux must use the same mining algorithm (scrypt for LTC → DOGE)
+- Each aux must declare itself with `role: "aux"` and `aux_of` pointing to the parent
+- The coin pool dashboard shows an orange warning banner if any of these rules are violated, with specific misconfigurations listed
+
+**Graceful degradation:**
+
+- If the aux node goes offline, jobs are built without the AuxPoW commitment and parent-chain mining continues
+- When the aux node comes back, the commitment resumes automatically
+- Both coins remain fully functional standalone pools — merged mining is an additive layer. Removing the `merged_mining` config field leaves both pools running exactly as before.
+
+**Dashboard indicators:**
+
+- Parent dashboard shows an orange `Merged → DOGE` badge
+- Aux dashboard shows an orange `AuxPoW ← LTC` badge
+- Each connected miner on the parent shows an `(M)` indicator next to its worker ID
+
+See the [Coin Configuration Guide](../documents/GoSlimStratum/gss-coin-config-guide.md#merged-mining-auxpow---as-of-version-410) for full configuration details and the username format.
+
+### Dashboard Improvements
+
+- **Recent Blocks pagination** — dropdown selector (5, 10, 20) on the Recent Blocks card. Preference saved to browser storage.
+- **Coin icon badge fix** — coin symbols longer than 3 characters (e.g., DGBT, DGB-SCRYPT) now correctly display the coin icon using the first 3 characters
+- **Sticky footer** — footer now stays at the bottom of the viewport on all pages, even with short content
+
+### Web UI Polish
+
+A round of mobile and usability improvements across the web dashboard:
+
+- **Mobile-friendly status badges** — On phones (`< 640px`), the coin pool dashboard status badges collapse to short abbreviations (e.g., `Running` → `R`, `Revenue Share` → `RS`, `Merged → DOGE` → `M`) while keeping full text on tablets and desktop. Same colors and indicators on both — only the text changes.
+- **Configured Coins table — mobile card layout** — On the Global Configuration page, the Configured Coins table was unreadable on phones (six columns crammed horizontally). It now renders as one labeled card per row on small screens, with each field shown next to its column name. Desktop view unchanged.
+- **Mobile coin selector — last-selection persistence** — The mobile coin dropdown now remembers your last-picked coin across navigation. Previously, navigating to a global page (Global Configuration, Notifications, License, etc.) reset the dropdown to the first option. Your selection is restored when the page loads, so you don't have to re-pick every time you switch between a coin page and a global one.
+- **Mobile free-tier badge label** — The free-tier "Unlock Features ↗" badge in the header now shows a shorter "Unlock ↗" on phones to save space. Hyperlink and behavior unchanged.
+- **Coin pool dashboard header** — Removed "Pool Dashboard" from the title — now just shows the coin symbol (e.g., `DOGE`) next to the coin icon. Saves header real estate on both desktop and mobile, page context already makes the dashboard purpose obvious.
+- **Removed "Last updated" wall clock** — The "Last updated: HH:MM:SS" indicator in the dashboard header was a system clock that ticked regardless of actual data refresh state, which made it actively misleading. Removed entirely. The refresh button (which actually does refresh) stays.
+
+### In-App Help &amp; Configuration Reference
+
+Added a built-in help page at `/help` that visually documents every configurable field across the entire GSS UI — a single in-app source of truth for "what does this field do?". Accessible from a new **(?)** icon in the header, placed to the immediate left of the Global Configuration gear icon and visible on every page.
+
+**Format:** Two-pane layout with a sticky left sidebar (grouped into "Global Configurations" and "Coin Pool Configurations") and a right pane that shows one documentation section at a time. Each section reproduces the actual live config form — same look-and-feel, same layout — but with inputs pre-populated with example values and a numbered blue badge next to each field, paired with a numbered explanation list below.
+
+**19 sections covering ~140 fields, including:**
+
+- **Configured Coins table** — Shows all 5 coin-state combinations (Enabled+Running, Enabled+Stopped, Enabled+Not Loaded, Disabled+Not Loaded) so you can recognize each status badge on sight.
+- **Pool Lifecycle** — Mockups of the Running / Stopped / Not Loaded states with the real action buttons, explaining when each appears and what it does (Stop, Restart, Start, Unload, Load & Start).
+- **Every field** on the Global Configuration page (Pool Settings, Web Server, Metrics & Database, Logging, Notifications), the Add Coin wizard, the Clone Coin modal, the Remove Coin modal, and every section of the per-coin Configuration page (Status & DTM, Node Settings, Block Explorer, Node Failover, Merged Mining, Stratum, Mining, VarDiff, Payout).
+- **Contextual tips** — e.g., the Mining section now recommends `max_job_history: 5` when DTM is enabled (instead of the default 20), because DTM creates per-miner jobs and history grows fast.
+
+**URL deep-linking:** Every section has a hash anchor — `/help#merged-mining`, `/help#pool-lifecycle`, `/help#node-failover`, etc. — so you can bookmark a specific section or share a link to it. Browser back/forward navigation works as expected.
+
+**Header spacing fix:** The new (?) icon ships grouped with the gear icon in a shared inline container, and both icons use tighter padding — on mobile this frees up horizontal space so the free-tier / Pro / Enterprise badge is no longer pushed off-screen.
+
+No configuration required — the help page is available immediately after upgrading and works offline (no API calls, no backend dependencies).
+
+### Upgrade Notes
+
+- No configuration changes required. All new features are backward compatible.
+- The `alternate_host`, `enable_failover`, `explorer`, and `merged_mining` fields are all optional — pools without them behave exactly as before.
+- `animated_background` defaults to `"hash-drift"` if not set.
+- Block explorer links in the Blocks and Earnings pages now navigate to the internal explorer. External `block_explorer_urls` in config are no longer used for block lookups but can remain for reference.
+- Transaction and address external links (`tx_explorer_urls`, `address_explorer_urls`) are still used.
+- **Merged mining miners** — Existing miners without pipe-delimited usernames continue working unchanged. To enable merged mining, update the miner's stratum username to `parentaddress|auxaddress.workername`. If only the parent address is provided, the aux pool's `mining.address` is used as the fallback DOGE payout address.
 
 ---
 
