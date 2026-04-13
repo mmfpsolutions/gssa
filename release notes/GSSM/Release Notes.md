@@ -89,37 +89,6 @@ Consolidated release rolling up changes from v1.0.17 through v1.0.21 (intermedia
   - LTC and XEC branches added to `DetectCoinFromAddress`
   - 93 new test cases in `coin_detect_test.go`
 
-### Files Changed/Added
-
-**New files (8):**
-- `internal/handlers/v1/normalize_elphapex.go` — ElphaPex CGI normalization
-- `internal/handlers/v1/coin_detect_test.go` — 93 address-detection tests
-- `internal/web/static/js/background-canvas.js` — animated background canvas
-- `internal/web/static/img/coins/ltc.png` — LTC icon
-- `internal/web/static/img/coins/doge.png` + `dog.png` — DOGE icon
-- `design-documents/ElphaPexMiner-Scrypt-Miner/cgi-calls.md` — ElphaPex CGI reference
-- `design-documents/elphapex-dg-home-1-support-plan.md` — implementation plan
-- `design-documents/ElphaPexMiner-Scrypt-Miner/asic-health.png` + `chart.png` — reference assets
-
-**Modified files (~14):**
-- `internal/config/config.go` — `Disabled` on Miner, `AnimatedBackground` on Config, ElphaPex device type
-- `internal/notifications/service.go` — skip disabled miners in poll loop
-- `internal/notifications/fan_control.go` — skip disabled miners (loop + spawn check)
-- `internal/notifications/polling.go` — ElphaPex polling
-- `internal/notifications/telegram_commands.go` — Disabled state in `/miners` and `/miner <name>`
-- `internal/handlers/v1/config_crud.go` — accept `disabled` field, whitelist `animatedBackground`
-- `internal/handlers/v1/miners.go` — short-circuit `fetchMiner` for disabled, ElphaPex switch case
-- `internal/handlers/v1/meta.go` — return `animatedBackground`, ElphaPex thresholds
-- `internal/handlers/v1/coin_detect.go` — LTC, XEC support, documented ambiguities
-- `internal/handlers/v1/pools.go` — DTM confirmed block count fix
-- `internal/types/v1/miners.go` — `Disabled` field on summary, `AnimatedBackground` on meta
-- `internal/web/templates/layout/base.html` — canvas element, init script
-- `internal/web/static/js/miners.js` — disabled miner card, ElphaPex card renderer, action handlers
-- `internal/web/static/js/config.js` — Status column, disable checkbox, animated background dropdown, LTC/DOGE icon support, algorithm options
-- `internal/web/static/js/miner-detail.js` — ElphaPex detail view
-- `internal/web/static/js/utils.js` — `'disabled'` in `getStatusClass`
-- `internal/web/static/css/custom.css` — disabled status/card styles, miner table grid update for new Status column
-
 ---
 
 ## v1.0.16
