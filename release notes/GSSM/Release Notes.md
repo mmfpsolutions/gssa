@@ -1,5 +1,43 @@
 # GSSM Release Notes
 
+## v1.0.22
+
+### New Features
+
+- **NerdMiner 2.0 Support** — GSSM now supports both classic NerdMiner devices and the new NMMiner 2.x firmware family side by side. Pick the model from a new dropdown when you add or edit a miner. Configured v2 devices unlock:
+  - **Richer card data** on the dashboard — accurate hashrate, accepted/rejected shares, VCore temperature, and pool URL straight from the device
+  - **Detail page** with hostname, firmware version, Wi-Fi signal strength bars, session vs lifetime stats, network/pool/last-share difficulty, temperatures, free heap, storage usage, and pool info
+  - **Restart button** with confirmation — same UX as Bitaxe restart
+  - **Six-section Settings editor** — Mining (pools/address/password), Network (hostname/Wi-Fi), Display & LED (brightness/rotation/screensaver), Time & Date (timezone/format), Market (coin watch-list), and Weather (city/coordinates). Each section saves independently.
+
+- **Litecoinpool.org Pool Type** — Add your litecoinpool.org account as a pool entry and watch your account performance from the GSSM dashboard. Just enter a name and your API key:
+  - **LTC + DOGE dual-currency cards** showing pool stats, your account stats (hashrate, blocks found, past 24h, unpaid balance, total paid — all dual currency), and LTC network stats
+  - **Detail page** with summary tiles, an Earnings Breakdown table (Paid / Unpaid / Total / Past 24h / Expected 24h for both LTC and DOGE), a Workers table (status, hashrate, 24h average, valid/stale/invalid shares, last share time), and recent payouts charts for both currencies
+  - **Smart rate-limit protection** — GSSM caches the upstream response for 60 seconds (matching the pool's own update cadence), so refresh-spam and multiple browser tabs never trip litecoinpool's 10-requests-per-minute limit on your API key
+  - Add it from the Config page just like you'd add a GoSlimStratum pool — pick "Litecoinpool.org" from the new pool type dropdown
+
+- **Bulk Restart** — Restarting a fleet one rig at a time was painful. New **Bulk Restart** link sits between Fleet View and Collapse all on the Miners page. Opens a dedicated page where you:
+  - See every restart-capable miner in a checklist (AxeOS, Canaan, NerdMiner v2 — devices that don't support remote restart aren't listed)
+  - Pick which ones to restart with checkboxes, or hit **All** to select everything
+  - Confirm and watch — each miner's row animates Ready → In Progress → Success / Fail, with a live progress bar and success/fail counters at the top
+  - Restarts run sequentially with a 1-second pause between each, so you don't flood your network or your rigs
+  - Failures show with hover-tooltip error messages so you know which rigs need attention; the rest of the fleet still gets restarted
+  - URL pattern is `/miners/bulk/restart` so future bulk operations have somewhere to live
+
+### Improvements
+
+- **Faster-feeling Miners page** — The Miners dashboard used to show a single full-page spinner until every rig in the fleet had responded. With 11 miners, one slow rig could stall the whole page render for several seconds. Now the page lights up instantly with a placeholder card per miner (showing the name, device type, and a small loading indicator), and each card fills in with live data as the response arrives. Same data, same backend, just stops feeling sluggish.
+
+- **Cleaner summary card sizing** — Total Miners / Online / Total Hashrate / Avg Temperature on the Miners page (and the equivalent cards on Pools and Nodes) had numbers that jumped from medium to extra-large at desktop breakpoints. Now they're consistently sized across screen sizes, matching the look of the GoSlimStratum coin dashboard.
+
+- **Status dots on Bulk Restart match the Miners page** — Same colors for online (green), offline (red), error (yellow), timeout (gray), and the purple dot for "online but rejecting shares".
+
+### Bug Fixes
+
+None this cycle.
+
+---
+
 ## v1.0.21
 
 Consolidated release rolling up changes from v1.0.17 through v1.0.21 (intermediate point releases were never publicly distributed).
@@ -59,36 +97,6 @@ Consolidated release rolling up changes from v1.0.17 through v1.0.21 (intermedia
 
 - **DOGE Icon Routing** — Coin icon for Dogecoin was being requested at `dog.png` due to an existing 3-character symbol-truncation pattern; added matching asset filename so the icon renders correctly across cards, dropdowns, and badges
 
-### Technical Details
-
-- **Disabled Miner:**
-  - New `Disabled bool` field on `config.Miner` (JSON: `disabled`, omitempty)
-  - New `Disabled bool` and `Status: "disabled"` on `MinerSummary` API response
-  - New `Disabled int` count on `MinersSummary` (separate from offline)
-  - PUT `/api/v1/config/miners/{id}` accepts `disabled` as `*bool` for explicit true/false/unchanged semantics
-  - `fetchMiner()` short-circuits to a zero-cost summary when `Disabled == true`
-  - `notifications.Service.checkMiners()` skips disabled miners before state tracking
-  - `notifications.Service.checkFanControl()` and the loop-spawn check both honor the disabled flag
-  - Telegram `/miners` and `/miner <name>` commands surface the Disabled state with a distinct ⚫ marker
-  - New CSS: `.status-disabled` (slate gray dot, no glow) and `.device-card-disabled` (muted opacity 0.55)
-  - JS: new `renderDisabledMinerCard()`, `confirmDisableMiner()`, `enableMiner()`, `setMinerDisabled()` helpers in `miners.js`
-- **Animated Background:**
-  - New `AnimatedBackground string` field on `config.Config`
-  - Whitelisted in PATCH `/api/v1/config` allowed-fields map
-  - Surfaced via `MetaData.AnimatedBackground` on `GET /api/v1/meta` (no auth required, called early on every page)
-  - New file: `internal/web/static/js/background-canvas.js` (~360 lines, four animation modes, pure canvas 2D, no external dependencies)
-  - Canvas element `<canvas id="gssm-bg-canvas">` injected via `base.html` (excluded on login page)
-  - Init script in `base.html` calls `api.getMeta()` and passes the resolved mode into `window.initGSSMBackground()`; defaults to `nonce-hunt` when no value is set
-- **ElphaPex:**
-  - New file: `internal/handlers/v1/normalize_elphapex.go` (CGI response normalization)
-  - New file: `internal/handlers/v1/cgi-calls.md` (CGI endpoint reference)
-  - Polling loop extension in `internal/notifications/polling.go` for ElphaPex devices
-  - Coin/algorithm wiring in `config.go`, `meta.go`, `miners.go`
-  - Frontend: ElphaPex card renderer in `miners.js`, detail page in `miner-detail.js`
-- **Address Detection:**
-  - LTC and XEC branches added to `DetectCoinFromAddress`
-  - 93 new test cases in `coin_detect_test.go`
-
 ---
 
 ## v1.0.16
@@ -113,16 +121,6 @@ Consolidated release rolling up changes from v1.0.17 through v1.0.21 (intermedia
 - **Mobile Collapsible Settings** - Fixed collapse/expand sections not responding to taps on mobile devices (added touch-action, pointer-events fix)
 - **Reduced Miner Load** - Fan control uses lightweight `stats` command (~8KB) instead of `estats` (~64KB) for temperature reads
 
-### Technical Details
-
-- New package: `internal/devicelock` — singleton per-device mutex manager for TCP connection serialization
-- New file: `internal/notifications/fan_control.go` — P-controller algorithm, fan control loop, state management
-- New file: `internal/handlers/v1/fan_control.go` — API handlers for fan status and configuration
-- Config: `FanControlConfig` struct added to `Miner` in `config.json` (enabled, targetTemp, minFanSpeed, emergencyTemp)
-- Notifications: `fanControlIntervalSeconds` added to polling config (default 30s)
-- Events: `miner_fan_emergency` / `miner_fan_emergency_off` event types
-- Design documents: `design-documents/auto-fan-control.md`
-
 ---
 
 ## v1.0.15
@@ -140,8 +138,3 @@ Consolidated release rolling up changes from v1.0.17 through v1.0.21 (intermedia
 
 - **Collapsible Settings Sections** - Work Mode, LED Control, and Fan Control sections on the Nano3s settings page are now individually collapsible with persistent state (remembered across page loads)
 
-### Technical Details
-
-- Backend: New `fanspeed` command in Canaan command handler (`ascset|0,fan-spd,<SPEED>`)
-- Frontend: New `.status-rejected` CSS class (purple `#a855f7`)
-- Fan speed range enforced at 30-100 (manual) or -1 (automatic) on both frontend and backend
