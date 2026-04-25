@@ -1,5 +1,68 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.1.0
+## v3.0.15 through v4.1.1
+
+---
+
+## v4.1.1
+
+### Health & Metrics Page
+
+New dedicated **Health & Metrics** page at `/metrics` that visualizes runtime and database health at a glance. Replaces the system-stats and database tables that were previously crowded onto the Version page.
+
+**What it shows:**
+
+- **Runtime tiles** — uptime, goroutines, CPU cores, Go runtime version
+- **Memory card** — donut chart of heap usage (in-use / reserved / stack / other) with companion table of memory in-use, memory from OS, heap objects, and log file size
+- **Garbage Collection card** — GC cycle count, forced GC count, total pause time, GC CPU fraction
+- **Database card** — database size, schema version, table count, plus a horizontal bar chart of row counts per table and a connection pool stats grid (open, in-use, idle, wait counters)
+
+All three main cards are collapsible, with state remembered in your browser between visits.
+
+**Footer changes:**
+
+- The footer "API Health" link is renamed **Health** and now opens the new `/metrics` page
+- The footer "Version" label now displays the actual version number (e.g. `v4.1.1`) and links to the Version page (which has been slimmed down to show just version and license info — the system-stats / database / about cards moved to the new Metrics page)
+
+### Coin Dashboard — Summary Row Refactor
+
+The top summary row on the coin pool dashboard has been redesigned for compactness and at-a-glance scanning, modeled on the GSSM mining dashboard layout.
+
+**Visible changes:**
+
+- **6 cards instead of 5** — a new **Difficulty** card joins Hashrate / Active Miners / Shares / Blocks Found / Node Comm. The bottom-of-page Network Statistics card was removed; its data now lives in the Difficulty card up top.
+- **Compact layout** — small icon top-right, bold value taking center stage. The previous oversized icons on the right edge are gone, giving values more visual weight.
+- **Consistent value sizing** across all cards. Smaller, less shouty.
+- **Difficulty card** — primary value is the network difficulty, with hashrate and block height shown beneath. Click anywhere on the card to open the Network Statistics page with full historical charts.
+- **Blocks Found** — entire card is now a clickable link to the Earnings Dashboard. The coin symbol was removed from the "X paid" subtext (it rendered awkwardly for long names like DGB-SCRYPT).
+- **Active Miners** — icon swapped from the construction-worker emoji to a hammer-and-pick (⚒️) for a more mining-themed look.
+- **Node Comm in DUAL mode** — when running in dual ZMQ-and-polling mode, the card now stacks the mode label, ZMQ status, and polling interval on three separate lines instead of cramming them onto one. Easier to read at a glance.
+- **Hide Summary toggle** — small text link above the summary row that collapses the entire card row when you want more screen space for charts and the miners table. Your preference is saved in your browser, so reloads and revisits remember whether you wanted it shown or hidden.
+
+### Animated Background — New "Nonce Hunt" Mode
+
+A fourth animated background option themed around the actual mining process. Hex nonces (`0x3a7f2e1c`) appear at random positions on the page and rapidly mutate their characters — visualizing ASICs cycling through nonce candidates searching for a valid hash. Most nonces fade out after a few seconds (failed attempts), but approximately 1 in 6 "hit" — flashing gold with an expanding ring and spark particles before fading.
+
+- Selectable from the Global Configuration page dropdown alongside Hash Drift, Node Mesh, Share Pulse, and Off
+- Mobile-aware: 15 nonces on small screens, 25 on desktop
+- Pauses when the tab is hidden, respects the system "reduce motion" preference
+
+### Animated Background — Hot Reload
+
+Changing the animated background no longer requires a GSS restart. Pick a new background in Global Configuration, click Save, and the next page navigation shows the new animation. Previously you had to restart the service for the change to take effect.
+
+### Help Page Expansion
+
+The in-app Help page (`/help`, accessed via the **(?)** icon in the header) gained two big additions in 4.1.1:
+
+- **Coin Dashboard Guide** — a new "Dashboard Guide" sidebar group with a complete walkthrough of the coin pool dashboard. Mockups of the page header (status badges, feature badges, icon links), all summary cards, the collapsible chart sections, the miners table (filter buttons, action icons, columns explained), and the bottom Recent Blocks section. Every badge color, icon, and interactive element is explained.
+- **Updated for the dashboard refactor** — the Coin Dashboard guide reflects the new 6-card layout, GSSM-style icons, ⚒️ for Active Miners, the new Difficulty card, the Hide Summary toggle, and the DUAL-mode Node Comm display.
+
+### Upgrade Notes
+
+- No configuration changes required. All changes are visible additions or layout improvements.
+- Hide Summary toggle starts in the "shown" state; click it to hide.
+- The `/metrics` page does not require a license — available to all users.
+- If you'd previously bookmarked the bottom-of-page Network Statistics card, the same data (and a link to the full Network Statistics page) is now in the Difficulty card at the top of the dashboard.
 
 ---
 
