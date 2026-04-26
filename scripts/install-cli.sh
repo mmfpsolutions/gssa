@@ -30,7 +30,7 @@ if [[ ! -t 0 ]]; then
 fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-INSTALLER_VERSION="1.0.0"
+INSTALLER_VERSION="1.0.1"
 GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
@@ -107,7 +107,7 @@ banner() {
   echo "  ╔══════════════════════════════════════════════════╗"
   echo "  ║                                                  ║"
   echo "  ║       MMFP Solutions - Full CLI Installer        ║"
-  echo "  ║       v${INSTALLER_VERSION}                                    ║"
+  echo "  ║       v${INSTALLER_VERSION}                                     ║"
   echo "  ║                                                  ║"
   echo "  ╚══════════════════════════════════════════════════╝"
   echo -e "${NC}"
@@ -133,20 +133,47 @@ preflight() {
 
   source /etc/os-release
 
-  if [[ "$ID" != "ubuntu" ]]; then
-    error "This installer requires Ubuntu. Detected: $ID"
-    exit 1
-  fi
-  success "OS: Ubuntu"
-
-  # Must be 24.04+
-  local version_major
-  version_major=$(echo "$VERSION_ID" | cut -d. -f1)
-  if [[ "$version_major" -lt 24 ]]; then
-    error "Ubuntu 24.04 or later required. Detected: $VERSION_ID"
-    exit 1
-  fi
-  success "Version: $VERSION_ID"
+  # Officially supported: Ubuntu 24.04+
+  # Allowed but unsupported: Debian (any version), older Ubuntu
+  # Blocked: everything else (apt-get / dpkg path won't work)
+  case "$ID" in
+    ubuntu)
+      success "OS: Ubuntu"
+      # Version check (warn-only for < 24.04)
+      local version_major
+      version_major=$(echo "$VERSION_ID" | cut -d. -f1)
+      if [[ "$version_major" -lt 24 ]]; then
+        warn "Ubuntu ${VERSION_ID} detected. Officially supported: 24.04 or later."
+        echo ""
+        echo "  Older Ubuntu versions are not regularly tested. The installer may"
+        echo "  proceed but you may encounter issues that we cannot help with."
+        echo ""
+        if ! confirm "Proceed on older Ubuntu version?" "N"; then
+          error "Installation cancelled."
+          exit 1
+        fi
+      else
+        success "Version: $VERSION_ID"
+      fi
+      ;;
+    debian)
+      warn "OS: Debian — unsupported."
+      echo ""
+      echo "  Debian is not officially tested or supported. The installer may"
+      echo "  proceed but you are on your own for any issues you encounter."
+      echo "  No bug reports will be accepted for Debian-specific problems."
+      echo ""
+      if ! confirm "Proceed on unsupported OS?" "N"; then
+        error "Installation cancelled."
+        exit 1
+      fi
+      ;;
+    *)
+      error "This installer requires Ubuntu or Debian. Detected: $ID"
+      echo "  Other distributions (Fedora, Arch, RHEL, etc.) are not supported."
+      exit 1
+      ;;
+  esac
 
   # Must be ARM64 or AMD64
   local arch
@@ -171,10 +198,26 @@ preflight() {
   total_mem_kb=$(grep MemTotal /proc/meminfo | awk '{print $2}')
   local total_mem_gb=$(( total_mem_kb / 1024 / 1024 ))
   if [[ "$total_mem_gb" -lt "$MIN_MEMORY_GB" ]]; then
-    error "Minimum ${MIN_MEMORY_GB} GB RAM required. Detected: ${total_mem_gb} GB"
-    exit 1
+    warn "System has only ${total_mem_gb} GB RAM. Minimum recommended is ${MIN_MEMORY_GB} GB."
+    echo ""
+    echo "  IMPACT:"
+    echo "    - The blockchain node may run out of memory during its initial"
+    echo "      sync (the highest memory pressure phase). DigiByte and Bitcoin"
+    echo "      initial sync are particularly memory-hungry."
+    echo "    - Postgres + GoSlimStratum + node + dashboard running together"
+    echo "      can exceed available RAM and trigger the OOM killer."
+    echo "    - Performance will degrade significantly under any memory pressure."
+    echo ""
+    echo "  You can proceed, but expect issues. The installer cannot recover from"
+    echo "  a node that crashes mid-sync — you may need to wipe /data and start over."
+    echo ""
+    if ! confirm "Proceed anyway?" "N"; then
+      error "Installation cancelled."
+      exit 1
+    fi
+  else
+    success "Memory: ${total_mem_gb} GB"
   fi
-  success "Memory: ${total_mem_gb} GB"
 
   # Must have curl
   if ! command -v curl &>/dev/null; then
@@ -280,13 +323,14 @@ setup_docker() {
 
   info "Adding Docker GPG key..."
   install -m 0755 -d /etc/apt/keyrings
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  # ${ID} is sourced from /etc/os-release in preflight() — "ubuntu" or "debian"
+  curl -fsSL "https://download.docker.com/linux/${ID}/gpg" -o /etc/apt/keyrings/docker.asc
   chmod a+r /etc/apt/keyrings/docker.asc
-  success "Docker GPG key added"
+  success "Docker GPG key added (linux/${ID})"
 
   info "Adding Docker repository..."
   echo \
-    "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${ID} \
     $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null
   success "Docker repository added"
