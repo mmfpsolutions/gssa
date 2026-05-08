@@ -1,5 +1,22 @@
 # GSSM Release Notes
 
+## v1.0.23
+
+### Improvements
+
+- **Cleaner notification messages** — Several readability tweaks across Telegram, Discord, Email, and Generic Webhook alerts:
+  - **Prefix on its own line** — The configured Message Prefix (e.g. `[GSSM-138]`) used to share a line with the alert subject, which wrapped awkwardly on phones. The prefix now sits above the subject on its own line, so the alert reads cleanly at every screen width.
+  - **Hashrate in human units** — Miner Online and Pool Online alerts no longer show `1.0434260000000001e+06` — they show `1.04 MH/s`, auto-scaled through KH / MH / GH / TH as needed.
+  - **Cleaner timestamps** — Last-seen times like `2026-05-06 05:30:05.287506172 +0000 UTC m=+376803.723714515` (Go's internal monotonic-clock reading) now render as `2026-05-06 05:30:05 UTC`.
+  - **Title-cased detail labels** — `last_seen`, `previous_hashrate`, `block_height`, etc. now appear as `Last Seen`, `Previous Hashrate`, `Block Height` in the alert body.
+  - All four changes apply to the human-readable channels. The Generic Webhook payload keeps raw values and snake_case keys so any custom automation you've wired up against the webhook still works unchanged.
+
+### Bug Fixes
+
+None this cycle.
+
+---
+
 ## v1.0.22
 
 ### New Features
