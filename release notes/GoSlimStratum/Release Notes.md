@@ -1,5 +1,70 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.1.1
+## v3.0.15 through v4.1.2
+
+---
+
+## v4.1.2
+
+### Coin Dashboard — Miners Table Column Reorder
+
+The miners table on the coin pool dashboard has been reordered to put the columns you watch most on the left and the column that rarely changes on the right.
+
+- **Before:** Worker, Device, Hashrate, Shares, Best Share, Lifetime
+- **After:** Worker, Hashrate, Best Share, Shares, Lifetime, Device
+
+At a glance, what you usually want to see for each worker is what it's producing right now — Hashrate and Best Share — so those now sit immediately next to the Worker name. Device (firmware / user-agent string) rarely changes once a rig is set up, so it has been pushed to the far right.
+
+### Coin Dashboard — Long Device Names Truncated
+
+Long firmware strings (e.g. `NerdQAxe++/v2.x.x/...`) were eating horizontal space in the miners table and pushing the layout around. Device names longer than 10 characters are now truncated to 10 characters in the cell. The full name is preserved as a hover tooltip — point your mouse at any truncated cell to see the complete value. The multi-device case (`N Devices` for workers with more than one active connection) follows the same rule but is typically short enough not to be truncated.
+
+### Notifications — Message Prefix on Its Own Line
+
+If you've configured a Message Prefix (e.g. `[GSS-138]`), it used to share a line with the alert subject:
+
+**Before:**
+```
+[GSS-138] ✅ Block Matured - DGB #23426904 ✅
+```
+
+On narrow viewports — Telegram on mobile especially — this string wraps mid-sentence (sometimes mid-emoji), making the alert harder to read at a glance. The prefix now sits above the subject on its own line:
+
+**After:**
+```
+[GSS-138]
+✅ Block Matured - DGB #23426904 ✅
+```
+
+Applied to **Telegram, Discord, and Generic Webhook** alerts. Email subject lines are unchanged because email clients handle long subjects with their own truncation/expansion UX.
+
+### Notifications — Cleaner Reward and Payment Amounts
+
+Block and payment alerts used to repeat the coin name on every amount line:
+
+**Before:**
+```
+Coin: DGB-Test
+Block: #23426904
+Hash: abc123…
+Reward: 265.20020841 DGB-Test
+```
+
+The trailing identifier is the *coin pool key* you configured (often a shortened tag like `DGB-Test`), not a real currency symbol — and the coin is already named in the subject and on the `Coin:` line, so repeating it on every amount line was just noise. The trailing identifier has been removed:
+
+**After:**
+```
+Coin: DGB-Test
+Block: #23426904
+Hash: abc123…
+Reward: 265.20020841
+```
+
+Applies to all event types (Block Found, Block Matured, Block Orphaned, Payment Pending, Payment Completed, Payment Failed) and all channels (Telegram, Discord, Email, Generic Webhook). The `/blocks` Telegram bot command also got the same treatment for consistency.
+
+### Upgrade Notes
+
+- No configuration changes required.
+- If you script against the Generic Webhook payload, the **alert body string** now contains a newline between the prefix and subject (previously concatenated). The structured fields and event payload schema are unchanged.
 
 ---
 
