@@ -65,3 +65,6 @@ blockmintxfee=0.00001000
 
 # Additional spam protection
 dustrelayfee=0.00003000
+
+# New consensus rule 05/08/2026
+consensusrules=rdts
