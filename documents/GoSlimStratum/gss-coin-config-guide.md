@@ -185,6 +185,74 @@ When `enable_failover` is `true` and `alternate_host` is set, GSS will automatic
 
 > **Tip:** If you only need an alternate host for explorer queries (not mining failover), set `alternate_host` and leave `enable_failover` as `false`. The two settings are independent.
 
+### Node Health Monitoring & Startup Recovery
+
+GSS continuously monitors each coin's node health and **automatically starts the stratum server** as soon as the node finishes its startup process. There is no need to restart GSS after a node restart, server reboot, or `apt upgrade`. This section explains the timing so you know what to expect.
+
+**The most common question:** *"I rebooted my server / restarted Docker, GSS shows my pool stopped or node offline. Is something broken?"*
+
+Almost always, no. The node is still starting up (verifying blocks, loading the wallet, opening the RPC port). GSS sees the node as not yet ready, refuses to open the stratum port (so miners don't connect to a pool that can't yet build jobs), and keeps polling on a tight cadence until the node responds. The moment it does, GSS opens the stratum port automatically.
+
+**Three-tier health-check polling cadence:**
+
+| Phase | Polling interval | When it applies |
+|---|---|---|
+| **Warmup** | every **5 seconds** | Node is responding with RPC error `-28` ("Loading block index", "Verifying blocks", "Loading wallet"). GSS polls aggressively so it detects the transition to ready ASAP. |
+| **Initial** | every **20 seconds** | First **5 minutes** after the node accepts RPC normally. Tight cadence in case the node flakes during early operation. |
+| **Long-term** | every **120 seconds** | After 5 minutes of clean responses. Steady-state polling for the lifetime of the pool. |
+
+**What happens on a server reboot / Docker restart:**
+
+1. GSS starts up and tries to initialize each coin's pool by calling `getblockchaininfo` on its node.
+2. The node is still loading blocks → RPC returns error `-28`. GSS marks the node as "warmup" state and the pool stays uninitialized (stratum port stays closed).
+3. GSS health monitor polls every **5 seconds** while the node is in warmup.
+4. The node finishes its startup process and starts responding normally to RPC.
+5. The next 5-second poll succeeds → GSS initializes the pool and **starts the stratum server automatically**. Dashboard updates to show node = Online and pool = Running.
+6. For the next 5 minutes GSS polls every 20 seconds (initial mode). After that, it settles into 120-second long-term polling.
+
+**Node startup time depends on total block count and disk speed.** It is roughly proportional to how many blocks the node has to verify on startup, not to the chain's "weight" or popularity:
+
+- **DGB tends to be the longest.** DigiByte has 15-second block times since 2014 → millions of blocks, each requiring signature verification on startup. On slower SSDs or HDDs this can easily run 10–30+ minutes. **This is normal.**
+- **BTC and BCH typically come up faster** despite their reputation, because 10-minute blocks means far fewer blocks to verify on startup, even though the chain weight is heavier per block.
+- **XEC and other smaller chains** are usually fastest.
+
+**The right way to check progress:** don't watch GSS — Couple of ways:
+
+- Watch in your dozzle logs viewer : http:{YOUR_IP_ADDRESS}:8080
+- Watch the node directly. Run the coin's CLI from a shell on the node host:
+
+```bash
+# DigiByte
+digibyte-cli getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+
+# Bitcoin
+bitcoin-cli getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+
+# Bitcoin Cash
+bitcoin-cli -conf=/path/to/bitcoincash.conf getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+```
+
+When you see:
+- `"initialblockdownload": false`
+- `"verificationprogress": 0.9999...` (very close to 1.0)
+- `"blocks"` matches (or nearly matches) `"headers"`
+
+…the node is ready, and GSS will detect it on the next health poll — **within 5 seconds** (warmup) or **within 20 seconds** (initial). No GSS restart required.
+
+**Notifications:** A `node_online` notification fires the moment GSS detects the node is ready. If you have Telegram, Discord, email, or webhook notifications configured for the `nodes` channel, you'll get a ping the instant the pool comes back up — even if you're not watching the dashboard.
+
+**When to actually worry:**
+
+If 30+ minutes pass and the node CLI still shows `initialblockdownload: true` or `verificationprogress` not approaching 1.0, the node itself is the issue, not GSS. Check the node's own log (e.g. `~/.digibyte/debug.log`) for errors. Common causes: full disk, corrupted chain state (rare, usually requires `-reindex`), or insufficient RAM during verification.
+
+If `getblockchaininfo` reports the node IS ready but GSS still shows it offline after 2 minutes, check that GSS's configured `host`, `port`, `username`, and `password` actually work from GSS's perspective:
+
+```bash
+curl --user rpc_user:rpc_password -d '{"jsonrpc":"1.0","method":"getblockchaininfo","params":[]}' http://NODE_HOST:NODE_PORT/
+```
+
+A 200 OK with JSON content = GSS should be detecting it. A 401, connection refused, or timeout = network/auth misconfiguration, not a GSS bug.
+
 ### Merged Mining (AuxPoW) - AS OF Version 4.1.0
 
 Merged mining lets your miners simultaneously mine a parent chain and one or more aux (auxiliary) chains using the same hashrate — no extra work, no extra hardware. The classic example is **LTC → DOGE**: scrypt miners hashing for Litecoin can also produce Dogecoin blocks, since DOGE accepts AuxPoW (Auxiliary Proof of Work) blocks proven by LTC's parent chain.
