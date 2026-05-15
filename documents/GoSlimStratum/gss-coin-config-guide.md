@@ -221,15 +221,20 @@ Almost always, no. The node is still starting up (verifying blocks, loading the 
 - Watch in your dozzle logs viewer : http:{YOUR_IP_ADDRESS}:8080
 - Watch the node directly. Run the coin's CLI from a shell on the node host:
 
+> **Note:**
+> $USER=Your RPC Username
+> $PASSWORRD=Your RPC Password
+> $PORT=Your RPC Port
+
 ```bash
 # DigiByte
-digibyte-cli getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+sudo docker exec dgb digibyte-cli -rpcuser=$USER -rpcpassword=$PASSWORD -rpcport=$PORT getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
 
 # Bitcoin
-bitcoin-cli getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+sudo docker exec btc bitcoin-cli -rpcuser=$USER -rpcpassword=$PASSWORD -rpcport=$PORT getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
 
 # Bitcoin Cash
-bitcoin-cli -conf=/path/to/bitcoincash.conf getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
+sudo docker exec bch bitcoin-cli -rpcuser=$USER -rpcpassword=$PASSWORD -rpcport=$PORT getblockchaininfo | grep -E "blocks|headers|verificationprogress|initialblockdownload"
 ```
 
 When you see:
@@ -246,6 +251,9 @@ When you see:
 If 30+ minutes pass and the node CLI still shows `initialblockdownload: true` or `verificationprogress` not approaching 1.0, the node itself is the issue, not GSS. Check the node's own log (e.g. `~/.digibyte/debug.log`) for errors. Common causes: full disk, corrupted chain state (rare, usually requires `-reindex`), or insufficient RAM during verification.
 
 If `getblockchaininfo` reports the node IS ready but GSS still shows it offline after 2 minutes, check that GSS's configured `host`, `port`, `username`, and `password` actually work from GSS's perspective:
+
+> **Note:**
+> You must have rest=1 in your node configuration file (e.g. digitbyte.conf) for this to work
 
 ```bash
 curl --user rpc_user:rpc_password -d '{"jsonrpc":"1.0","method":"getblockchaininfo","params":[]}' http://NODE_HOST:NODE_PORT/
