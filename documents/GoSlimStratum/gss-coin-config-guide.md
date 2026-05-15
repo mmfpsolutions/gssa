@@ -222,9 +222,9 @@ Almost always, no. The node is still starting up (verifying blocks, loading the 
 - Watch the node directly. Run the coin's CLI from a shell on the node host:
 
 > **Note:**
-> $USER=Your RPC Username
-> $PASSWORRD=Your RPC Password
-> $PORT=Your RPC Port
+> - $USER=Your RPC Username
+> - $PASSWORD=Your RPC Password
+> - $PORT=Your RPC Port
 
 ```bash
 # DigiByte
