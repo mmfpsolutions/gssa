@@ -1,5 +1,119 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v4.1.2
+## v3.0.15 through v5.0.0
+
+---
+
+## v5.0.0 — Stratum V2 Support
+
+GoSlimStratum v5.0.0 is the **Stratum V2** release. GSS now speaks the next-generation mining protocol alongside the classic Stratum V1 — both protocols run side-by-side on the same pool, on different ports, with no breaking changes for existing miners.
+
+### What's Stratum V2 and Why Should I Care?
+
+Stratum V2 (often called "SV2") is the modernized mining protocol that the Bitcoin protocol community has been building over the last several years. Compared to the original Stratum protocol from 2012, V2 brings three things that matter to a pool operator:
+
+- **Encryption.** Every message between miner and pool is encrypted with a Noise-protocol handshake (the same crypto family used by WireGuard, Lightning Network, and Signal). On hostile networks (public WiFi, shared hosting, ISPs that throttle Bitcoin traffic), nobody between your miner and your pool can read or tamper with shares.
+- **Authentication.** The miner verifies it's talking to *your* pool — not an attacker doing a "share hijack" man-in-the-middle. You generate a pool-wide authority key once; every miner verifies it during the handshake.
+- **Efficiency.** Binary frames instead of JSON, smaller packets, less CPU on both ends. On constrained ESP-based miners (Bitaxe, NerdQAxe), this means a little more cycles for hashing and a little less for protocol bookkeeping.
+
+### What You Get in v5.0.0
+
+- **One pool, two protocols.** Existing V1 miners (Bitaxe, NerdMiner, Antminer, Avalon, anything speaking classic Stratum) continue to work exactly as before, on exactly the same ports as before. No firmware updates required.
+- **Per-coin V2 listener.** Each SHA256d coin in your config (DGB, BTC, BCH, XEC) gets a new optional Stratum V2 listener that you can enable on its own port. V1 stays where it is; V2 binds to a new port (`34254` is the convention; you can change it).
+- **One-click key generation.** A new **Stratum V2 Keys** card at the bottom of the **Global Configuration** page generates your pool's keys with a single button click. The authority public key — the value your miners paste into their firmware — appears immediately on screen, ready to copy.
+- **Mixed-fleet support.** Run a Bitaxe (V1) and a NerdQAxe++ (V2) at the same time on the same coin pool. GSS tracks both, shows both in the dashboard with a `v1`/`v2` badge next to each worker name, and pays out (in pool mode) or routes rewards directly (in DTM mode) identically for both.
+- **Full vardiff, license, DTM, and revenue-share parity.** Every existing feature works for V2 miners exactly as it does for V1 — same difficulty algorithm, same flood protection, same license enforcement, same Direct-to-Miner mode with optional revenue share for built-in coins.
+
+### What Doesn't Change
+
+- **Nothing for existing operators by default.** v5.0.0 ships with V2 disabled on every coin. Until you go to the Coin Configuration page and explicitly add a Stratum V2 listener, your pool behaves exactly as v4.1.2 did. Upgrade with zero risk.
+- **No firmware required.** V1 miners ignore the V2 port. V2 miners (NerdQAxe++ firmware shipping today; Bitaxe SV2 firmware once their PR lands) can connect when you're ready.
+- **No protocol re-encoding inside GSS.** Block templates, share validation, vardiff, and block submission all use the same pipeline regardless of which protocol delivered the share. If V1 mines a block today, V2 mines blocks the same way.
+
+### Supported Coins
+
+Stratum V2 is currently available on **SHA256d coins only** — that's BTC, BCH, DGB (SHA256d algorithm), XEC and coins.json (SHA256d) coins. Scrypt-based coins (LTC, DOGE) are not in scope for this release.
+
+### Setup Walkthrough
+
+For a step-by-step walkthrough with screenshots covering the global key generation and per-coin listener configuration, see the dedicated guide:
+
+📘 **[v5.0.0 — Stratum V2 Setup Guide](v5.0.0-Stratum-V2-Setup-Guide.md)**
+
+### Miner Dashboard — Total Rewards Now Correct in DTM Mode
+
+If you've been running a coin in **Direct-to-Miner (DTM)** mode, you may have noticed the **Total Rewards** card on each miner's detail page always showed `0.0000`, even when that miner had matured blocks in the **Blocks Found** list below it. This was a long-standing bug.
+
+**Cause:** The miner dashboard's reward summary only looked at the pool's `payments` table — which is populated when the pool distributes a matured block's reward across miners in pool mode. In DTM mode there's no pool distribution step; the miner's wallet receives the reward directly via the coinbase, so nothing ever lands in `payments` for DTM workers.
+
+**Fix:** The per-miner reward query now also sums matured DTM block rewards from the blocks history (filtered by the same wallet address + worker name + coin, and only counted after the block reaches maturity). Pool-mode users see no change — their numbers were already correct. DTM-mode users with matured blocks now see their actual on-chain rewards reflected on the dashboard.
+
+> **Note:** Pre-maturity DTM blocks still show as 0 until they reach the maturity confirmation count — same semantics as pool-mode pre-maturity payments. This is intentional: rewards aren't spendable until the block matures, so showing them as 0 keeps the dashboard honest.
+
+### Miner Dashboard — Blocks Found Pagination (and a Bug Fix)
+
+The **Blocks Found** panel on each miner's detail page got two improvements that fix a subtle bug along the way.
+
+**The bug:** previously, the panel fetched the **50 most recent blocks pool-wide**, then filtered client-side to keep only those belonging to the current worker. On a busy pool, a low-output miner whose blocks fell outside that 50-block window would see "No blocks found yet" — even with a non-zero Total Rewards card and obvious block-found history. The miner's blocks weren't lost; they just weren't being fetched in the first place.
+
+**The fix:** the panel now does a proper server-side worker-scoped query. Every block that miner has found shows up, regardless of how many pool-wide blocks have come and gone since.
+
+**Pagination on top:** since worker-scoped block history can grow indefinitely, the panel also gained:
+- **Per-page dropdown** (5 / 10 / 20) — your choice is remembered across page loads.
+- **"Showing X-Y of Z" indicator** at the bottom-left.
+- **Prev / Next buttons** at the bottom-right, auto-disabled at the first and last page.
+
+The collapse toggle and section header are unchanged.
+
+### Miner Dashboard — Summary Cards Match the Coin Pool Dashboard
+
+The four summary cards on the **Miner Dashboard** (Current Hashrate, Efficiency, Best Share, Total Rewards) used to have a different visual treatment than the matching cards on the Coin Pool Dashboard — bigger numbers, a large icon floated to the right of the value. The inconsistency was distracting when bouncing between the two pages.
+
+The Miner Dashboard cards now share the Coin Pool Dashboard's compact layout: title and icon sit side-by-side at the top of the card, value and subtext stack underneath. Both pages now feel like a unified set.
+
+### In-App Help — New Miner Dashboard Guide
+
+The in-app Help page (the **(?)** icon in the page header) gained a new **Miner Dashboard** entry under the existing **Dashboard Guide** sidebar group, mirroring the Coin Dashboard guide that's been there for a while.
+
+What it covers:
+- **Identity Header** — status indicator, worker name, device firmware, payment address, session time
+- **Summary Cards** — the four cards in their new (matched-to-coin-dashboard) layout. The Total Rewards reference explicitly notes that pool-mode payouts AND matured DTM block rewards are both summed (the fix above).
+- **Charts** — Hashrate History with 1H/2H/4H/6H selector, Share Submissions, Difficulty Adjustments
+- **Performance Stats** — Average Share Rate, Session / Lifetime Shares, Valid / Invalid / Stale rate, Current Difficulty
+- **Blocks Found** — the new pagination UI, with a footnote about the pre-5.0.0 client-side filtering behavior so anyone reading older screenshots/issues understands the change.
+
+### Other Improvements in v5.0.0
+
+Beyond Stratum V2 itself, this release rolls in a number of polish items:
+
+- **Header coin tooltips show all ports.** Hovering a coin chip in the page header now shows a multi-line tooltip with the coin name, the V1 port, and every running V2 listener (`SV2 (bip324) <port>`). Makes it obvious at a glance which ports each coin is serving.
+- **Dashboard v1/v2 protocol pill.** Each worker in the miners table and on the miner detail page is now labeled with a small rounded pill showing the protocol it's connected with — `v1` or `v2`. Color preserves the familiar green = online, red = offline.
+- **Node health monitoring documentation.** The most common "why does GSS say my pool is stopped after a server reboot" question is now answered in the [Coin Configuration Guide](../../documents/GoSlimStratum/gss-coin-config-guide.md#node-health-monitoring--startup-recovery) with a clear explanation of the 3-tier polling cadence and what to expect during node startup.
+- **Cleaner Telegram bot warnings.** Transient Telegram API timeouts (network-side, not GSS-side) no longer spam ERROR-level log entries — they were already demoted to WARN in v3.1.0 but several configuration patterns still surfaced them frequently. Recovery middleware also now filters benign client-disconnect events out of the panic logs.
+
+### Breaking Change — Legacy Single-Coin API Removed
+
+> ⚠️ **This affects external API consumers only — not the GSS Web UI, GSSM, or MIM.** If you've never written your own scripts against GSS's HTTP API, you can skip this section.
+
+When GoSlimStratum was originally single-coin (DGB-only), all metrics endpoints lived at paths like `/api/v1/metrics/pool`. When multi-coin support landed, a parallel set of coin-aware endpoints was added at `/api/v1/{coin}/metrics/pool`, and the legacy paths silently defaulted to DGB. Every internal client (Web UI, GSSM dashboard, MIM) migrated to the coin-aware paths long ago. The legacy paths have been carrying duplicate handler logic with no internal consumers ever since.
+
+**In v5.0.0, the legacy paths are removed entirely.** Hitting `/api/v1/metrics/pool` (or any of the other legacy endpoints) now returns a `404 Not Found`.
+
+**Migration is a simple find-and-replace:**
+
+```
+s|/api/v1/metrics/|/api/v1/DGB/metrics/|
+```
+
+…where `DGB` becomes whatever coin symbol you're actually querying (`BTC`, `BCH`, `XEC`, etc.). Every legacy endpoint has a direct multi-coin equivalent at the corresponding `/api/v1/{coin}/metrics/...` path. No data schema or response format changes — just add the coin symbol into the URL path.
+
+For the full updated endpoint catalog, see the GoSlimStratum API Documentation.
+
+### Upgrade Notes
+
+- **Drop-in upgrade for the Web UI and GSSM.** Pull the new image, restart your container. Your existing config.json works as-is. No dashboard or notification changes required.
+- **Breaking change for external API scripts.** If you've written your own scripts that query GSS's metrics API directly (not through the Web UI or GSSM), update them to use the coin-aware paths — see the "Breaking Change" section above.
+- **No mandatory config changes.** A new top-level `sv2` block and per-coin `sv2: []` array are documented and supported, but if you don't add them GSS uses sensible defaults — and with no V2 listeners enabled, those defaults are never read.
+- **Want to try V2 today?** Pick up a NerdQAxe++ (current firmware ships with SV2 support) or wait for the Bitaxe SV2 firmware PR to merge upstream. Follow the [Setup Guide](v5.0.0-Stratum-V2-Setup-Guide.md) to enable a V2 listener on one coin, generate keys, paste the authority public key into the miner, and you're mining over V2.
 
 ---
 

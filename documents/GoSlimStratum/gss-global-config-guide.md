@@ -88,6 +88,12 @@ This guide covers the global sections of `config.json` and the full `notificatio
             "network": 30
         }
     },
+    "sv2": {
+        "authority_key_path": "/app/config/gssv2-authority.key",
+        "variants": {
+            "bip324": { "static_key_path": "/app/config/gssv2-static-bip324.key" }
+        }
+    },
     "coins": {
         "...": "see coin-config-guide.md"
     }
@@ -282,6 +288,57 @@ Controls how often the web dashboard polls the API to update each section (in se
 | `network` | `30` | How often the network difficulty and block height refreshes. |
 
 > **Tip:** Lower refresh intervals give more real-time data but increase API load. The defaults are suitable for most setups.
+
+---
+
+## Stratum V2 Keys - AS OF Version 5.0.0
+
+If you plan to enable Stratum V2 listeners on any coin (see the [Coin Configuration Guide](gss-coin-config-guide.md) for the per-coin `sv2` array), GSS needs two types of cryptographic key files. These are configured **once, pool-wide**, then reused across every V2 listener.
+
+```json
+"sv2": {
+    "authority_key_path": "/app/config/gssv2-authority.key",
+    "variants": {
+        "bip324": { "static_key_path": "/app/config/gssv2-static-bip324.key" }
+    }
+}
+```
+
+### What These Keys Do
+
+| Key | Purpose | Rotation Impact |
+|-----|---------|-----------------|
+| **Authority Keypair** | One per pool. The base58 public key is what each miner pastes into their `sv2_auth_pk` NVS field. Miners verify the server certificate during the Noise handshake using this key. | **High** — rotating means every miner needs the new pubkey pasted into NVS. |
+| **Per-Variant Static Keypair** | One per supported variant (today: `bip324`). Used internally during the handshake transcript binding — never published, never pasted into miners. | **Low** — rotating only requires a GSS restart; miners don't need updates. |
+
+### Fields
+
+| Field | Description |
+|-----|-----------|
+| `authority_key_path` | Filesystem path to the authority private key file. The corresponding base58 public key is what miners paste into the `sv2_auth_pk` NVS field. One authority key per pool — shared across every coin. |
+| `variants.<variant>.static_key_path` | Filesystem path to the per-variant static private key file. Used during the Noise handshake. Today only `bip324` is supported. |
+
+> **Default paths:** Both fields default to `/app/config/` when not explicitly set (so they sit alongside `config.json` in the Docker container's config volume). Existing pre-5.0.0 configs that don't have an `sv2` block at all will pick up these defaults automatically — no hand-editing required.
+
+### Generating the Keys
+
+The recommended (and easiest) way to generate keys is the **Stratum V2 Keys** section at the bottom of the **Global Configuration** page in the Web UI. Two cards appear, one per key type, each with a "Generate" button. Clicking Generate writes the private key to disk owner-read-only (Unix mode `0600`) and immediately displays the resulting authority public key for copy-paste into your miner's NVS.
+
+For a step-by-step walkthrough including screenshots, see the [v5.0.0 Stratum V2 Setup Guide](../../release%20notes/GoSlimStratum/v5.0.0-Stratum-V2-Setup-Guide.md).
+
+> **Headless setups:** A `gssv2-keygen` CLI is also included in the GSS distribution for operators who can't use the Web UI. Run it once on the host with the same paths configured.
+
+### Regeneration Warnings
+
+- **Regenerating the authority keypair is destructive.** Every miner currently configured with the OLD pubkey will fail handshake against the new one until you paste the new pubkey into each miner's NVS. The Web UI gates this behind a typed-confirmation modal — you must type `GENERATE` to proceed.
+- **Regenerating a static key is mild.** GSS's cert refresh goroutine re-signs the server certificate every `cert_valid_hours / 2` (per the per-coin `sv2[].cert_valid_hours` field, default 24 hours) using whatever static key is loaded at restart. No miner NVS update is required. Already-connected miners stay connected until they disconnect for unrelated reasons.
+- **Restart required.** A freshly generated or regenerated key file is not picked up by running listeners — they hold the old key in memory. Restart GSS to load the new key.
+
+### Behavior
+
+- The `sv2` block only matters if at least one coin has an `enabled: true` V2 listener entry. If no coin uses V2, the block is parsed but unused.
+- Key file validation happens at startup: if any enabled V2 listener references a missing or unreadable key file, GSS refuses to start with a clear error message pointing at the offending path.
+- Authority key is shared across every coin's V2 listeners — miners only configure one `sv2_auth_pk` value regardless of which coin pool they're connected to.
 
 ---
 

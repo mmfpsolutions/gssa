@@ -61,6 +61,14 @@ Here is a complete example of a coin configuration object in `config.json`:
         "ping_enabled": true,
         "ping_interval_seconds": 30
     },
+    "sv2": [
+        {
+            "variant": "bip324",
+            "enabled": false,
+            "port": 34254,
+            "cert_valid_hours": 24
+        }
+    ],
     "mining": {
         "address": "your_legacy_node_wallet_address",
         "network": "mainnet",
@@ -436,6 +444,57 @@ When multiple physical miners connect with the same worker name (e.g., two Bitax
 > - If disambiguation is enabled, the default 3-second consolidation window is usually sufficient. Increase it only if your miners experience longer reconnect cycles.
 > - Set `auto_worker_id` to `false` if you want miners connecting with just a wallet address to be grouped together under the bare address.
 > - Use `default_worker_id` with a custom name (e.g., `"miner"`) to give all no-suffix connections a readable shared name instead of individual connection IDs.
+
+---
+
+## Stratum V2 Section - AS OF Version 5.0.0
+
+Stratum V2 is the next-generation mining protocol — a binary, encrypted, authenticated successor to the classic JSON-based Stratum V1. GSS supports **both protocols simultaneously** on different ports per coin, so V1 miners and V2 miners can mine the same pool concurrently with no firmware changes required for V1 devices.
+
+**Important — what V2 is and isn't:**
+
+- **Only `sha256d` algorithm coins** can run V2 today (DGB, BTC, BCH, XEC). Scrypt and other algorithms are not in scope for this release.
+- **Only firmware that supports V2** can use a V2 listener (e.g. NerdQAxe++ firmware shipping today; Bitaxe firmware via [Bitaxe SV2 PR #1553](https://github.com/bitaxeorg/ESP-Miner/pull/1553) once it lands). V1-only firmware ignores the V2 listener and continues using the V1 port — no breaking changes for existing setups.
+- **V2 requires a one-time key generation step** on the Global Config page. See the [v5.0.0 Stratum V2 Setup Guide](../../release%20notes/GoSlimStratum/v5.0.0-Stratum-V2-Setup-Guide.md) for the walkthrough.
+- **V2 is opt-in** — every existing coin pool starts up with V2 disabled. Nothing changes for existing operators until they explicitly enable a V2 listener.
+
+### The `sv2` Array
+
+The per-coin `sv2` field is an **array** of listener entries. Each entry binds one V2 port to one crypto variant. The array form is forward-looking — when additional variants (like SRI) ship in future versions, an operator can add a second entry on a different port without disrupting the first.
+
+```json
+"sv2": [
+    {
+        "variant": "bip324",
+        "enabled": true,
+        "port": 34254,
+        "cert_valid_hours": 24
+    }
+]
+```
+
+| Field | Description | Guidelines |
+|-----|-----------|----------|
+| `variant` | The SV2 crypto stack. Today only `bip324` is supported (`Noise_NX_Secp256k1+EllSwift_ChaChaPoly_SHA256` with BIP-340 Schnorr cert). | `"bip324"` |
+| `enabled` | Whether this listener actually starts. A disabled entry is parsed and validated but the port is not bound. | `true` to enable; `false` to keep the config in place without binding |
+| `port` | TCP port miners connect to. Must be unique across this coin's V1 stratum port and all other V2 listeners. Default convention: `34254` (BTC), `34255` (BCH), `34256` (other SHA256d coins). | Any free TCP port |
+| `cert_valid_hours` | Validity window of the server certificate. GSS auto-renews the cert every `cert_valid_hours / 2`, so newly-connecting miners always see a fresh cert. Already-connected miners are unaffected. | `24` (default) |
+
+### Key Files
+
+V2 uses cryptographic keys for the encrypted handshake — but these are configured **globally**, not per-coin (see the [Global Configuration Guide](gss-global-config-guide.md) for the `sv2` section at the top level of `config.json`). The reasoning: one authority public key per pool is what miners paste into their `sv2_auth_pk` NVS field, regardless of which coin they're mining. Per-variant static keys are shared across all coins using that variant.
+
+### Behavior
+
+- **V1 + V2 coexistence:** Both servers fan out from the same job-management pipeline, so block templates, share validation, vardiff, license enforcement, and (when applicable) DTM revenue share all "just work" for V2 miners with no special configuration.
+- **Multiple variants per coin:** Add additional entries to the `sv2` array with distinct `variant` values when more variants become available. Each entry uses its own static key (from the global config) but shares the single pool-wide authority key.
+- **Non-SHA256d coins:** If the coin's algorithm isn't `sha256d`, the V2 array is silently ignored at startup. The Web UI shows a polite "Stratum V2 is not available for this coin" message instead of the listener editor.
+- **Validation:**
+  - Each enabled listener requires the global `sv2.authority_key_path` and `sv2.variants.<variant>.static_key_path` to be configured (and the corresponding key files to exist).
+  - Port uniqueness is enforced across V1 and all V2 listeners on the same coin AND across coins (no two listeners can share a port).
+  - Variant uniqueness within a coin's `sv2` array is enforced (you cannot have two `bip324` listeners on the same coin).
+
+> **Tip:** Start with V2 disabled (`"enabled": false`) on your existing coin configs after upgrading to v5.0.0. Generate keys on the Global Config page, then come back to the coin config, set `enabled: true`, save, and restart GSS. V1 miners continue working throughout — they don't even notice.
 
 ---
 

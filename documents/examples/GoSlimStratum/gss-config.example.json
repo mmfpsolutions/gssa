@@ -41,6 +41,14 @@
         "ping_enabled": true,
         "ping_interval_seconds": 30
       },
+      "sv2": [
+        {
+          "variant": "bip324",
+          "enabled": false,
+          "port": 34254,
+          "cert_valid_hours": 24
+        }
+      ],
       "mining": {
         "address": "your_legacy_node_wallet_address",
         "network": "mainnet",
@@ -119,6 +127,14 @@
         "ping_enabled": true,
         "ping_interval_seconds": 30
       },
+      "sv2": [
+        {
+          "variant": "bip324",
+          "enabled": false,
+          "port": 34256,
+          "cert_valid_hours": 24
+        }
+      ],
       "mining": {
         "address": "bc1qYourBitcoinAddressHere",
         "network": "mainnet",
@@ -197,6 +213,14 @@
         "ping_enabled": true,
         "ping_interval_seconds": 30
       },
+      "sv2": [
+        {
+          "variant": "bip324",
+          "enabled": false,
+          "port": 34255,
+          "cert_valid_hours": 24
+        }
+      ],
       "mining": {
         "address": "bitcoincash:qYourBitcoinCashAddressHere",
         "network": "mainnet",
@@ -458,6 +482,12 @@
       "miners": 10,
       "blocks": 30,
       "network": 30
+    }
+  },
+  "sv2": {
+    "authority_key_path": "/app/config/gssv2-authority.key",
+    "variants": {
+      "bip324": { "static_key_path": "/app/config/gssv2-static-bip324.key" }
     }
   }
 }
