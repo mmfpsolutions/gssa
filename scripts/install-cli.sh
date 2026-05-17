@@ -368,6 +368,7 @@ collect_config() {
       CONTAINER_NAME="dgb";  DATA_SUBDIR="dgb";  DEFAULT_RPC_USER="digibyterpc"
       RPC_PORT=9001;  ZMQ_PORT=28332;  STRATUM_PORT=3333
       NODE_CLI="digibyte-cli";  NODE_CONF="digibyte.conf"
+      WALLET_ADDR_TYPE="bech32m"
       ;;
     2)
       COIN_ID="bch";  COIN_ID_UPPER="BCH";  COIN_NAME="Bitcoin Cash"
@@ -375,6 +376,7 @@ collect_config() {
       CONTAINER_NAME="bch";  DATA_SUBDIR="bch";  DEFAULT_RPC_USER="bitcoincashrpc"
       RPC_PORT=9002;  ZMQ_PORT=28333;  STRATUM_PORT=3334
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      WALLET_ADDR_TYPE="legacy"
       ;;
     3)
       COIN_ID="btc";  COIN_ID_UPPER="BTC";  COIN_NAME="Bitcoin"
@@ -382,6 +384,7 @@ collect_config() {
       CONTAINER_NAME="btc";  DATA_SUBDIR="btc";  DEFAULT_RPC_USER="bitcoinrpc"
       RPC_PORT=9003;  ZMQ_PORT=28334;  STRATUM_PORT=3335
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      WALLET_ADDR_TYPE="bech32m"
       ;;
     *)
       error "Invalid selection. Please enter 1, 2, or 3."
@@ -707,13 +710,18 @@ start_node_and_wallet() {
     createwallet "default" 2>/dev/null || true
   success "Default wallet created"
 
-  # Get legacy address
-  info "Generating legacy wallet address..."
+  # Get wallet address using the coin's preferred address type
+  # DGB/BTC: bech32m (Taproot) — modern default, lighter spend weight on
+  #         payouts. Future-proofs DGB operators for any feature that
+  #         prefers P2TR (e.g. DigiDollar minting works on legacy too,
+  #         but starting on P2TR avoids a transfer step later).
+  # BCH:    legacy (P2PKH script type; node returns CashAddr format).
+  info "Generating wallet address (${WALLET_ADDR_TYPE})..."
   WALLET_ADDRESS=$(docker exec "$CONTAINER_NAME" "$NODE_CLI" \
     -rpcuser="$RPC_USER" \
     -rpcpassword="$RPC_PASSWORD" \
     -rpcport="$RPC_PORT" \
-    getnewaddress "" "legacy" 2>/dev/null)
+    getnewaddress "" "${WALLET_ADDR_TYPE}" 2>/dev/null)
 
   if [[ -z "$WALLET_ADDRESS" ]]; then
     error "Failed to generate wallet address."

@@ -1,5 +1,7 @@
 server=1
 listen=1
+#Enabled REST API - faster for GSS block Explorer
+rest=1
 # Development: Use testnet for testing (comment out for production)
 #testnet=1
 #[test]
@@ -12,19 +14,16 @@ rpcbind=127.0.0.1
 {PRUNE_VALUE}
 algo=sha256d
 dbcache=1000
-maxmempool=1000
 keypool=100
 wallet=default
 #still send transactions out
 walletbroadcast=1
 zmqpubhashblock=tcp://127.0.0.1:28332
-#Inbound limits
+#limits
 maxuploadtarget=500      # 500mb per day upload limit
 maxreceivebuffer=5000    # Limit receive buffer per connection
 maxsendbuffer=1000       # Limit send buffer per connection
-#maxconnections=32
+#maxconnections=32       # Set this if you want to limit the number of connections
 peerbloomfilters=0       # Disable bloom filter requests
 peerblockfilters=0       # Disable block filter serving
-#blocksonly=1
-#timeout=30000
 whitelist=127.0.0.1      # Always allow local connections

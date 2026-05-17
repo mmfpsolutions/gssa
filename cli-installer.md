@@ -29,9 +29,23 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 5. Downloads config templates from GitHub (base + coin-specific)
 6. Creates MIM system user with sudo/docker access
 7. Generates all config files from templates
-8. Starts coin node, creates wallet, saves address
+8. Starts coin node, creates wallet, saves address (see **Wallet Address Format** below)
 9. Starts PostgreSQL, creates GoSlimStratum database and role
 10. Brings up the full 7-container stack
+
+**Wallet Address Format:**
+
+The installer generates a fresh receiving address on the coin node and writes it into the GSS config as the pool's mining/payout address. The format chosen depends on the coin:
+
+| Coin | Address type | Example shape |
+|---|---|---|
+| **DigiByte (DGB)** | `bech32m` (P2TR / Taproot) | `dgb1p...` |
+| **Bitcoin Cash (BCH)** | `legacy` script type, CashAddr format | `bitcoincash:q...` |
+| **Bitcoin (BTC)** | `bech32m` (P2TR / Taproot) | `bc1p...` |
+
+For DGB and BTC, Taproot (`bech32m`) is the modern default — lighter spend weight on payouts and forward-compatible with newer features (e.g. DGB's upcoming DigiDollar stablecoin works with legacy addresses too, but starting on Taproot avoids a transfer step later if you decide to mint). BCH has never adopted SegWit or Taproot, so it stays on the standard CashAddr-formatted P2PKH that BCH wallets and exchanges expect.
+
+The generated address is saved to `/data/<coin>/<coin>_wallet.txt` for your records, and patched into `/data/goslimstratum/config/config.json` automatically. You can swap it for a different address at any time by editing the GSS config and restarting the stack.
 
 ### Uninstaller (`uninstall.sh`)
 

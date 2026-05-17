@@ -1,5 +1,7 @@
 # BCH Node Configuration
 server=1
+#Enable REST API - faster for GSS Block Explorer
+rest=1
 # Turn off listener, not needed for outbound only
 listen=0
 
@@ -31,8 +33,6 @@ maxuploadtarget=500      # 500mb per day upload limit
 maxreceivebuffer=5000    # Limit receive buffer per connection
 maxsendbuffer=1000       # Limit send buffer per connection
 #maxconnections=32        # Limit number of connections, optional       
-#blocksonly=1             # Only relay/request blocks, not loose txs
-#timeout=30000
 
 # Whitelist trusted connections
 whitelist=127.0.0.1      # Always allow local connections
