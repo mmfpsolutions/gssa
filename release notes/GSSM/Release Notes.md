@@ -1,5 +1,39 @@
 # GSSM Release Notes
 
+## v1.0.25
+
+### Bug Fixes
+
+- **Zero Hashrate alerts now fire on Canaan miners (Avalon Q, Nano3S)** — GSSM was silently dropping every field after the first from the response sent by Canaan-firmware miners, leaving the internal hashrate value stuck at zero. Combined with the alert reading the wrong field (lifetime average instead of recent 5-second average), the Zero Hashrate event could never fire on these devices — even when a fan died and the hashboards stopped producing shares while the control board kept the stratum connection alive. Fixed both issues:
+  - The parser now correctly extracts every field from the response (hashrate, accepted/rejected shares, best share, temperature)
+  - Hashrate is now read from the 5-second average, matching how the dashboard already reads it — so a sudden hardware failure triggers a Zero Hashrate alert within one polling cycle
+- **No change to the dashboard miner card** — the miner card on the Miners page was always reading from a different (and correct) code path, so your displayed hashrate, share counts, and best share have been right all along. The fix is entirely on the notification/alerting side.
+- **No change to temperature alerts or automatic fan control** — both run on independent code paths that were never affected by this bug, and they continue to work exactly as before.
+
+If you have Zero Hashrate alerts enabled on a Canaan-firmware miner, you'll start receiving Discord / Telegram / email / webhook notifications within ~1 minute of the miner stopping share submission, even if the device remains TCP-connected to the pool.
+
+### Improvements
+
+None this cycle.
+
+---
+
+## v1.0.24
+
+### Improvements
+
+- **Footer version label tidied up** — The version string in the GSSM footer used to display with a leading `v` (e.g. `v1.0.24`). Removed the `v` so the version reads as just the number, matching the version files on disk and the rest of the GSSM ecosystem (GSS, GSBE, MIM).
+
+### Bug Fixes
+
+None this cycle.
+
+### Behind the scenes
+
+- CI/CD workflows bumped to Node.js 24 (replaces the deprecated Node 20). No user-facing impact — builds continue to publish the same Docker images to the same registry.
+
+---
+
 ## v1.0.23
 
 ### Improvements
