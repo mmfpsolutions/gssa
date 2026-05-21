@@ -1,5 +1,68 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v5.0.0
+## v3.0.15 through v5.0.1
+
+---
+
+## v5.0.1 — Node Wallet Sweep + Stratum V2 Polish
+
+GoSlimStratum v5.0.1 is a focused follow-up to v5.0.0's big Stratum V2 release. The headline addition is the **Node Wallet Sweep** feature — a one-click, PIN-protected way to move your accumulated node wallet balance to cold storage (or anywhere else) directly from the Web UI, without ever opening a terminal. Plus polish around the Stratum V2 Standard Channel codebase to validate compatibility with the freshly-released Bitaxe SV2 2.14.0b3 Beta firmware.
+
+### Node Wallet Sweep
+
+In pool mode (or DTM mode with a non-zero pool fee), your node wallet accumulates a balance over time — pool-fee outputs from every coinbase transaction land in your configured mining address. Until v5.0.1, the only way to move that balance to cold storage was through your coin's command-line interface (`bitcoin-cli sendall ...`, `digibyte-cli sendtoaddress ...`, etc.) executed from a terminal on the node host. That works for power users, but it's a meaningful friction point for prosumer and home-pool operators.
+
+v5.0.1 adds a guided **Sweep Wallet** flow to each supported coin's Earnings page.
+
+**What you get:**
+
+- **Node Wallet card** on each per-coin Earnings page, showing the live node wallet balance with a **Sweep Wallet** button, refreshes automatically every 60 seconds. Collapsible like every other card on the page, with the collapse state remembered across reloads.
+- **PIN-protected sweep flow.** Before any sweep can fire, you set a **4–8 digit numeric PIN** on the new **Security** panel of the Global Configuration page. The PIN is stored as a bcrypt hash on disk (file permissions 0600); the plaintext PIN never persists and never appears in any API response. Wrong PIN entries are logged at WARN level with the remote IP for basic brute-force visibility.
+- **Two sweep modes:**
+  - **Send All** — sweeps the entire wallet balance to your destination address. The destination receives `balance − network fee`.
+  - **Specific Amount** — sweeps exactly the amount you choose. The recipient receives `amount − network fee`; your wallet loses exactly the amount entered.
+- **Concurrency safety.** If a regular payout transaction is currently broadcast but not yet confirmed, the sweep refuses to fire and asks you to wait for the payout to confirm. Prevents accidental UTXO collisions between a sweep and an in-flight payout.
+- **Coin-aware address validation.** Your destination address is checked against the coin's address validators before any RPC fires. Wrong address format (e.g., a Bitcoin address when sweeping DigiByte, or a malformed CashAddr for BCH) is caught immediately with a clear error — no wasted RPC round-trip.
+- **Wallet Sweep History card** appears beneath your payment tables once you've performed at least one sweep. Lists every attempt (success or failure) with timestamp, mode, destination, amount, status badge, and either the on-chain txid (clickable to the block explorer) or the error message on failed attempts.
+- **Encrypted-wallet support.** If your node wallet is password-protected (the same setup you configured for the existing payout system in v3.0.28), sweeps use the same `wallet_passphrase` field — unlock for the minimum window needed, then re-lock automatically.
+
+**Supported coins:**
+
+The Node Wallet Sweep feature is available on **SHA256d coins**: BTC, BC2, DGB, BCH, XEC. Non-SHA256d coins (LTC, DOGE, generic coins from `coins.json`) do not see the Node Wallet card on their Earnings pages.
+
+### ⚠️ Recommended — Keep a Working Balance in Your Node Wallet
+
+If you're running in **pool mode with a low pool fee percentage** (especially below 1%), be careful not to sweep your entire node wallet balance to zero. The pool's payout system relies on UTXOs in the node wallet to fund miner payouts. Sweeping too aggressively can leave the wallet in a state where the next scheduled payout fails until pool-fee outputs from subsequent blocks refill it.
+
+**Suggested rule of thumb:** Leave enough balance in the node wallet to cover several payout cycles' worth of miner distributions plus typical network fees. The exact amount depends on your hashrate, block frequency, and miner count, but **a few days of expected payout volume** is a safe target. You can sweep more frequently if you're closer to that threshold, less frequently if you have a larger buffer.
+
+In **DTM mode** the consideration is smaller — block rewards go directly to miners via the coinbase, so your node wallet only accumulates pool-fee outputs. Sweeping more aggressively in DTM is fine. You may still want a small buffer if you occasionally run any coins in pool mode alongside DTM.
+
+### Stratum V2 — Bitaxe v2.14.0b3 Validation
+
+Shortly after v5.0.0 shipped, the Bitaxe ecosystem released firmware **v2.14.0b3** with first-class Stratum V2 support (PR #1553) — covering both Extended Channel and Standard Channel modes. v5.0.1 includes the polish work needed to fully validate GoSlimStratum's SV2 server against this brand-new client implementation.
+
+**What was validated:**
+
+- **Extended channel mode** on Bitaxe v2.14.0b3 — works cleanly end-to-end. Same hashrate the device delivers on V1, just over the encrypted V2 transport. Confirmed live on BTC mainnet through one ~54-minute outlier block (well into Bitcoin's long-tail block-time distribution): 217 shares accepted, 0 rejected.
+- **Standard channel mode** on Bitaxe v2.14.0b3 — also works cleanly after a small protocol-handling refinement on the GSS side related to how Standard-channel jobs are activated at the moment a new block lands. The change brings Standard-channel handling into alignment with how Extended channel has worked since v5.0.0. Validated against both BTC mainnet and DGB (rapid-fire block transitions every ~15 seconds, exercising the new-block activation path many times in a short window with zero rejects).
+
+**What this means for you:**
+
+If you're running a Bitaxe with firmware v2.14.0b3 (or any newer SV2-capable firmware), you can connect it to your GoSlimStratum pool over Stratum V2 today. The setup is identical to v5.0.0: enable a V2 listener on the coin's Configuration page, paste your pool's authority public key into the Bitaxe's `sv2_auth_pk` NVS field, and connect.
+
+**Channel mode recommendation:** For most operators, **Extended channel is the recommended default**. It gives the miner full visibility into the coinbase transaction — block height, transactions, rewards — which the on-device dashboard uses to display the contextual mining stats Bitaxe owners expect. Standard channel also works, but the on-device dashboard will show less context because the SV2 protocol intentionally doesn't transmit the coinbase to the miner in Standard mode.
+
+### Other Improvements
+
+- **Cleaner amount displays throughout the Web UI.** Numbers no longer trail with your coin pool's config key (e.g., the earnings page now shows `85,681.57000000` instead of `85,681.57000000 DGBT`). Operator-chosen pool keys like `DGBT` or `BCH-Test` read as currency units next to a number but aren't actual denominations — they were visual noise. The coin context is already named by the page header or card title, so the trailing label was redundant. Kept in places where the symbol genuinely *identifies* which pool you're operating on (modal titles like "Sweep Wallet — DGBT") or what address format is expected ("Enter DGBT address" placeholders).
+
+### Upgrade Notes
+
+- **Drop-in upgrade.** Pull the new image, restart your container. Your existing `config.json` works as-is. Database auto-migration adds one new audit table (`wallet_sweeps`) on first startup; existing data is untouched.
+- **No new config required to keep existing behavior.** Until you visit Global Configuration → Security and set a Sweep PIN, the Node Wallet Sweep feature is dormant. The Sweep Wallet card on the Earnings page will display the balance, but clicking the button points you at Configuration to set up the PIN first.
+- **Setting your Sweep PIN:** Global Configuration → Security panel (above the Restart Warning) → enter a 4–8 digit PIN and confirm. Done. To change the PIN later, the form requires you to enter the current PIN first.
+- **Bitaxe SV2 operators:** If you're using firmware v2.14.0b3 or newer, your pool benefits from the validation work — no config changes required. Use whichever channel mode (Extended or Standard) you prefer, though Extended is recommended for the richer on-device dashboard experience.
+- **Pool-mode operators with low pool fees:** Read the "⚠️ Keep a Working Balance" callout above before performing your first sweep. Don't drain the wallet to zero — your payout system needs a working balance to fund miner distributions.
 
 ---
 
