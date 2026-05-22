@@ -1,5 +1,53 @@
 # GSSM Release Notes
 
+## v1.0.26
+
+### New Features
+
+- **List View on the Miners, Pools, and Nodes dashboards** — Each dashboard now has a desktop alternative to the card grid: a dense table view where every miner / pool / node is one row of column-aligned values. Click any row to expand it inline with the same body content the card would show.
+  - **View toggle** sits in the page header next to Hide summary. The icon shows what you'll switch *to* — `☰ List` in card view, `▦ Gallery` in list view. Hidden on mobile (the existing card view already reads as a list at narrow widths).
+  - **Column headers** above the table with values vertically aligned across all rows — read down any column to spot the outlier.
+  - **Expand all / Collapse all** button appears next to the view toggle in list mode.
+  - **Compact summary row** — the four stat cards at the top of each dashboard (Total Miners / Online / Total Hashrate / Avg Temp, and equivalents for pools and nodes) collapse to a tighter inline row in list view, giving the table more vertical real estate.
+  - Your choice (gallery vs list) is remembered per dashboard and survives page reloads. Switching between modes is instant — no waiting for the next poll.
+  - Per dashboard, the columns are:
+    - **Miners**: Status · Block-found · Coin · Name · Hashrate · Best Difficulty · Shares · Pool Diff · Performance % · Actions. The Pool Diff column reads from each miner's reported value across all supported device types (AxeOS, CGMiner, Canaan/Nano3s, NerdMiner v1/v2, ElphaPex).
+    - **Pools**: Status · Coin · Name · Network Hashrate · Network Difficulty · Block · Active Miners · Pool Hashrate · Details
+    - **Nodes**: Status · Coin · Name · Chain · Blocks · Difficulty · Verification % · Version · Connections · Details
+  - At narrower desktop widths (under 1024px), the lower-priority columns drop automatically so the table stays inside the viewport. Expand any row to see the full detail.
+
+- **Drag-to-Reorder on the Configuration page** — Miners, GoSlimStratum pools, and crypto nodes can now be reordered with the mouse. The new order persists to `config.json` and propagates to every other page in the app on the next poll.
+  - **Drag handle** (the `⋮⋮` glyph in a new "Order" column) on each row. Grab and drop where you want it. A blue indicator line shows whether the row will land above or below the target.
+  - **Up / Down arrow buttons** on each row for mobile and keyboard users (HTML5 drag doesn't work on touch). Arrows are the only reorder path on phones; on desktop the drag handle takes over.
+  - Race-aware: if another browser tab modifies the section between when you loaded the page and when you drop, the server detects the mismatch, the page silently refetches, and you see the fresh state.
+
+- **NerdQAxe++ Settings Page** — NerdQAxe++ devices now get a full settings editor in GSSM, matching what Bitaxe devices have had. Six sections cover Device (hostname, screen options), WiFi (SSID/password), Pool Strategy (Failover / Dual Pool / Stratum keepalive), Primary Pool, Fallback Pool, and Performance (frequency, voltage, fan control mode).
+  - **Stratum V2 fields** included — Stratum Protocol (V1/V2 select), SV2 Authority Pubkey, SV2 Channel Type (Extended/Standard), with fallback equivalents. NerdQAxe++ is the first GSS-supported miner with SV2 capability and operators can now configure it from GSSM.
+  - **OTP/TOTP aware** — when the device's `GET /api/system/info` reports `otp: true`, a one-line note appears at the top of the form explaining that saves will return a 401 from the device until OTP is disabled in the device's own web UI. v1 doesn't negotiate OTP sessions; the note pre-explains the failure mode so a bare 401 in the save status is interpretable.
+  - **Coinbase verification fields are intentionally not exposed yet** — the device's own UI doesn't surface them either, so GSSM holds the line on parity for now.
+  - Click the Settings link on any NerdQAxe++ miner detail page to access it (same place Bitaxe settings live).
+
+- **Stratum Protocol indicator built into the status pill** — Every miner's status indicator across the app (dashboard cards, miner detail hero, settings page header, bulk-restart rows, and the new list view) is now a single rounded pill that combines status color with the protocol label inside. Green pill = online, red = offline, etc., with `v1` or `v2` text inside. NerdQAxe++ on Stratum V2 and Bitaxe v2.14+ on Stratum V2 show as `v2`; everything else shows as `v1`. Devices that are offline / error / timeout / disabled show the colored pill with no label since the protocol can't be determined. Hover the pill for a tooltip with the full status + protocol name.
+
+### Improvements
+
+- **Wider text inputs on the Settings page (desktop)** — Long stratum URLs, full `address.worker` wallet usernames, and 51-character SV2 authority public keys were getting clipped inside the settings form's input fields, forcing horizontal scrolling inside each field to see the whole value. On desktop (≥768px width), text and password fields and selects are now twice as wide (28rem instead of 14rem) so addresses and pubkeys fit comfortably. Number inputs (port, frequency, difficulty, etc.) are unchanged — they have short content that doesn't benefit from extra width. Mobile is also unchanged — narrow fields work better with the on-screen keyboard.
+
+- **Configuration page mobile experience** — Several visual fixes for the Config page on phones:
+  - **Action buttons render as icons** on mobile (✓ Test, ✎ Edit, ✕ Delete) instead of text labels, saving horizontal space.
+  - **The IP-address column drops on mobile** — operators can identify each entry by name; tap ✎ to see the full address when needed.
+  - **Long values fit cleanly** — addresses, hostnames, and pool keys no longer push table columns past the screen edge.
+  - **Tighter padding** so every pixel of width goes to the values that matter.
+  - Each section's column widths re-tuned for the new layout. Pool Type chips (GSS / LTC) no longer clip at the column edge.
+
+- **Cleaner node version display** — Bitcoin Core sub-version strings (used by all the BTC family node implementations) wrap themselves in forward slashes by convention — `/Satoshi:27.0.0/`. The leading and trailing slashes are now stripped for display, so it reads as `Satoshi:27.0.0`. Multi-component versions like Knots's `/Satoshi:29.3.0/Knots:20260508/` become `Satoshi:29.3.0/Knots:20260508` — the internal slash between Satoshi and Knots is informative so it stays.
+
+### Bug Fixes
+
+- **Statistics chart now shows on Bitaxe devices running beta firmware** — When ESP-Miner 2.14.0b3 (an SV2 test build) was installed on a Bitaxe, the device-detail page's statistics chart vanished. Cause: GSSM's internal version parser rejected the `b3` pre-release suffix, so the device was incorrectly classified as older than the version that introduced the new statistics endpoint, and the chart never activated. The parser now tolerates pre-release suffixes from ESP-Miner (`Nb3`, `Nrc1`, `Nalpha`, `Nbeta`) and standard SemVer pre-release / build-metadata forms (`-beta.3`, `+build123`). A beta of `X.Y.Z` is treated as equal to stable `X.Y.Z` for capability gating, so operators running beta firmware see all the same features stable firmware operators do.
+
+---
+
 ## v1.0.25
 
 ### Bug Fixes
