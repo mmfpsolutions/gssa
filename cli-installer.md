@@ -78,10 +78,6 @@ sudo bash scripts/install-cli.sh
 # Uninstaller
 sudo bash scripts/uninstall.sh
 
-# Web installer (optional)
-sudo bash scripts/install-web.sh
-```
-
 
 ## Deployment
 
@@ -93,22 +89,3 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 
 # Uninstaller
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
-
-# Web installer (optional)
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
-
-### Web Installer — Optional (`install-web.sh`) - SLOWEST - ONLY SUPPORTS DGB
-
-Alternative installer that launches the MIM Bootstrap web UI for guided setup. Use this if you prefer a browser-based workflow.
-
-```bash
-sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-web.sh)"
-```
-
-**What it does:**
-1. Verifies Ubuntu 24.04+ and supported architecture (ARM64/AMD64)
-2. Creates `/data` directory
-3. Checks for Docker Engine — installs official Docker if needed (interactive)
-4. Pulls and starts MIM Bootstrap container on port 3002
-5. Prints the web installer URL
