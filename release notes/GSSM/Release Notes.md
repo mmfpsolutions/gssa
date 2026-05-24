@@ -1,5 +1,48 @@
 # GSSM Release Notes
 
+## v1.1.0
+
+A milestone release. Three big new operator features (Auto-Discovery, encrypted credentials at rest, Disable for pools and nodes), plus a quieter pass on the parts of the UI that no longer made sense once those features landed.
+
+### New Features
+
+- **Auto-Discovery — find your fleet in one click** — A new Discover page (reachable from the Configuration page's new "Auto-Discover Miners" action card, or directly during first-time setup) scans your LAN and surfaces everything GSSM can manage. Three tabs share the same scan controls and results layout but each looks for a different kind of thing:
+  - **Miners** — probes every IP in your subnet for the five GSSM-supported miner families: AxeOS (Bitaxe / NerdQAxe++), NerdMiner v1 and v2, ElphaPex DG Home 1, CGMiner-family (Antminer, vnish), and Canaan (Avalon Q / Nano3S). Identifies each device by what its firmware reports, then bulk-adds your selection to `config.json` with one click.
+  - **GoSlimStratum Pools** — finds every GSS instance on your network and lists each coin pool loaded inside it. Pick the coins you want, give each a name, and add them all in one shot.
+  - **Crypto Nodes** — finds the underlying RPC nodes behind your GSS pools, deduplicates across multiple GSS instances pointing at the same node (so you don't get duplicate rows for the same physical daemon), and lets you bulk-add the new ones. A **Pick coin type** dropdown on each row lets you tell GSSM exactly which coin to label the node as — operators sometimes name their GSS coin keys in ways GSSM can't infer (e.g. `DGB-prod-mainnet-01`), so you get the final word.
+  - **Already-configured devices are hidden** — each tab silently deduplicates against your current `config.json` and stashes already-known items behind a "Show N already-configured" reveal so the results list shows only what's new.
+  - **Subnet auto-detect** — GSSM proposes a sensible default subnet based on the network interface it's running on. Override it freely (any CIDR up to /16) if you want to scan a different range.
+
+- **Credentials encrypted at rest** — Every sensitive value GSSM stores in `config.json` and `notifications.json` is now encrypted on disk. The Configuration API still masks these fields the way it always did, and your settings forms still show `****`. The difference is what's on disk: open `config.json` directly and you'll see encrypted blobs in place of the plaintext passwords, tokens, and webhook URLs that used to be there.
+  - **No operator action required.** The first time you start GSSM 1.1.0, it detects any plaintext credentials and encrypts them in place. Restart again and nothing changes — the file is already encrypted and stays that way. Hand-edit `config.json` to set a new plaintext value? The next start encrypts it.
+  - **What this protects against**: config backups, screenshots of your config file, Docker volume snapshots, anything captured without the running binary. An attacker who grabs your config file alone gets ciphertext, not working credentials.
+  - **What this doesn't claim to protect against**: someone with full access to the host running GSSM. The encryption is defense in depth, not an isolation boundary.
+  - **Fields covered**: every node RPC credential, every notification channel password / token (email, Telegram bot), and every webhook URL and header value (Discord, Slack, generic).
+
+- **Disable individual pools and nodes** — You could already disable a miner (`config.json: miners[].disabled = true`) to suspend its polling and silence its alerts without deleting the entry — useful for hardware swaps, summer shutdowns, or any "this device is intentionally offline" moment. The same affordance is now available for **GoSlimStratum pools** and **crypto nodes**:
+  - **Disable button** on each pool / node card on the Pools and Nodes dashboards, with a confirmation modal so an accidental click doesn't suspend a production component.
+  - **Status column on the Configuration page** — see at a glance which pools and nodes are enabled vs. disabled, alongside the same column for miners.
+  - **Disabled checkbox** in each pool's / node's edit form on the Config page for the same toggle from the editor.
+  - While disabled, GSSM stops polling the entry and **no offline alerts fire** for it — exactly the same semantics as disabled miners. Stratum keeps running on the GSS side (GSSM doesn't touch GSS state); GSSM just stops watching the entry.
+  - Re-enable from the same button — polling resumes on the next cycle.
+
+### Improvements
+
+- **Compatible with GoSlimStratum's new at-rest encryption** — GoSlimStratum 5.1.0 adds encryption to every credential it stores. GSSM 1.1.0's Auto-Discovery flow knows how to read both formats: when it finds a GSS 5.1.0+ instance with encrypted credentials, it understands them transparently and stores the discovered node with GSSM's own encryption. When it finds a GSS instance on an older version with plaintext credentials, it handles those too. No setup, no flags — just upgrade and Auto-Discovery keeps working across mixed-version fleets.
+
+- **Header navigation tidied** — The three status dots beside the Miners / Pools / Nodes tabs in the top nav have been removed. They were a holdover from before disabled pools / nodes and optional notifications, and could no longer represent the dashboards accurately — a "green dot" on Pools didn't tell you anything useful once some pools could be intentionally disabled. The dashboards themselves remain the canonical source for status, and they're one click away.
+
+- **Test Connection on the node configuration page now reports actual results** — previously the "Test" button always returned "Connection Successful" even when the node was unreachable or the credentials were wrong. Test now exercises a real RPC call and surfaces the actual outcome (success, auth failure, network unreachable, etc.) so you can fix configuration issues without guessing.
+
+- **Editing only the RPC password no longer clears the username** — when you opened a node's config edit form and changed just the password field, leaving the username untouched, the save sometimes lost the username. Fixed: a password-only edit now correctly preserves the existing username.
+
+### Behind the scenes
+
+- Internal refactoring across the configuration loading and saving paths so every entry point treats sensitive values identically. The Auto-Discovery feature and the at-rest encryption layer share the same plumbing.
+- Test coverage substantially expanded around configuration handling and the new encryption layer.
+
+---
+
 ## v1.0.26
 
 ### New Features
