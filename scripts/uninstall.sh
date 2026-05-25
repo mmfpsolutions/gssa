@@ -95,7 +95,7 @@ if [[ -f "$COMPOSE_FILE" ]]; then
   fi
 else
   # Try to stop containers by name if compose file is missing
-  local_containers=(dgb bch btc goslimstratum postgres mim axeos-dashboard dozzle watchtower)
+  local_containers=(dgb bch btc goslimstratum postgres mim gssm dozzle watchtower)
   running=false
   for c in "${local_containers[@]}"; do
     if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^${c}$"; then

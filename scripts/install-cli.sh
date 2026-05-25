@@ -490,10 +490,6 @@ download_templates() {
     "docker-compose.yml"
     "env.template"
     "goslimstratum/config.json.template"
-    "axeos-dashboard/config.json.template"
-    "axeos-dashboard/rpcConfig.json.template"
-    "axeos-dashboard/access.json"
-    "axeos-dashboard/jsonWebTokenKey.json"
     "mim-config/servers.json.template"
     "postgres/user-db-setup.sql.template"
     "coins/${COIN_ID}/docker-compose.yml"
@@ -538,8 +534,8 @@ system_setup() {
     "${DATA_DIR}/goslimstratum/logs"
     "${DATA_DIR}/goslimstratum/data"
     "${DATA_DIR}/postgres18"
-    "${DATA_DIR}/axeos-dashboard/config"
-    "${DATA_DIR}/axeos-dashboard/data"
+    "${DATA_DIR}/gssm/config"
+    "${DATA_DIR}/gssm/logs"
     "${DATA_DIR}/mim/config"
     "${DATA_DIR}/mim/data"
     "${DATA_DIR}/mim/logs"
@@ -565,10 +561,6 @@ generate_configs() {
   password_hmac=$(echo -n "$RPC_PASSWORD" | openssl dgst -sha256 -hmac "$salt" 2>/dev/null | awk '{print $NF}')
   RPC_AUTH_STRING="${RPC_USER}:${salt}\$${password_hmac}"
   success "RPC auth string generated"
-
-  # Generate JWT secret for AxeOS
-  local jwt_secret
-  jwt_secret=$(openssl rand -base64 32)
 
   # ── Node config (digibyte.conf / bitcoin.conf) ──
   info "Generating ${NODE_CONF}..."
@@ -608,35 +600,10 @@ generate_configs() {
       > "${DATA_DIR}/goslimstratum/config/config.json"
   success "config.json → /data/goslimstratum/config/config.json"
 
-  # ── axeos-dashboard config.json ──
-  info "Generating axeos-dashboard config.json..."
-  sed -e "s|{COIN_NODE_ID}|${COIN_NODE_ID}|g" \
-      -e "s|{COIN_NAME}|${COIN_NAME}|g" \
-      -e "s|{COIN_NODE_TYPE}|${COIN_NODE_TYPE}|g" \
-      -e "s|{COIN_ID}|${COIN_ID}|g" \
-      -e "s|{COIN_ID_UPPER}|${COIN_ID_UPPER}|g" \
-      -e "s|{SERVER_IP}|${SERVER_IP}|g" \
-      "${TEMPLATE_DIR}/axeos-dashboard/config.json.template" > "${DATA_DIR}/axeos-dashboard/config/config.json"
-  success "config.json → /data/axeos-dashboard/config/config.json"
-
-  # ── axeos-dashboard rpcConfig.json ──
-  info "Generating axeos-dashboard rpcConfig.json..."
-  sed -e "s|{COIN_NODE_ID}|${COIN_NODE_ID}|g" \
-      -e "s|{RPC_PORT}|${RPC_PORT}|g" \
-      -e "s|{RPC_USER}|${RPC_USER}|g" \
-      -e "s|{RPC_PASSWORD}|${RPC_PASSWORD}|g" \
-      "${TEMPLATE_DIR}/axeos-dashboard/rpcConfig.json.template" > "${DATA_DIR}/axeos-dashboard/config/rpcConfig.json"
-  success "rpcConfig.json → /data/axeos-dashboard/config/rpcConfig.json"
-
-  # ── axeos-dashboard access.json ──
-  cp "${TEMPLATE_DIR}/axeos-dashboard/access.json" "${DATA_DIR}/axeos-dashboard/config/access.json"
-  success "access.json → /data/axeos-dashboard/config/access.json"
-
-  # ── axeos-dashboard jsonWebTokenKey.json ──
-  info "Generating jsonWebTokenKey.json..."
-  sed -e "s|{JWT_SECRET}|${jwt_secret}|g" \
-      "${TEMPLATE_DIR}/axeos-dashboard/jsonWebTokenKey.json" > "${DATA_DIR}/axeos-dashboard/config/jsonWebTokenKey.json"
-  success "jsonWebTokenKey.json → /data/axeos-dashboard/config/jsonWebTokenKey.json"
+  # GSSM has no install-time config templates. On first hit, the GSSM
+  # web UI bootstraps access.json + jsonWebTokenKey.json and walks the
+  # operator through setup; miners/pools/nodes come in via GSSM's
+  # auto-discovery or manual entry.
 
   # ── mim servers.json ──
   info "Generating MIM servers.json..."
@@ -656,7 +623,7 @@ generate_configs() {
   info "Setting directory permissions..."
   chmod -R 777 "${DATA_DIR}/${DATA_SUBDIR}"
   chmod -R 777 "${DATA_DIR}/goslimstratum"
-  chmod -R 777 "${DATA_DIR}/axeos-dashboard"
+  chmod -R 777 "${DATA_DIR}/gssm"
   chmod -R 777 "${DATA_DIR}/mim"
   chmod -R 777 "${DATA_DIR}/postgres18"
   success "Directory permissions set"
@@ -786,7 +753,7 @@ deploy_stack() {
   sleep 5
   info "Verifying containers..."
 
-  local expected_containers=("$CONTAINER_NAME" goslimstratum postgres mim axeos-dashboard dozzle watchtower)
+  local expected_containers=("$CONTAINER_NAME" goslimstratum postgres mim gssm dozzle watchtower)
   local all_running=true
 
   for container in "${expected_containers[@]}"; do
@@ -821,7 +788,7 @@ finish() {
   echo -e "  ${BOLD}Your Services:${NC}"
   echo ""
   echo -e "    MIM Dashboard:      ${CYAN}http://${SERVER_IP}:3001${NC}"
-  echo -e "    AxeOS Dashboard:    ${CYAN}http://${SERVER_IP}:3000${NC}"
+  echo -e "    GSSM Dashboard:     ${CYAN}http://${SERVER_IP}:3000${NC}"
   echo -e "    GSS Web UI:         ${CYAN}http://${SERVER_IP}:3003${NC}"
   echo -e "    Stratum Connect:    ${CYAN}stratum+tcp://${SERVER_IP}:${STRATUM_PORT}${NC}"
   echo -e "    Dozzle Logs:        ${CYAN}http://${SERVER_IP}:8080${NC}"

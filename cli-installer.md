@@ -17,7 +17,7 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 - GoSlimStratum mining stratum server
 - PostgreSQL 18 database
 - MIM management dashboard
-- AxeOS monitoring dashboard
+- GSSM monitoring dashboard
 - Dozzle log viewer
 - Watchtower auto-updater
 

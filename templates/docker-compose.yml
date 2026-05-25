@@ -61,13 +61,13 @@ services:
         max-file: "3"  
     restart: always
 
-  axeos-dashboard:
-    image: ghcr.io/mmfpsolutions/axeos-dashboard:latest
-    container_name: axeos-dashboard
+  gssm:
+    image: ghcr.io/mmfpsolutions/gssm:latest
+    container_name: gssm
     network_mode: host
     volumes:
-      - /data/axeos-dashboard/data:/app/data
-      - /data/axeos-dashboard/config:/app/config
+      - /data/gssm/config:/app/config
+      - /data/gssm/logs:/app/logs
     logging:
       driver: "json-file"
       options:

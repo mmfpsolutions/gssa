@@ -18,7 +18,7 @@ MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infra
 | GoSlimStratum    | Mining stratum server and pool                      |
 | PostgreSQL 18    | Database for share tracking and metrics             |
 | MIM              | Infrastructure management dashboard                 |
-| AxeOS Dashboard  | Miner monitoring dashboard                          |
+| GSSM Dashboard   | Miner monitoring dashboard                          |
 | Dozzle           | Docker log viewer                                   |
 | Watchtower       | Automatic container updates                         |
 
@@ -56,7 +56,7 @@ gssa/
 ├── templates/                # Configuration templates (served via GitHub Pages)
 │   ├── docker-compose.yml
 │   ├── env.template
-│   ├── axeos-dashboard/
+│   ├── axeos-dashboard-deprecated/
 │   ├── goslimstratum/
 │   ├── mim-config/
 │   ├── postgres/
@@ -65,13 +65,13 @@ gssa/
 │   ├── GoSlimStratum/
 │   ├── GSS Miners/
 │   ├── MIM/
-│   ├── AxeOS Dashboard/
+│   ├── AxeOS Dashboard-deprecated/
 │   ├── GSSUC/
 │   ├── examples/             # Example configuration files for each product
 │   │   ├── GoSlimStratum/    # gss-config.example.json, coins.example.json
 │   │   ├── GSS Miners/       # config.example.json, notifications.example.json
 │   │   ├── MIM/              # servers.example.json
-│   │   ├── AxeOS Dashboard/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
+│   │   ├── AxeOS Dashboard-deprecated/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
 │   │   └── GSSUC/            # config.example.json
 │   └── diagrams/
 ├── design-documents/         # Internal technical specifications
@@ -121,7 +121,7 @@ Example configs: [documents/examples/MIM/](https://github.com/mmfpsolutions/gssa
 
 ---
 
-### AxeOS Dashboard
+### AxeOS Dashboard - Deprecated
 
 AxeOS Dashboard is a monitoring dashboard focused on AxeOS-based miners (Bitaxe, NerdQAxe), with optional integration for CGMiner devices, GoSlimStratum pools, and blockchain nodes.
 
