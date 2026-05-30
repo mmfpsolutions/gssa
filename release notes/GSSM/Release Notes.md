@@ -1,5 +1,26 @@
 # GSSM Release Notes
 
+## v2.0.1
+
+A new device family added (Whatsminer), plus a round of polish across the configuration and auto-discovery flows.
+
+### New Features
+
+- **Whatsminer support** — GSSM now supports MicroBT Whatsminer devices (M30S / M50 / M60 series running BTMiner firmware). Add them manually from the Configuration page or let Auto-Discovery find them on TCP port 4433. Dashboard card, detail page (with per-board diagnostic charts and a Power Supply info card), notifications, and threshold editor all support Whatsminer end-to-end.
+
+- **Multiple-fan support for NerdQAxe++** — NerdQAxe++ firmware 1.0.37+ reports both fans on dual-fan models. The miner card now shows Fan 1 + Fan 1 RPM and Fan 2 + Fan 2 RPM separately, each color-coded against your fan-speed thresholds. Single-fan boards (Bitaxe, older NerdQAxe firmware) still show one fan with no label change.
+
+### Improvements
+
+- **Auto-Discovery enables sections automatically on bulk-add** — When you discover pools or crypto nodes and add them, GSSM now flips the "Enable GoSlimStratum Pools" and "Enable Crypto Nodes" master switches to on for you. Previously, a fresh-install operator could add a dozen pools via discovery and wonder why none of them showed data — the section-level toggles still defaulted to off on a clean config. Adding entries now turns the corresponding section on, the way you'd expect.
+
+- **Configuration page polished** — Several fields that almost nobody changes have been hidden from the Configuration page UI. They still live in `config.json` and can be hand-edited by anyone running a non-default setup, but they're no longer cluttering the form:
+  - **Web Server Port** and **Cookie Max Age** dropped from Application Settings — defaults (3000 and 3600) work for the vast majority of operators.
+  - **API Port** dropped from the GoSlimStratum Pool list and add/edit form — GSS runs on port 4004 by default for everyone; new pools save with that value automatically, existing pools keep their hand-edited port, and the Lookup Keys button uses 4004 internally.
+  - **RPC User** column dropped from the Crypto Node list — the value was already masked to `****` everywhere (credentials are encrypted at rest since 1.1.0), so the column never carried useful information. The form still collects the RPC username on add/edit.
+
+---
+
 ## v1.1.0
 
 A milestone release. Three big new operator features (Auto-Discovery, encrypted credentials at rest, Disable for pools and nodes), plus a quieter pass on the parts of the UI that no longer made sense once those features landed.
