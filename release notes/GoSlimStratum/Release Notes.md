@@ -1,5 +1,172 @@
 # GoSlimStratum — Release Notes
-## v3.0.15 through v5.0.1
+## v3.0.15 through v5.1.0
+
+---
+
+## v5.1.0 — Coin Alerts, SV2 Connection Liveness, Full At-Rest Encryption
+
+GoSlimStratum v5.1.0 is a substantial release built around three independent features that each solve a real-world operator problem.
+
+- **Coin Alerts** — a new per-coin notification system that fires on noteworthy share events and network difficulty swings. Tell me when any miner submits a new pool-best share, when chronic rejections start piling up on a miner, or when a chain's difficulty crosses a threshold I care about. Configured per coin, routed to your existing Telegram / email / webhook channels.
+- **Stratum V2 Connection Liveness** — fixes a class of false-positive disconnects on SV2 miners that GSS v5.0.x couldn't catch on its own. Kernel-level TCP keepalive + `TCP_USER_TIMEOUT` replace the app-level read deadline that didn't fit V2's "quiet between shares" traffic pattern.
+- **Full at-rest encryption** — every secret in your config files (node RPC passwords, metrics database password, Telegram bot token, webhook URLs and Authorization headers) is now encrypted on disk and masked in API responses. Previously only your wallet passphrase was encrypted; v5.1.0 brings the same treatment to everything else.
+
+Plus polish: orphaned per-coin notification entries self-clean, "Reset All Statistics" also resets the alerts pipeline's pool-best record, the Notifications config link is now always visible (with a clear "license required" page if you don't have one), and the in-app Help reference has been updated for every new feature.
+
+### Coin Alerts
+
+A new **Coin Alerts** panel appears on every per-coin Configuration page. Master switch at the top, then four independent alert types, each with their own thresholds.
+
+> Coin Alerts require both **notifications enabled** (GSS license) and **metrics enabled** (Postgres). Without both, the panel is dormant. The page shows a callout pointing to MMFP pricing if you need a license.
+
+#### 🏆 Best Share Alert
+
+Fires **once** when any miner submits a new pool-wide best share above your floor. The "new record" alert — useful for celebrating when your fleet hits something noteworthy and for tracking the long-tail of "luckiest share ever" outcomes.
+
+- **Minimum Value**: floor below which the alert won't fire, in the same units the miner card on the dashboard shows. Accepts SI suffixes — type `1G`, `1.5G`, or `1000000000` interchangeably.
+- The pool's best-share record is loaded from your shares history at startup so a restart doesn't replay history. **"Reset All Statistics"** on the dashboard now also resets this — clean slate for testing.
+- Alerts include a "% of block difficulty" line so you can see how close that share was to actually finding a block.
+
+#### 💎 Notable Share Alert
+
+Fires **every time** any miner submits a share above your floor (not just records). Use this for "tell me when ANY miner hits something good." Rate-limited per miner to keep volume sane.
+
+- **Minimum Value**: same units / SI suffixes as Best Share.
+- **Max Alerts/hour (per miner)**: rate cap. `10` = at most one alert every 6 minutes per miner; `0` = unlimited.
+- **Breakthrough rule**: even when the rate limit is suppressing alerts, a share **at or above 2× the last fired value** breaks through. So if a miner just hit a notable 10K share and now hits a 25K share inside the rate window, you'll still see it — the bigger jump is worth surfacing even when the smaller stream is being throttled.
+
+Tip: set the Notable floor a bit above your "typical noteworthy" value so the rate cap stays loose for genuinely high shares.
+
+#### ⚠️ Rejected Shares Alert
+
+Fires when a specific miner crosses a rejection threshold within a rolling window. Leading indicator that something has gone wrong with that miner's infrastructure (firmware glitch, network instability, voltage problem).
+
+- **Threshold Count**: rejections needed within the window to fire.
+- **Window (minutes)**: how far back to count. Default 10.
+- **Max Alerts/hour (per miner)**: optional cap for chronic flaky miners that would otherwise re-fire every window. `0` = no cap.
+- Per-miner counter — one noisy device doesn't bury alerts for the rest of the fleet.
+- Counter resets to zero on fire, so the next alert requires another full threshold's worth of rejections.
+- **Stale shares count as rejections** — they're functionally the same thing from the operator's perspective.
+
+#### 📉📈 Network Difficulty Alert
+
+Fires when the chain's network difficulty moves above or below a threshold you set. Useful for "tell me when difficulty jumps" (chain about to get hard) or "tell me when it drops" (window of opportunity for solo / small-pool mining).
+
+- **Below Threshold**: fires when difficulty drops below this value.
+- **Above Threshold**: fires when difficulty rises above this value.
+- Either side can be set independently — leave the other at `0` to disable it.
+- Both can be set together for a band — but the form prevents you from saving `below ≥ above` so a fat-finger doesn't break the pool's startup.
+- Thresholds are in **raw units** — the same number mining.info shows for the chain, the same number the main dashboard's "Network Difficulty" tile shows. Accepts SI suffixes (`535G`, `218K`, etc.).
+- Fires on **transitions only**. Sustained breach fires once; if the chain recovers and breaches again, you get another alert.
+
+✅ **Recovery alerts.** When difficulty climbs back into the OK band (out of an above-breach, or up across the below threshold), GSS fires a recovery alert too — "things have stabilized." Less noise than constantly checking the dashboard to see if the alert state has resolved.
+
+#### Hot reload — thresholds apply immediately on save
+
+Coin Alerts thresholds are **hot-reloadable**: edit floors, rate caps, or band thresholds in the UI, hit Save, and the running pool picks up the new values on the very next share or template. No pool restart, no GSS restart. The pool-best record, rejection counters, and rate-limiter state all survive the reload — you're tightening or loosening your rules, not resetting history.
+
+Other coin config sections (node password, stratum port, mining address, VarDiff, etc.) still require a pool reload or full GSS restart to take effect. The Web UI's existing "restart required" warning persists for those; the Coin Alerts panel has its own small green callout noting that changes apply immediately on save.
+
+#### Routing — Notifications page
+
+Each Coin Alert type has its own toggle and channel selection on the Notifications page, alongside the existing Block / Payout / Node / Miner event types:
+
+- **Best Share (Coin Alerts)**
+- **Notable Share (Coin Alerts)**
+- **Rejected Shares (Coin Alerts)**
+- **Network Difficulty (Coin Alerts)**
+
+Pick which channels (Telegram, email, your webhooks) each alert type goes to. The notifications page reloads live without restart — you can opt in and out of channels mid-run.
+
+#### Quick start
+
+1. Open a coin's Configuration page → scroll to the **Coin Alerts** section.
+2. Tick **Coin Alerts Enabled** (master switch).
+3. Set thresholds for whichever alert types you want — start conservative (high floors / low rate caps) and tune down as you see how often they fire.
+4. **Save.** Thresholds apply immediately. No restart.
+5. Open the Notifications page → scroll to **Event Types** → tick the four new "(Coin Alerts)" rows and pick channels for each. Save.
+
+You'll see your first alerts on the next qualifying share or template fetch.
+
+### Stratum V2 Connection Liveness
+
+If you've been running miners on a Stratum V2 listener since v5.0.0, you may have seen the occasional false-positive disconnect — GSS dropping a miner's session even though the miner was online and healthy. v5.1.0 fixes the root cause.
+
+**What was happening:** GSS V2 used the same application-level read deadline (`connection_timeout_seconds`, default 600) that V1 uses. On V1 that works because V1 traffic is chatty — `mining.ping`, `mining.submit`, periodic difficulty adjustments all flow back to the pool, naturally refreshing the deadline. SV2 is a different protocol: idle miners on low-rate coins can go 10+ minutes between share submissions, with no other application-layer chatter in either direction. The 600-second deadline tripped on miners who were perfectly healthy, just quiet.
+
+**The fix:** SV2 sessions now use kernel-level **TCP keepalive** (probe packets sent by the OS on idle connections) plus **`TCP_USER_TIMEOUT`** (bounds how long the kernel will keep retrying an unACKed packet before giving up). This is the same liveness mechanism Linux servers use for any long-lived idle TCP connection. The application-level `connection_timeout_seconds` field is now **V1-only** — V2 no longer uses it.
+
+**Default behavior:** TCP keepalive sends a probe every 30 seconds after 30 seconds of idle, gives up after 4 failed probes — meaning a quietly-dead miner is detected within roughly 90 seconds (vs the prior 600s best-case, or 13–30 minutes in the death-during-push case on V2's push-heavy protocol). Production validation across V1 and V2 mixed fleets confirmed zero false disconnects across 72+ hours of real miner traffic.
+
+**Tunable per-pool.** New fields in the Global Configuration's Stratum section let you tune the keepalive math for unusual network conditions:
+
+- `tcp_keepalive_idle_seconds` (default 30)
+- `tcp_keepalive_interval_seconds` (default 15)
+- `tcp_keepalive_count` (default 4)
+- `tcp_user_timeout_ms` (default 0 = auto-compute from the above)
+
+Most operators won't need to touch these. They're per-coin override-able if a single coin has unusual network conditions, but in practice you set them once at the global level and forget about them.
+
+> Linux-only for `TCP_USER_TIMEOUT`. On macOS / Windows dev environments the second-layer protection falls back to TCP keepalive alone — sufficient for development, not relevant for production since GSS deploys on Linux.
+
+### Full At-Rest Encryption for All Sensitive Config Values
+
+GSS v3.0.28 introduced encryption for the wallet passphrase. v5.1.0 extends the same treatment to **every other secret** in your config files. After upgrade, your `config.json` and `notifications.json` no longer hold any plaintext secret values — they all migrate to the same `ENC:` ciphertext format the wallet passphrase already used.
+
+**What gets encrypted (newly in 5.1.0):**
+
+- **Node RPC password** (each coin's `node.password`)
+- **Metrics database password** (`metrics.database_password`)
+- **Telegram bot token** (`channels.telegram.bot_token`)
+- **Webhook URL** (each entry in `channels.webhooks[].url`)
+- **Webhook headers** (each value in `channels.webhooks[].headers` — covers `Authorization`, `X-API-Key`, and any other auth-header pattern you may have configured)
+
+**What stays plaintext** (unchanged): non-secret fields like usernames, host/port pairs, addresses, every other config field. Only actual secrets get the encryption treatment.
+
+**What you see in the Web UI:**
+
+Every password / token / URL field on the Config and Notifications pages now displays `****` instead of the actual value. The eye-toggle icon on edit forms still reveals what you're typing in real time, but the saved value is masked in display rows. If you don't touch a field, it stays exactly as it was — the form treats the `****` you see as "don't change."
+
+
+**Migration:**
+
+On first startup with v5.1.0, GSS rewrites your `config.json` and `notifications.json` files, converting every newly-covered plaintext secret to `ENC:` ciphertext. The conversion is automatic and one-time per field — subsequent startups read the encrypted value, decrypt it in memory for use, and the on-disk file stays encrypted.
+
+> **Threat model.** This protects against accidental disclosure — config files in support bundles, screenshares, log dumps, third-party API consumers, browser DevTools, tcpdump on localhost. Same threat model as the v3.0.28 wallet passphrase encryption — defense in depth, not isolation.
+
+**GSSM operators:** if you run GSSM autodiscovery pointed at this GSS instance, you'll need to be on GSSM version 2.0.0 or better before autodiscover can read GSS-encrypted values. See the upgrade notes below. 
+
+### Other Improvements
+
+#### Notifications — Per-coin list now self-cleans
+
+The "Per-Coin Settings" panel on the Notifications page used to be **add-only**: when you added a coin to your pool, an entry appeared; when you removed a coin, the orphaned entry stayed forever. On a long-running install with churn, the list could accumulate clutter.
+
+v5.1.0 turns this into a true bidirectional reconcile. At startup, GSS adds entries for newly-configured coins (default opt-in) AND removes entries for coins no longer in your config. Disabling a coin temporarily keeps the entry (so your opt-out preference is preserved for when you re-enable). Only **removing** a coin from `config.json` triggers cleanup.
+
+You'll see stale entries disappear on your first 5.1.0 startup — that's expected.
+
+#### Notifications Config link — always visible on Global Config
+
+Previously the Notifications panel link on the Global Configuration page was hidden if your license didn't include notifications. Now it's **always visible**. Clicking it lands you on a clean "Feature Not Available" page with a "Manage License" button — better discoverability than hiding the feature entirely.
+
+#### "Reset All Statistics" also resets the Best Share alert prime
+
+If you hit "Reset All Statistics" on the dashboard expecting a clean slate, that now includes the Coin Alerts pipeline. The watcher's in-memory pool-best record drops to zero, so the very next noteworthy share fires a Best Share alert if you've got one configured. Matches the operator-intent meaning of "clear stats." Single-worker delete deliberately does NOT re-prime — other workers' historical shares could still legitimately be the pool record.
+
+#### In-app Help reference — updated
+
+The in-app Help reference (the **(?)** icon in the page header) gained a new **Coin Alerts** section under the **Coin Pool Configurations** sidebar group, with a visual mock of the configuration panel and a numbered field reference for every threshold and rate-cap input. The **Notifications** section was updated to document the four new event types.
+
+### Upgrade Notes
+
+- **Drop-in upgrade.** Pull the new image, restart your container. Your existing `config.json` and `notifications.json` work as-is. No new database migration. Existing data untouched.
+- **First-startup migration.** On the first 5.1.0 startup, GSS rewrites both config files to convert newly-covered plaintext secrets (node passwords, metrics DB password, Telegram bot token, webhook URLs and headers) to `ENC:` ciphertext. The migration is one-time per field, idempotent on subsequent startups, and logged at INFO level so you can confirm it happened. Wallet passphrases (already encrypted since v3.0.28) are untouched.
+- **Coin Alerts: nothing to do unless you want them.** The new `alerts` block on each coin defaults to fully disabled. A config file from before 5.1.0 (no `alerts` block at all) loads cleanly. To enable: open a coin's Configuration page, scroll to **Coin Alerts**, tick **Coin Alerts Enabled**, set whatever thresholds you want, Save. Then on the Notifications page, tick the four new event types and pick channels. **Thresholds apply immediately on save** — no restart needed for Coin Alerts.
+- **SV2 connection liveness: nothing to do.** Defaults are sensible. If you've been seeing false-positive V2 disconnects, the next dead-miner event in your log should resolve within ~90 seconds instead of the prior 600s+ pattern.
+- **Stale notification entries will self-clean.** If your `notifications.json` has accumulated entries for coins you've removed over time, the first 5.1.0 startup drops them automatically. Coins that are merely disabled (not removed) keep their preferences.
+- **Hit "Reset All Statistics" recently?** That now also resets the Best Share alerts watcher to zero. If you were relying on the old behavior of historical-best persisting across resets, plan accordingly — the new behavior matches operator intent more than the old one did.
+- **GSSM autodiscovery coordination.** Until your GSSM instance ships a matching 5.1.x release that knows how to read GSS's new `ENC:` values, autodiscover-fetched fields will look opaque. Make sure you are on GSSM 2.0.0 or better before using autodiscovery after upgrading to GSS 5.1.0 for node discovery.
 
 ---
 
@@ -724,7 +891,7 @@ Operators whose node wallets are encrypted (password-protected) can now configur
 
 How it works:
 - Add the wallet passphrase to the `wallet_passphrase` field in the coin's node section.
-- On first startup, GSS automatically encrypts the plaintext passphrase in-place using AES-256-GCM. The config file is rewritten with the encrypted value (prefixed with `ENC:`), so the plaintext passphrase never persists on disk after the first run.
+- On first startup, GSS automatically encrypts the plaintext passphrase in-place. The config file is rewritten with the encrypted value (prefixed with `ENC:`), so the plaintext passphrase never persists on disk after the first run.
 - During payouts, GSS decrypts the passphrase, unlocks the wallet for the minimum time needed (fund + sign + broadcast), then immediately re-locks it.
 - If a passphrase is configured but the wallet is not actually encrypted, GSS logs a warning and proceeds normally.
 
