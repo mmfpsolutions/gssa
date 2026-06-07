@@ -27,3 +27,5 @@ maxsendbuffer=1000       # Limit send buffer per connection
 peerbloomfilters=0       # Disable bloom filter requests
 peerblockfilters=0       # Disable block filter serving
 whitelist=127.0.0.1      # Always allow local connections
+#Enable V2 Transport, if available
+v2transport=1
