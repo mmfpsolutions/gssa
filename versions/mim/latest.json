@@ -1,7 +1,7 @@
 {
-  "latest": "3.1.2",
-  "released_at": "June 7, 2026",
+  "latest": "3.2.0",
+  "released_at": "June 8, 2026",
   "release_notes_url": "https://github.com/mmfpsolutions/gssa/tree/main/release%20notes/MIM/Release%20Notes.md",
-  "min_recommended": "3.1.1"
+  "min_recommended": "3.2.0"
 }
 
