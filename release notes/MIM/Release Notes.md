@@ -1,6 +1,22 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.2.1
+
+A hotfix release. If you upgraded to 3.2.0 and tried to install a crypto node (DGB, BCH, BC2, eCash, Bitcoin Knots, Litecoin, or Dogecoin), the install wizard's **Next** button silently did nothing after you filled in the user, password, and prune settings. **3.2.1 fixes this.** If you're on 3.2.0 and want to install or re-install a node, upgrade to 3.2.1 first.
+
+Already-installed nodes from 3.1.x or earlier are unaffected and keep running. This bug only impacted the install wizard, not anything that was already running.
+
+### What happened
+
+The 3.2.0 release added a new "Custom" option for blockchain node prune sizes. Picking Custom reveals an extra "Prune Size (MB)" field; picking Full or Pruned keeps it hidden. The hide/show wiring was correct, but the wizard's Next-button validation was checking the hidden field against the "required" flag and silently rejecting the form when nothing was filled in (because the field wasn't visible to fill in). The error message was being written to the hidden field, so you saw nothing change. 3.2.1 makes the validator respect the same hidden/visible state the form already tracked.
+
+### Also in 3.2.1
+
+- **New crypto node products: Litecoin and Dogecoin.** Both selectable from the Products page Crypto Nodes section. Litecoin follows the standard node install flow (RPC user + password + prune setting + auto-detected server IP). Dogecoin is DTM-only and requires a 2.3 GB pruning floor — see the product description on the catalog card for full details on the license / revenue-share semantics before you install.
+
+---
+
 ## v3.2.0
 
 A long-overdue rebuild of the per-server System Updates page. The old three-button terminal-style flow (Check for Updates / List Updates / Upgrade, each streaming scrolling apt output into a black box at the bottom of the page) has been replaced with a structured table where you check, see what's available, pick what you want to apply, watch live progress, and see a summary — the same shape every other MIM page already uses. The legacy page is gone entirely; this is the new home for system updates from 3.2.0 forward.
