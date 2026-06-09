@@ -7,7 +7,6 @@
       "ssh_port": 22,
       "ssh_user": "mim",
       "ssh_password": "{MIM_PASSWORD}",
-      "docker_host": "ssh://mim@{SERVER_IP}",
       "enabled": true,
       "description": "MIM Configured Server"
     }
