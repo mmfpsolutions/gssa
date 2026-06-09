@@ -20,7 +20,7 @@ MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infra
 | MIM              | Infrastructure management dashboard                 |
 | GSSM Dashboard   | Miner monitoring dashboard                          |
 | Dozzle           | Docker log viewer                                   |
-| Watchtower       | Automatic container updates                         |
+| Watchtower       | (optional) Automatic container updates                         |
 
 ---
 

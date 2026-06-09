@@ -1,0 +1,16 @@
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker:/config
+    environment:
+      - DOCKER_API_VERSION=1.52
+      - DOCKER_CONFIG=/config
+    command: ["--interval", "21600"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped

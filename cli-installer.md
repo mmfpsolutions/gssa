@@ -19,7 +19,7 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/install-cli.sh)"
 - MIM management dashboard
 - GSSM monitoring dashboard
 - Dozzle log viewer
-- Watchtower auto-updater
+- (optional) Watchtower auto-updater
 
 **What it does:**
 1. Preflight checks (root, Ubuntu 24.04+, ARM64/AMD64, memory, openssl)

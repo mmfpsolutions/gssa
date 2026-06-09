@@ -30,7 +30,7 @@ if [[ ! -t 0 ]]; then
 fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-INSTALLER_VERSION="1.0.1"
+INSTALLER_VERSION="1.0.2"
 GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
@@ -446,6 +446,20 @@ collect_config() {
   fi
   success "Server IP: $SERVER_IP"
 
+  # Watchtower (optional auto-updater)
+  echo ""
+  echo -e "  ${CYAN}Watchtower automatically pulls and restarts updated container images${NC}"
+  echo -e "  ${CYAN}every 6 hours. MMFP products (GSS, GSSM, MIM) all surface update${NC}"
+  echo -e "  ${CYAN}notifications in their UI, so most operators can skip this.${NC}"
+  echo -e "  ${CYAN}You can install it later from MIM's product catalog at any time.${NC}"
+  if confirm "Install Watchtower (unattended container updates)?" "N"; then
+    INSTALL_WATCHTOWER=yes
+    success "Watchtower will be installed"
+  else
+    INSTALL_WATCHTOWER=no
+    success "Watchtower skipped"
+  fi
+
   # Confirmation
   echo ""
   echo -e "  ${BOLD}Configuration Summary:${NC}"
@@ -457,6 +471,7 @@ collect_config() {
   echo -e "    MIM user password:        ${CYAN}${MIM_PASSWORD}${NC}"
   echo -e "    Pruning:                  ${CYAN}${PRUNE_VALUE}${NC}"
   echo -e "    Server IP:                ${CYAN}${SERVER_IP}${NC}"
+  echo -e "    Watchtower:               ${CYAN}${INSTALL_WATCHTOWER}${NC}"
   echo ""
 
   if ! confirm "Proceed with these settings?"; then
@@ -496,6 +511,9 @@ download_templates() {
     "coins/${COIN_ID}/node.conf.template"
     "coins/${COIN_ID}/gss-coin.json.template"
   )
+  if [[ "${INSTALL_WATCHTOWER}" == "yes" ]]; then
+    files+=("watchtower/docker-compose.yml")
+  fi
 
   for file in "${files[@]}"; do
     download_file "$file"
@@ -569,12 +587,16 @@ generate_configs() {
       "${TEMPLATE_DIR}/coins/${COIN_ID}/node.conf.template" > "${DATA_DIR}/${DATA_SUBDIR}/data/${NODE_CONF}"
   success "${NODE_CONF} → /data/${DATA_SUBDIR}/data/${NODE_CONF}"
 
-  # ── docker-compose.yml (base + coin service) ──
+  # ── docker-compose.yml (base + coin service + optional watchtower) ──
   info "Generating docker-compose.yml..."
   {
     cat "${TEMPLATE_DIR}/docker-compose.yml"
     echo ""
     cat "${TEMPLATE_DIR}/coins/${COIN_ID}/docker-compose.yml"
+    if [[ "${INSTALL_WATCHTOWER}" == "yes" ]]; then
+      echo ""
+      cat "${TEMPLATE_DIR}/watchtower/docker-compose.yml"
+    fi
   } > "${COMPOSE_DIR}/docker-compose.yml"
   success "docker-compose.yml → /data/docker-compose/docker-compose.yml"
 
@@ -753,7 +775,10 @@ deploy_stack() {
   sleep 5
   info "Verifying containers..."
 
-  local expected_containers=("$CONTAINER_NAME" goslimstratum postgres mim gssm dozzle watchtower)
+  local expected_containers=("$CONTAINER_NAME" goslimstratum postgres mim gssm dozzle)
+  if [[ "${INSTALL_WATCHTOWER}" == "yes" ]]; then
+    expected_containers+=(watchtower)
+  fi
   local all_running=true
 
   for container in "${expected_containers[@]}"; do
@@ -769,7 +794,7 @@ deploy_stack() {
     warn "Some containers are not running. Check: docker ps -a"
     warn "View logs with: docker logs <container-name>"
   else
-    success "All 7 containers are running"
+    success "All ${#expected_containers[@]} containers are running"
   fi
 }
 
