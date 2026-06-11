@@ -1,6 +1,36 @@
 # GSSM Release Notes
 ## v2.x Series
 
+## v2.0.4
+
+First-class dashboard support for NerdQAxe++ devices running in **dual-pool mode** — mining two different coins concurrently with a configurable hashrate split (e.g. 80% to your DGB pool, 20% to your BCH pool). On prior releases, GSSM only showed you the primary pool's stats and silently hid everything about the second pool. This release surfaces both pools in every view: dashboard card, list view, and miner detail page. Plus one small improvement — the network difficulty for the coin you're mining now shows on single-pool AxeOS cards too (Bitaxe and NerdQAxe++ in failover mode).
+
+### New Features
+
+- **NerdQAxe++ dual-pool mode is now first-class** — If your NerdQAxe++ is configured to mine two coins at once, GSSM now shows you both. **No operator action required** — the dashboard detects dual mode automatically from the device's existing API and surfaces the per-pool information without any config changes.
+
+  - **Two coin icons in the card header** — instead of just the primary coin, you'll see both coins side-by-side in the gallery card header and in the list view's Coin column (e.g. DGB icon next to BCH icon).
+
+  - **A cyan "DUAL" badge in the expanded card** — a banner row at the top of the expanded card body reads `DUAL · 80/20` (or whatever your configured split is), so the dual-mode status is unmistakable when you open a card. The same badge appears in the top header of the miner detail page next to the coin icons.
+
+  - **Per-pool stats in the card body** — the expanded card now has a "Pools" section showing each pool individually, with its own Best Diff, Shares, Net Diff, Pool Diff, and Ping. Each pool's section is labeled with the pool's coin icon and your configured split percentage (e.g. "Pool 1 · [DGB icon] · SV2 · 80%"). Rejected shares render in red per-pool, so you can see at a glance which pool — if either — has a problem.
+
+  - **Both pools' best-diff shown in collapsed view** — when the gallery card is collapsed, the best-diff stat shows both values separated by a middle dot (e.g. `5.71 M · 560.45 K`) on desktop. On mobile (where the collapsed row is tight), only the higher of the two values shows, with the per-pool breakdown still available in the tooltip.
+
+  - **Same treatment in list view** — the Diff column shows both values (e.g. `5.71 M / 560.45 K`) with a tooltip naming each pool by coin, and the same "Pools" section appears when you expand a row.
+
+  - **Dedicated Pools card on the miner detail page** — when you open a dual-mode miner's detail page, a new "Pools" card appears between the device's diagnostic cards and the Device Details section. Same per-pool layout as the gallery card body.
+
+  - **Single-pool devices are unchanged** — every other miner on your dashboard (Bitaxe, regular NerdQAxe++ in failover mode, AxeOS3, AvalonNano, NerdMiner, Antminer, ElphaPex, Whatsminer) renders exactly the same as it did in 2.0.3. The dual-pool surface only activates when a device actually reports dual mode.
+
+### Improvements
+
+- **Net Diff row on single-pool AxeOS cards** — The expanded card body for Bitaxe and single-pool NerdQAxe++ devices now shows a "Net Diff" row right after "Pool Difficulty," reading the current network difficulty for the coin you're mining (auto-formatted with K/M/G/T scaling). The data was always in the device's API response — it just wasn't being surfaced. Older AxeOS firmware that doesn't report the field simply omits the row, no error. (Dual-pool devices don't get this row — they already show Net Diff per-pool in the dual-pool section.)
+
+- **Tighter card header on the Miners dashboard** — The Details / Restart / Disable buttons in the top-right of each gallery card are now icon-only on every screen size (desktop previously showed text labels next to the icons; mobile was already icon-only). Same buttons, same behavior, just compact enough that the new dual-coin icons + DUAL badge fit on the same line at every breakpoint.
+
+---
+
 ## v2.0.3
 
 GSSM now tells you when there's a newer version available, so you stop finding out about updates months later from a Telegram message. A small badge appears next to the version link in the footer when a new release ships, the `/version` page picks up a new Updates card, and you can dismiss the badge per-version or turn the check off entirely if you'd rather not have it. The release also picks up a few polish improvements on the crypto node card and detail page.
