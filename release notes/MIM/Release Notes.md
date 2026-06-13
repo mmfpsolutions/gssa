@@ -1,6 +1,50 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.2.2
+
+Two things: a fix for a MIM self-update problem, and a new **Bitcoin Cash II (BCH2)** node you can install from the Products page.
+
+**The bugfix:** if you updated MIM itself from the Products page, MIM could get **stuck showing no Update or Config buttons** afterward — locking you out of future MIM updates from the web UI. **3.2.2 fixes this**, and also automatically repairs any MIM that's already stuck the next time it starts.
+
+This only affected MIM updating itself; your servers, crypto nodes, and other products were never impacted.
+
+### What happened
+
+When you click Update on the MIM row, MIM pulls the new image and restarts itself. While doing that it marks its own status as "updating" in its product inventory — and it's supposed to flip back to "installed" once the restart kicks off. But MIM restarting means MIM is *recreating its own container*, which shut the old MIM process down a moment too early — before it could write the "installed" status back. The status stayed stuck on "updating", and because the Products page only shows the Update and Config buttons for products that are "installed", the MIM row went quiet with no actions.
+
+### The fix
+
+Two changes:
+
+- **MIM now records "installed" *before* it restarts**, not after — so the status is correct no matter how quickly the restart takes the old process down.
+- **MIM self-heals on startup.** If MIM ever starts up and finds itself (or any product) stuck on "updating", it resets it to "installed" automatically. This is what repairs already-stuck installs — see below.
+
+### If your MIM is already stuck
+
+If you self-updated on an earlier version and your MIM row has no Update/Config buttons, do one of these once — after that, the new self-healing keeps it from happening again:
+
+- **Recommended:** on the MIM host, pull and recreate MIM manually, then let it start up (it will fix itself on boot):
+  ```
+  sudo docker compose -f /data/docker-compose/docker-compose.yml pull mim && \
+  sudo docker compose -f /data/docker-compose/docker-compose.yml up -d mim
+  ```
+- **Or** edit `product-inventory.json` on the host: find the `mim` entry and change its `"status": "updating"` back to `"installed"`, then restart MIM.
+
+### New: Bitcoin Cash II (BCH2) node
+
+You can now install a **Bitcoin Cash II** node from the Products page, under Crypto Nodes. Pick your RPC username/password and a node type (Full, Pruned, or Custom prune size), and MIM installs and starts the node and sets up a default wallet.
+
+A few things to know about this one specifically:
+
+- **It installs the node only.** Unlike the other crypto nodes, BCH2 does **not** wire itself into GoSlimStratum and does **not** restart GSS. GoSlimStratum doesn't support BCH2 out of the box, so if you want to mine it you'll need to add it to your GoSlimStratum `coins.json` yourself. MIM is just giving you an easy way to stand up the node.
+
+- **No GoSlimStratum required.** Because there's no GSS integration, you can install the BCH2 node whether or not you run GoSlimStratum on that server.
+
+- **Removing it is clean** — uninstalling stops and removes the node and its data, and (since it never touched GoSlimStratum) leaves your GSS config alone.
+
+---
+
 ## v3.2.1
 
 A hotfix release. If you upgraded to 3.2.0 and tried to install a crypto node (DGB, BCH, BC2, eCash, Bitcoin Knots, Litecoin, or Dogecoin), the install wizard's **Next** button silently did nothing after you filled in the user, password, and prune settings. **3.2.1 fixes this.** If you're on 3.2.0 and want to install or re-install a node, upgrade to 3.2.1 first.
