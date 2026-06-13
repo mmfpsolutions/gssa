@@ -528,6 +528,22 @@ All standard address types are supported for each coin:
 
 BTC and BC2 also accept `bcrt1` regtest addresses when `network` is set to `"testnet"`.
 
+**Generic coins (coins.json) and CashAddr:** A user-defined coin can opt into CashAddr by adding a `cashaddr` block to its `address` config with the coin's mainnet/testnet prefixes:
+
+```json
+"address": {
+  "base58": {
+    "p2pkh": { "mainnet": 0, "testnet": 111 },
+    "p2sh":  { "mainnet": 5, "testnet": 196 }
+  },
+  "cashaddr": {
+    "prefix": { "mainnet": "bitcoincash", "testnet": "bchtest" }
+  }
+}
+```
+
+With the block present, the coin accepts both the CashAddr form (`bitcoincash:q/p...`, or the bare `q.../p...` shorthand) and legacy Base58 (`base58` stays required). The prefix is folded into the CashAddr checksum, so it must exactly match the prefix the coin's wallet issues. Without a `cashaddr` block, a generic coin accepts Base58 (and Bech32 if `segwit` is true) only.
+
 ---
 
 ## VarDiff Section

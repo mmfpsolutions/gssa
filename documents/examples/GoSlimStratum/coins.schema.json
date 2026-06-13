@@ -60,6 +60,9 @@
         },
         "bech32": {
           "$ref": "#/definitions/bech32Config"
+        },
+        "cashaddr": {
+          "$ref": "#/definitions/cashAddrConfig"
         }
       },
       "required": ["base58"],
@@ -125,6 +128,35 @@
           "type": "string",
           "pattern": "^[a-z0-9]+$",
           "description": "HRP for testnet (lowercase alphanumeric, e.g., 'tb' for Bitcoin)"
+        }
+      },
+      "required": ["mainnet", "testnet"],
+      "additionalProperties": false
+    },
+    "cashAddrConfig": {
+      "type": "object",
+      "description": "CashAddr address configuration (Bitcoin Cash-style coins)",
+      "properties": {
+        "prefix": {
+          "$ref": "#/definitions/networkPrefix"
+        }
+      },
+      "required": ["prefix"],
+      "additionalProperties": false
+    },
+    "networkPrefix": {
+      "type": "object",
+      "description": "CashAddr prefixes for mainnet and testnet. The prefix is folded into the CashAddr checksum, so it must match the issuing coin exactly.",
+      "properties": {
+        "mainnet": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$",
+          "description": "CashAddr prefix for mainnet (lowercase alphanumeric, e.g., 'bitcoincash')"
+        },
+        "testnet": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$",
+          "description": "CashAddr prefix for testnet (lowercase alphanumeric, e.g., 'bchtest')"
         }
       },
       "required": ["mainnet", "testnet"],

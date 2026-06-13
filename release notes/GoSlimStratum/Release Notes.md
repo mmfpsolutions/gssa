@@ -1,5 +1,45 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.1
+## v5.x Series through v5.1.2
+
+---
+
+## v5.1.2 — CashAddr for Custom Coins
+
+GoSlimStratum v5.1.2 adds one operator-requested capability: **custom coins defined in `coins.json` can now use CashAddr addresses** (the `bitcoincash:q...` / `ecash:q...` style format) directly.
+
+Previously, if you added a Bitcoin Cash-family coin through `coins.json`, GSS only understood the older "legacy" address format (`1...` / `3...`), so you had to convert every CashAddr to legacy before using it. Now you can paste the CashAddr format your wallet shows you — no conversion step — in your pool's mining address, in your miners' usernames, and (in DTM mode) for revenue-share payouts.
+
+No behavior changes to mining, payouts, alerts, or Stratum V2. This sits entirely on top of 5.1.1.
+
+### 🪙 CashAddr support for custom coins
+
+To turn it on for a custom coin, add a `cashaddr` block to that coin's `address` section in `coins.json`, naming the coin's address prefixes:
+
+```json
+"address": {
+  "base58": {
+    "p2pkh": { "mainnet": 0, "testnet": 111 },
+    "p2sh":  { "mainnet": 5, "testnet": 196 }
+  },
+  "cashaddr": {
+    "prefix": { "mainnet": "bitcoincash", "testnet": "bchtest" }
+  }
+}
+```
+
+With that block present, the coin accepts **both** address styles:
+
+- **CashAddr** — `bitcoincash:q...` (P2PKH) and `bitcoincash:p...` (P2SH), or the short form without the prefix (`q...` / `p...`)
+- **Legacy Base58** — `1...` (P2PKH) and `3...` (P2SH), exactly as before
+
+#### Things to know
+
+- **Nothing changes for existing setups.** If you don't add a `cashaddr` block, your coin works exactly as it did before. If you're already using converted legacy addresses, they keep working — you can switch to CashAddr whenever you like, or never.
+- **The prefix must match your coin.** A CashAddr's built-in checksum includes its prefix, so the `mainnet` / `testnet` prefixes you configure must be the exact ones your coin's wallet issues (e.g. `bitcoincash` and `bchtest` for Bitcoin Cash).
+- **Built-in coins are unaffected.** BTC, BCH, XEC, DGB, LTC, and DOGE already handle their address formats natively — this change is only for custom coins you define yourself in `coins.json`.
+- **Same coins everywhere.** The CashAddr you configure works identically in your `mining.address`, in a miner's stratum username, and in DTM revenue-share — because under the hood CashAddr and legacy addresses point to the exact same destination; only the text format differs.
+
+See the updated coin configuration guide and the `coins.example.json` example (the `bitcoincashii` entry) for a full custom-coin definition using CashAddr.
 
 ---
 
