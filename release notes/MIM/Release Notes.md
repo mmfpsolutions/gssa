@@ -1,6 +1,35 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.2.3
+
+The per-server **Temperature** card grows up into a full **Sensors** card. Instead of just temperatures, it now shows everything `lm-sensors` can see on that machine — **temperatures, voltages, fan speeds, fan/PWM duty, power draw, and clock speeds** — grouped by hardware chip.
+
+### What's new
+
+- **The card is now called "Sensors"** (same spot on the Server page) and shows far more than before:
+  - **Temperatures** — CPU package + per-core, NVMe drives, RAM modules, chipset, NIC/Wi-Fi, etc., colored **green when healthy, amber as they warm up, red when critical** — now against each sensor's **own** high/critical limits instead of a fixed guess.
+  - **Voltages** — Vcore, DRAM, rails, 3VSB, etc.
+  - **Fans** — RPM per fan.
+  - **PWM** — fan-control duty %, with a small **MANUAL** tag on any fan that's under manual control.
+  - **Power & Clocks** — where the hardware reports them (e.g. GPU package power and clock).
+- **Works on any hardware** — Intel or AMD, any motherboard. The reader is based on the standard Linux sensor interface, so it adapts to whatever chips your server exposes; only the labels differ machine to machine.
+- **Graceful when there's little to show** — if `lm-sensors` finds nothing usable, MIM falls back to the basic system temperatures it could always read; if there's truly nothing, it says "No sensors found."
+
+### Getting the most out of it (host setup)
+
+MIM displays whatever `lm-sensors` reports — so how much you see depends on the server's sensor setup, not MIM:
+
+- Make sure `lm-sensors` is installed and run `sudo sensors-detect` once.
+- Some boards (especially mini-PCs / NAS units with ITE/Nuvoton Super-I/O chips) need an **extra out-of-tree driver** before fan RPM and voltages show up at all.
+- You can give sensors friendly names and hide disconnected/garbage inputs with a `/etc/sensors.d/*.conf` file. MIM will pick up those labels automatically.
+
+### Not yet (planned)
+
+This release is **read-only** — it shows the data, it doesn't control anything. Fan/PWM control, threshold alerts/notifications, and history/trend charts are possible follow-ups, not part of this release.
+
+---
+
 ## v3.2.2
 
 Two things: a fix for a MIM self-update problem, and a new **Bitcoin Cash II (BCH2)** node you can install from the Products page.
