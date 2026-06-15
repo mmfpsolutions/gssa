@@ -1,6 +1,35 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.0
+
+**New: the Performance tab.** Every server now has a **Performance** tab (right next to Server) that shows, at a glance, how hard the machine is actually working — and lets you dig into the details with one click.
+
+### What's new
+
+- **A live performance view for each server.** Open the Performance tab to see how busy a machine is right now:
+  - **CPU** — overall busy %, plus a bar for each core so you can spot a single pegged core.
+  - **Memory** — what's in use versus available, with the deeper breakdown one click away.
+  - **Network** — live upload/download speed for each real connection on the box.
+  - **Disk** — how much each drive is reading and writing, and how busy it is.
+  - **Pressure** — a single, plain-English "is this machine struggling?" reading. It's the clearest early warning that a server is starting to bog down, often before CPU or memory look maxed out.
+- **"Details" on every card.** Each card has a small **Details** link that expands to the deeper numbers — processor model and live clock speeds, memory internals, per-connection network counters and TCP health, disk response times, and more. Closed by default, so the main view stays clean.
+- **Network bonding, if you use it.** If a server bonds two network cards together for speed or redundancy, the Network section shows the bond's health — whether each link is up, its speed, and whether a link has been flaky (dropping and reconnecting). If a server doesn't use bonding, this simply doesn't appear.
+- **Refreshes when you want it to.** Performance checks on demand — when you open the tab and when you press **Refresh**. It does **not** constantly poll your servers in the background.
+
+### Good to know
+
+- **The Server tab didn't change.** Think of it this way: **Server** is the quick glance ("what is this box, and is it OK?"), and **Performance** is the deep look ("how hard is it working?").
+- **About "drops" in the network details.** A network connection keeps a lifetime tally of dropped packets that, on most servers, is harmless background noise (broadcast traffic the machine simply ignores) and only ever ticks up. MIM shows that number in grey so it doesn't look like an alarm — and only flags it in amber if packets are actually being dropped *while you're looking*.
+
+### Also in 3.3.0
+
+- **Tidier Server page.** CPU Load, Memory, and Swap are now combined into a single **System Resources** card — same information, less scrolling. The **Storage** card is cleaner too: one row per drive with a small usage dial, and the used-space figure turns **amber, then red** as a drive fills up, so a disk running low jumps right out at you.
+- **Documentation links on Products.** Products that have documentation now show a **Documentation** link (opens in a new tab) right under their description on the Products page.
+- **Install MIM as an app.** Add MIM to your phone's home screen or your desktop and it launches in its own window with the MIM icon and a splash screen — no browser address bar, just MIM. On iPhone/iPad (Safari → Share → **Add to Home Screen**) or Android/desktop Chrome, it installs like a native app. The iOS home-screen install works even over a plain `http://` address (a LAN IP or a Tailscale IP); if you front MIM with a real certificate (a reverse proxy or `tailscale serve`), you also get the one-click install button in desktop/Android Chrome. This is about installing and launching — it doesn't add offline functionality (MIM manages live servers, so it needs them reachable).
+
+---
+
 ## v3.2.3
 
 The per-server **Temperature** card grows up into a full **Sensors** card. Instead of just temperatures, it now shows everything `lm-sensors` can see on that machine — **temperatures, voltages, fan speeds, fan/PWM duty, power draw, and clock speeds** — grouped by hardware chip.
