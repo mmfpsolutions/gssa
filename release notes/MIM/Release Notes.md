@@ -1,6 +1,24 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.1
+
+A quick follow-up to 3.3.0 — mobile polish and a Products-page fix. Nothing changes about how MIM manages your servers or products; just update and you're set.
+
+### Fixed
+
+- **Action buttons now show on every device.** On the Products page, the **Update / Config / Disable / Uninstall** buttons could be missing when you opened MIM on a new device or browser — most noticeably on a phone — even though the products were installed. They now appear wherever a server has installed products, with no per-device setup. (On 3.3.0 the workaround was to tap **Discover** once on that device; you no longer need to.)
+- **Collapsing cards works reliably on mobile.** On phones — especially the installed home-screen app — tapping a card header to collapse or expand was hit-or-miss and sometimes zoomed the page instead. It now toggles cleanly on the first tap.
+- **Collapsed cards stay collapsed.** MIM now correctly remembers which cards you've collapsed on the Server and Performance tabs, even as you move between tabs — previously the state could get forgotten.
+- **Cleaner mobile layout on the Server and Performance tabs.** Several cards were cramped or overlapping on narrow screens — sensor readings, storage volumes (whose names were getting cut down to "/…"), and the Performance tab's network and disk details. Everything now stacks neatly and reads clearly on a phone.
+- **Disk I/O and network bonding are easier to read on mobile.** Disk rows now show read/write speed on one line and IOPS / utilization on the next; the bonding view lists each link's mode, driver, MAC address, and speed / duplex / failure count on their own lines instead of running together.
+
+### Good to know
+
+- These are all display and mobile fixes plus the Products button fix — your servers, nodes, and products are untouched. Just pull/update to 3.3.1.
+
+---
+
 ## v3.3.0
 
 **New: the Performance tab.** Every server now has a **Performance** tab (right next to Server) that shows, at a glance, how hard the machine is actually working — and lets you dig into the details with one click.
