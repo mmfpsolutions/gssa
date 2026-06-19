@@ -65,6 +65,7 @@ services:
     image: ghcr.io/mmfpsolutions/gssm:latest
     container_name: gssm
     network_mode: host
+    stop_grace_period: 120s
     volumes:
       - /data/gssm/config:/app/config
       - /data/gssm/logs:/app/logs

@@ -1,7 +1,7 @@
 {
-  "latest": "2.0.4",
-  "released_at": "Jun 10, 2026",
+  "latest": "2.0.5",
+  "released_at": "Jun 18, 2026",
   "release_notes_url": "https://github.com/mmfpsolutions/gssa/blob/main/release%20notes/GSSM/Release%20Notes.md",
-  "min_recommended": "2.0.2"
+  "min_recommended": "2.0.5"
 }
 

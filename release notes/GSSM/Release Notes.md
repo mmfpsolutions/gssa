@@ -1,6 +1,30 @@
 # GSSM Release Notes
 ## v2.x Series
 
+## v2.0.5
+
+A safety fix for **GSSM Auto Fan Control** (a Pro/Enterprise feature for Canaan / Avalon miners like the Avalon Nano 3S). When Auto Fan Control is on, GSSM manages the miner's fan to hit your target temperature. Previously, if GSSM *stopped* managing the fan — because you disabled the miner in GSSM, or shut GSSM down — the miner could be left with its fan stuck at a fixed speed and nothing watching the temperature. On a small miner that could mean overheating. This release makes GSSM always hand the fan back to the miner's own automatic mode whenever it stops managing it, and take control back when it resumes.
+
+> **Who this affects:** only Pro/Enterprise users running **GSSM Auto Fan Control** on a Canaan/Avalon miner. If you don't use Auto Fan Control, nothing changes for you.
+
+### Fixed
+
+- **Disabling a miner now returns its fan to automatic.** If you disable a miner in GSSM while Auto Fan Control is managing it, GSSM now hands the fan back to the miner's own built-in automatic fan mode — so the device keeps cooling itself based on temperature instead of holding a fixed speed. Your Auto Fan Control setting is remembered, so **re-enabling the miner automatically resumes GSSM control** — you don't have to turn it back on.
+
+- **Shutting GSSM down now returns fans to automatic.** On a graceful shutdown (including a normal Docker container stop), GSSM returns every miner it was managing to automatic fan mode first — before anything else — so a clean shutdown never leaves a fan stranded.
+
+- **Starting GSSM resumes control — and corrects.** On startup, GSSM takes back control of your Auto Fan miners. If it starts up and finds a miner already running hot, it ramps the fan immediately. A miner you deliberately left **disabled** stays disabled across restarts and remains on its own automatic fan mode until you re-enable it.
+
+- **Clearer status.** A disabled miner now correctly shows its fan as being in the device's automatic mode, instead of misleadingly showing it as GSSM-managed.
+
+### Good to know
+
+- **GSSM Auto Fan Control assumes GSSM stays running.** If GSSM is killed abruptly (a crash or sudden power loss — not a normal shutdown), it can't hand the fan back, so the fan holds its last speed (never below 30%) until GSSM restarts and resumes control. On a miner whose only real-time protection is its fan (such as the Avalon Nano 3S), don't run GSSM on a machine prone to hard crashes without separate temperature monitoring.
+
+- **Docker users:** set a generous `stop_grace_period` (e.g. `30s`) in your compose/run configuration so a container stop has time to complete the full graceful shutdown. The fan hand-back runs first and finishes within a few seconds regardless.
+
+---
+
 ## v2.0.4
 
 First-class dashboard support for NerdQAxe++ devices running in **dual-pool mode** — mining two different coins concurrently with a configurable hashrate split (e.g. 80% to your DGB pool, 20% to your BCH pool). On prior releases, GSSM only showed you the primary pool's stats and silently hid everything about the second pool. This release surfaces both pools in every view: dashboard card, list view, and miner detail page. Plus one small improvement — the network difficulty for the coin you're mining now shows on single-pool AxeOS cards too (Bitaxe and NerdQAxe++ in failover mode).
