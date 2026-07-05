@@ -1,5 +1,38 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.2
+## v5.x Series through v5.1.3
+
+---
+
+## v5.1.3 — DigiByte 9.26.x Mining Fix
+
+GoSlimStratum v5.1.3 is a focused hotfix for **DigiByte mining on DigiByte Core 9.26.x**. If you mine DigiByte (SHA256d) with modern ASICs — Bitaxe, NerdQAxe++, Avalon Nano, and similar — and you've upgraded your DigiByte node to the 9.26.x line, your miners may have started losing work: **rejected "low difficulty" shares**, or your DigiByte **dashboard hashrate reading about half** of what the miner itself reports. v5.1.3 restores full, correct DigiByte mining.
+
+Nothing changes for any other coin, for DigiByte's other algorithms (Scrypt / Skein / Qubit / Odocrypt), or for older DigiByte nodes. This sits entirely on top of 5.1.2.
+
+### ⛏️ What happened — and the fix
+
+DigiByte Core 9.26.x began rolling out **DigiDollar**, and part of that rollout uses one bit of the block **version** field to signal the upgrade across the network. That bit happens to land in the exact region SHA256 mining chips borrow for their own internal speed trick (version rolling, a.k.a. AsicBoost). With both sides writing to the same space, the miner and the pool ended up disagreeing about what each share actually contained — and perfectly valid shares got miscounted.
+
+Depending on the miner, that showed up two different ways:
+
+- **Rejected shares.** Some devices (e.g. Avalon Nano) had good shares bounced by the pool as "low difficulty," even though the miner was working perfectly.
+- **Half hashrate, silently.** Others (e.g. NerdQAxe++) discarded the affected shares on the device before sending them — so the miner's own screen showed full speed while GSS credited only about half.
+
+v5.1.3 adjusts how GoSlimStratum builds DigiByte SHA256 jobs so the miner and the pool line up again. Rejected shares go back to accepted, and your dashboard hashrate returns to the miner's true rate.
+
+### Things to know
+
+- **DigiByte SHA256d only.** The fix is scoped precisely to the DigiByte SHA256 pool. Every other coin — and DigiByte's other algorithms (Scrypt, Skein, Qubit, Odocrypt) — is completely untouched.
+- **Backward-compatible.** If your DigiByte node is on an older release (8.26.2 or earlier), nothing changes. The fix only engages while the node is actively signaling the DigiDollar upgrade, and does nothing otherwise.
+- **Temporary by nature.** Once DigiDollar finishes activating on the DigiByte network, the node stops using that version bit and the fix quietly stands down on its own — no further action, ever.
+- **DigiDollar signaling is preserved.** Your pool still contributes to the network's DigiDollar vote normally; this change doesn't slow activation down.
+
+### Upgrade Notes
+
+- **Drop-in upgrade.** Pull the new image, restart your container. Your existing `config.json` works as-is. No database migration, no config changes.
+- **Reconnect your DigiByte miners once.** For the fix to take hold on a miner that's already connected, it needs to reconnect and pick up the corrected jobs — so **power-cycle (or reboot) your DigiByte SHA256 miners once** after upgrading.
+- **How to confirm.** After reconnecting, your DigiByte miners' rejected-share count should stop climbing, and the DigiByte hashrate on your dashboard should match the number the miner shows on its own screen.
+- **Mining DigiByte on an older Core release?** Nothing to do — the fix is a no-op on pre-DigiDollar nodes.
 
 ---
 

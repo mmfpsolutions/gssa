@@ -29,3 +29,5 @@ peerblockfilters=0       # Disable block filter serving
 whitelist=127.0.0.1      # Always allow local connections
 #Enable V2 Transport, if available
 v2transport=1
+#DigiDollar support
+digidollar=1
