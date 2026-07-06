@@ -1,6 +1,36 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.1
+
+A focused follow-up to 3.0.0 that hardens how GSSM watches your miners and nodes: accurate failover status on AxeOS devices, far fewer false offline/online alerts, faster alert checks for larger setups, and a greatly expanded in-app Help page.
+
+> **No operator action required on upgrade.** These are reliability fixes and improvements — nothing in your configuration changes.
+
+### Bug Fixes
+
+- **Accurate failover status on AxeOS miners (NerdQAxe++ & Bitaxe).** The miner card now correctly shows when a device is mining on its **backup pool** — previously a NerdQAxe++ always read *Failover: false* even after it had switched over. And the pool-switch notification now fires in **both** directions: when a miner fails over to its backup **and** when it moves back to its primary (it used to only alert on the way out).
+
+  > **Who this affects:** anyone running AxeOS miners (Bitaxe / NerdQAxe++) with a primary + fallback pool configured.
+
+- **Far fewer false "miner offline / online" alerts.** Some miners — NerdQAxe++ especially — occasionally answer slowly or briefly hang their API, which could make GSSM think a perfectly healthy miner had dropped and fire an offline-then-online alert pair. Two changes fix this:
+  - **A longer response window for AxeOS miners** — 5 seconds (up from 3) before a check counts as a miss.
+  - **A confirmation step** — a miner must now miss **two checks in a row** before an offline alert is sent. A single slow or hung check is absorbed silently, so one blip no longer pages you.
+
+### Improvements
+
+- **Faster, more reliable alert checks on larger setups.** GSSM now checks your **miners and crypto nodes in parallel** instead of one at a time. Previously, on a fleet of 20+ devices, a handful of slow or unresponsive ones could stretch a check cycle past its interval. Now a cycle is bounded by your *slowest* device, not the sum of all of them — so big fleets stay comfortably within their check window even when some devices are misbehaving. (Pools were already fast and are unchanged.)
+
+- **Expanded Help & Reference page.** The in-app **Help** page (linked in the footer) is now a full visual guide: sample miner, pool, and crypto-node cards, plus field-by-field references for every Configuration, Notifications, and Historicals setting — all styled to match your dashboard, with a quick sidebar to jump around.
+
+- **Consistent crypto-node logging.** Node checks now appear in the debug log — cycle start, per-node status, and event dispatch — matching what miners and pools already logged. If you ever turn on debug logging to troubleshoot a node, it now tells the same story as the rest of the dashboard.
+
+### Good to know
+
+- **Offline alerts are now confirmed over two check cycles.** That's the trade-off for killing the false alerts: a genuine outage is reported one check interval later than before (about a minute at default settings). Your **history and trends are unaffected** — the raw offline reading is still recorded; only the *alert* waits for confirmation.
+
+---
+
 ## v3.0.0
 
 Our biggest release yet. The headline is **Historicals** — an optional, Pro/Enterprise history database that gives your live dashboard a memory: trend charts, all-time best shares that survive reboots, and a searchable alert history. Alongside it: a new **Health** page, support for **two new coins** (Bitcoin Cash II and Bitcoin Silver), a richer pool and crypto-node detail experience (new charts, sortable tables, more of what your node actually knows), and a top-to-bottom **consistency and accuracy pass** across every miner, pool, and node — the card, the detail page, and your alerts now all read from one source, so they can't disagree, and details some devices reported all along but GSSM used to quietly drop now show up. There's a good round of bug fixes too, including one that stops a healthy node from spamming you with false offline alerts.
