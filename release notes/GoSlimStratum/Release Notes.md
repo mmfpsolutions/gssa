@@ -1,5 +1,60 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.3
+## v5.x Series through v5.1.4
+
+---
+
+## v5.1.4 — DigiDollar-Ready DigiByte, Custom Coin Badges & Alert Reliability
+
+GoSlimStratum v5.1.4 bundles two new capabilities and two reliability fixes:
+
+- **DigiByte is ready for DigiDollar.** When DigiByte's DigiDollar upgrade activates on the network, GSS will automatically carry the required oracle commitment in the blocks it mines — no operator action, and nothing changes until activation actually happens.
+- **Coin badge icons, fixed and customizable.** Badge icons now match by **coin type** instead of guessing from the first three letters of the symbol, so custom coins finally show the right icon (or a clean default) — and you can supply your own artwork for any coin.
+- **Coin alerts survive a pool stop/start**, and a **Stratum V2 connection fix** ensures rejected connections report their reason.
+
+Everything sits on top of 5.1.3. No config changes required.
+
+### 🟢 DigiByte — ready for DigiDollar activation
+
+DigiByte's **DigiDollar** upgrade introduces an *oracle commitment* that pools must include in the coinbase once the feature goes live (similar in spirit to the SegWit commitment already there). GSS now includes it automatically whenever your DigiByte node provides one.
+
+- **Automatic, and invisible until activation.** Before DigiDollar activates — and on older DigiByte nodes — the node doesn't hand out an oracle commitment, so GSS builds blocks exactly as it does today. When activation happens, GSS starts including the commitment on its own. No flag to flip, no restart to time to activation.
+- **Nothing for your miners to do.** The commitment rides inside the coinbase, which miners already treat as opaque. Bitaxe, NerdQAxe++, Avalon, and every other device need no firmware or setting changes.
+- **DigiByte-only, all algorithms.** Verified end-to-end on the DigiDollar test network across **SHA256d, Skein, and Scrypt**, over both **Stratum V1 and V2**. No other coin is affected.
+
+### 🎨 Coin badge icons — correct matching, and bring your own
+
+The coin icons on the dashboard header used to be chosen by the **first three letters of the coin symbol**. That worked for built-in coins but broke for custom (`coins.json`) coins: a coin named `BCH2` would wrongly show the Bitcoin Cash badge, and a coin with no matching image showed **no badge at all**.
+
+Badges now resolve by **coin type** — the stable identifier from your config — so:
+
+- **Custom coins show the right badge.** Icons match a coin's `coin_type`, not a 3-letter guess, so `BCH2`, `DGB-Scrypt`, and similar all resolve correctly.
+- **Upload your own badge — right from the dashboard.** Open **Global Config → Configured Coins** and click a coin's icon. A dialog lets you **upload a PNG** or **reset to the default** — no shell access, no rebuild, no restart. The new badge appears immediately.
+- **Or drop a file.** Prefer the filesystem? Drop a `<coin_type>.png` (or `.svg`) into a **`coin-icons`** folder next to your configuration and GSS serves it. Works for custom coins *and* overrides built-in badges.
+- **Never blank.** Any coin without a matching image now shows a neutral default badge rather than empty space.
+
+#### Things to know
+
+- **One badge per coin *type*.** Badges key off `coin_type`, so a badge applies to every pool of that type — if you run `DGB` and a cloned `DGB2` (both DigiByte), they share one badge. The upload dialog tells you which coin type you're changing.
+- **The folder is optional.** If you never upload or create `coin-icons`, everything works as before — built-in coins keep their shipped badges. The folder is created automatically on your first upload.
+- **Uploads are PNG, up to 256 KB.** The dashboard accepts PNG images; the filesystem drop-in also accepts SVG. Both name the file by `coin_type` (e.g. `bitcoincashii.png`), lowercase.
+- **Live pickup.** Uploaded, replaced, or dropped-in badges appear on the next page load — no restart needed.
+
+### 🔔 Coin alerts now survive a coin pool stop/start
+
+**Fixed:** if you **stopped and then started an individual coin pool** from the dashboard, that coin's alerts (best share, notable share, rejected-share, network-difficulty) went **silently quiet** until you restarted the whole GSS process — with nothing in the logs to explain it. Other coins kept alerting normally, which made it easy to miss.
+
+v5.1.4 re-wires each coin's alert watcher whenever its pool restarts, so alerts keep firing after a stop/start. A log line now records the re-wire, so the event is visible instead of silent.
+
+### 🔌 Stratum V2 connection fix
+
+**Fixed:** a Stratum V2 connection rejected at setup could close before its rejection reason was delivered, leaving the miner to see a bare disconnect instead of the "why." The shutdown path now flushes that final message before closing.
+
+### Upgrade Notes
+
+- **Drop-in upgrade.** Pull the new image and restart your container. Your existing `config.json` works as-is — no database migration, no config changes.
+- **DigiByte + DigiDollar: nothing to do.** Readiness is automatic and stays dormant until DigiDollar activates on the network — you don't need to time anything to activation.
+- **Custom coin badges (optional).** Upload a PNG from **Global Config → Configured Coins** (click a coin's icon), or drop `<coin_type>.png` / `.svg` into a `coin-icons` folder next to your config. Skip it and nothing changes.
+- **Coin alerts.** No action — the stop/start fix applies automatically. If you'd previously worked around it by fully restarting GSS after a pool stop/start, you no longer need to.
 
 ---
 
