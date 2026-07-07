@@ -1,6 +1,30 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.2
+
+A fix release: correct miner **coin badges**, plus a reliability fix that stops false offline alerts on Bitaxe / NerdQAxe++ miners.
+
+> **No operator action required on upgrade.** Nothing in your configuration changes.
+
+### Bug Fixes
+
+- **Fewer false offline alerts on Bitaxe & NerdQAxe++ miners.** On larger fleets, GSSM could report an AxeOS miner as offline — sometimes for many minutes — when it was actually mining fine, then send an "online" alert when it recovered. The cause was too many lingering network connections overwhelming the miner's small built-in web server until it briefly stopped responding. GSSM now closes each connection right after reading the miner (instead of holding it open) so it no longer ties up the device, and briefly retries a refused connection. This is on top of — and independent from — the alert-confirmation change in 3.0.1. Non-AxeOS miners (e.g. Avalon) were never affected.
+
+  > **Who this affects:** anyone running several Bitaxe / NerdQAxe++ (AxeOS) miners, especially with a short dashboard refresh interval.
+
+- **Miners on litecoinpool now show the right coin.** A miner pointed at litecoinpool.org (with a backup pool on another coin) could show the *backup* coin's badge — e.g. an LTC miner labeled **DGB**. GSSM now recognizes litecoinpool from its address and shows **LTC**, and the badge follows the pool the miner is *actually* connected to, so a failover to a different-coin pool moves the badge with it instead of a disconnected backup hijacking it.
+
+  > **Who this affects:** anyone whose miner logs into a pool with an account-style username (like litecoinpool.org's `account.worker`) rather than a wallet address, especially with a different-coin backup configured.
+
+### Improvements
+
+- **A default badge when the coin can't be determined.** If GSSM genuinely can't tell which coin a miner is on, it now shows a neutral placeholder badge instead of a blank gap — so every miner keeps a consistent coin slot. (An offline miner shows it too, since there's no pool to read a coin from.)
+
+- **Dual-mining badges are steadier.** For NerdQAxe++ devices mining two coins at once, both coin badges now stay put even if one of the two pools briefly disconnects — no more flicker between the dual and single display.
+
+---
+
 ## v3.0.1
 
 A focused follow-up to 3.0.0 that hardens how GSSM watches your miners and nodes: accurate failover status on AxeOS devices, far fewer false offline/online alerts, faster alert checks for larger setups, and a greatly expanded in-app Help page.
