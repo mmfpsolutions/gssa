@@ -1,6 +1,30 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.3
+
+A feature release for **ElphaPex (DG-Home1)** miners — previously monitor-only, they can now be **restarted** and have their **work mode** changed right from the dashboard — plus a small accuracy fix.
+
+> **No operator action required on upgrade.**
+
+### New Features
+
+- **Restart ElphaPex (DG-Home1) miners from the dashboard.** ElphaPex miners now get the same **Restart** button (↻) that Bitaxe, NerdQAxe++, and Avalon devices already have — on the miner card, the list view, and the bulk-restart tool. Previously ElphaPex was monitor-only, so a reboot meant logging into each device's own web page; now you can restart one (or a whole batch) straight from GSSM.
+
+- **Change ElphaPex (DG-Home1) work mode from the dashboard.** ElphaPex miners now have an editable **Work Mode** on their settings page — pick **Sleep**, **Low**, **Normal**, or **Overclock** and apply, without logging into the vendor's app. The miner card and detail page also show the current mode by name instead of a raw number.
+
+  > **Heads-up:** **Overclock** significantly raises hashrate *and* power draw, and **Sleep** pauses mining — so both change how the rig behaves, not just a label.
+
+### Bug Fixes
+
+- **ElphaPex miners no longer show an inaccurate frequency.** The frequency shown for ElphaPex (DG-Home1) miners was based on a value the device doesn't actually report in MHz, so it read far lower than the real clock speed. Rather than display a misleading number, GSSM no longer shows a frequency for ElphaPex — the rest of the card (hashrate, temps, fans, pools) is unaffected.
+
+### Improvements
+
+- **A more polished, consistent look across the app.** Device names and section titles throughout GSSM — on the dashboard cards, the list views, the detail pages, and the configuration screens — now share the same subtle orange-to-amber gradient as the dashboard title, for a cleaner, more cohesive feel everywhere. Disabled devices show the same gradient, gently dimmed, so they stay easy to spot.
+
+---
+
 ## v3.0.2
 
 A fix release: correct miner **coin badges**, plus a reliability fix that stops false offline alerts on Bitaxe / NerdQAxe++ miners.
