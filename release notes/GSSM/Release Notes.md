@@ -1,6 +1,20 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.4
+
+A quick fix release on top of 3.0.3 — two small display corrections.
+
+> **No operator action required on upgrade.**
+
+### Bug Fixes
+
+- **Configuration page names no longer disappear on hover.** With 3.0.3's new gradient titles, hovering a miner, pool, or node row on the Configuration page could briefly make its name vanish. Names now stay put on hover.
+
+- **Pool coin badges show the correct coin.** A pool running on a coin *variant* — where the pool's internal coin key differs from its coin type — could show a **blank** coin badge instead of its icon (for example, a DigiByte pool showing no coin symbol at all). GSSM now takes the badge from the pool's configured **coin type**, so the right coin icon appears on both the pool card and the pool detail page.
+
+---
+
 ## v3.0.3
 
 A feature release for **ElphaPex (DG-Home1)** miners — previously monitor-only, they can now be **restarted** and have their **work mode** changed right from the dashboard — plus a small accuracy fix.

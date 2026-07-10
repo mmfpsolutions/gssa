@@ -1,5 +1,52 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.4
+## v5.x Series through v5.1.5
+
+---
+
+## v5.1.5 — Config Summary Page, Clearer Coin Table & a Wallet-Timeout Fix
+
+GoSlimStratum v5.1.5 adds one new feature and a set of configuration-visibility improvements:
+
+- **Config Summary page.** A new read-only, printable page that gathers your entire configuration into one clean document — ideal for documentation, review, or attaching to a support ticket. Every secret is masked; nothing sensitive ever leaves the server.
+- **Clearer Configured Coins table.** The coins table on the Global Configuration page now shows each coin's **mining algorithm**, and the old single "Stratum Port" column is split into **SV1 Port** and **SV2 Port** — so you can see V1 and V2 listener ports (and which crypto variant) at a glance.
+- **The Wallet RPC Timeout setting now actually works.** A payout setting that was present in the UI but never wired up now takes effect — useful if you run a large or slow-to-respond encrypted node wallet.
+
+Everything sits on top of 5.1.4. No config changes required.
+
+### 📄 Config Summary — your whole setup on one printable page
+
+A new **View Summary** button in the Global Configuration header opens a read-only summary of your entire GoSlimStratum configuration at `/summary/config`. It's built for **documentation, review, and support tickets** — one page you can read top-to-bottom or **Print / Save as PDF** straight from your browser (no downloader, no separate export step).
+
+- **Everything in one place.** Global settings (metrics, web, logging), a security overview (which keys and PINs are configured), and — per coin — node, stratum, SV2 listeners, mining, VarDiff, payout, coin alerts, explorer, and merged-mining settings, plus your full notifications setup (channels, event matrix, per-coin overrides).
+- **Secrets never leave the server.** Every password, token, passphrase, and webhook URL renders as `[configured]` or `[not set]` — the real values are never sent to your browser, so the page is safe to screenshot or hand to support. SV2 binary keys show as a simple "configured?" flag.
+- **Compact and readable.** A clean multi-column document layout (not the big editable forms), with difficulty-scale numbers shown using friendly K / M / G / T / P suffixes instead of scientific notation.
+- **Opens in a new tab**, so you keep your place in the config editor.
+
+### 🪙 Configured Coins table — algorithm + SV1 / SV2 ports
+
+The **Configured Coins** table on the Global Configuration page picked up two readability improvements:
+
+- **New "Algo" column.** Each coin now shows its mining algorithm (`sha256d` / `scrypt`) at a glance, between Coin and Display Name.
+- **Separate SV1 and SV2 port columns.** The old single "Stratum Port" column only showed the V1 port, hiding your Stratum V2 listeners. It's now split into **SV1 Port** and **SV2 Port**. The SV2 column lists each configured listener as `port - variant` (e.g. `34254 - bip324`), stacking vertically when a coin runs more than one — so you can tell which port serves which SV2 implementation. Coins with no SV2 listener, and non-SHA256d coins (Scrypt — LTC / DOGE — which can't run SV2), show `--`.
+
+Display-only — nothing about your configuration or mining changes.
+
+### ⏱️ Wallet RPC Timeout setting now works
+
+**Fixed:** the **Wallet RPC Timeout** field on the payout configuration (`wallet_rpc_timeout_seconds`) has always been present in the UI — and documented as "increase if your wallet is slow to respond" — but it wasn't actually connected to anything. The pool used a fixed 30-second window internally, no matter what you set.
+
+v5.1.5 wires it up. The value now controls how long GSS keeps an encrypted node wallet unlocked while a payout (or a wallet sweep) completes — so operators with a large or slow-to-respond encrypted wallet can raise it and have it take effect.
+
+- **Default is unchanged (30 seconds).** If the default has been working for you, nothing changes.
+- **Only relevant for encrypted wallets.** The setting governs the wallet-unlock window used during payouts and sweeps; if your node wallet isn't password-protected, it has no effect.
+- **Safe by design.** It never interrupts a payment that's already broadcasting — it only governs the unlock window, so there's no risk to in-flight transactions.
+
+### Upgrade Notes
+
+- **Drop-in upgrade.** Pull the new image and restart your container. Your existing `config.json` works as-is — no database migration, no config changes.
+- **Config Summary: nothing to configure.** Click **View Summary** on the Global Configuration page (or visit `/summary/config`). It's read-only and every secret is masked. Print or Save-as-PDF from your browser.
+- **Coin table columns: automatic.** The new **Algo** column and the **SV1 Port** / **SV2 Port** split appear on their own — display-only, no action needed.
+- **Wallet RPC Timeout: default unchanged (30s).** If you'd previously raised this for a slow or encrypted node wallet and wondered why nothing changed, it now takes effect. No action needed otherwise.
 
 ---
 
