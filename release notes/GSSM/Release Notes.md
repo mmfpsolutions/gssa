@@ -1,6 +1,18 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.5
+
+A quick fix for pools mining scrypt-based coins.
+
+> **No operator action required on upgrade.**
+
+### Bug Fixes
+
+- **Correct "Best Share" for scrypt pools (Litecoin, Dogecoin, DigiByte-Scrypt).** On the pool card, the **Best Share** figure for scrypt-based coins was shown on Bitcoin's difficulty scale, making it read roughly **65,000× too large**. It's now scaled to the coin's own units, so it matches what you see on the pool's GoSlimStratum dashboard. SHA-256 coins (Bitcoin, Bitcoin Cash, and DigiByte's SHA-256 pools) were always correct and are unchanged.
+
+---
+
 ## v3.0.4
 
 A quick fix release on top of 3.0.3 — two small display corrections.
