@@ -1,6 +1,21 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.2
+
+A small enhancement to the **Bitcoin Cash II (BCH2)** node. When you install BCH2, MIM now creates a wallet address for you and shows it in the installation output — so you no longer have to hop onto the server and run a command yourself to get one. This matches how every other crypto node (Bitcoin, Bitcoin Cash, BC2, DigiByte, Litecoin, eCash) already behaves.
+
+### Improved
+
+- **BCH2 install now shows a wallet address.** Previously the BCH2 install created the node's default wallet but didn't display an address; now it generates a standard receiving address and shows it in the install output, right where the other nodes already do.
+
+### Good to know
+
+- **Existing BCH2 nodes are untouched.** The new address appears on your next install — if you already have a BCH2 node running, its wallet is unchanged.
+- Nothing else in MIM changes in this release.
+
+---
+
 ## v3.3.1
 
 A quick follow-up to 3.3.0 — mobile polish and a Products-page fix. Nothing changes about how MIM manages your servers or products; just update and you're set.
