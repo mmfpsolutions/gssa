@@ -1,5 +1,17 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.5
+## v5.x Series through v5.1.6
+
+---
+
+## v5.1.6 — Maintenance Release
+
+Internal improvements to share validation and minor code cleanup. Some miners may notice a small reduction in rejected shares.
+
+**Merged mining fix:** if you run merged mining (e.g. LTC + DOGE) and disable one of the coins, your pool now starts normally. Previously, disabling one side of a merged-mining pair could block *other*, unrelated coins from starting. When an aux coin is disabled, the parent simply mines on its own.
+
+**Blocks page fix (Scrypt coins):** on the Blocks dashboard, the difficulty of the share that found a block now displays at the correct scale for Scrypt coins (LTC, DOGE, DGB-Scrypt). It was previously shown 65,536× too large. This was a display-only issue — your mining, blocks, and rewards were never affected.
+
+Drop-in upgrade — no config changes, nothing to do.
 
 ---
 

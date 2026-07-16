@@ -69,6 +69,22 @@
         "tx": "https://explorer.bitcoinsilver.top/tx/{txid}",
         "address": "https://explorer.bitcoinsilver.top/address/{address}"
       }
+    },
+    "bitcoinsv": {
+      "name": "Bitcoin SV",
+      "symbol": "BSV",
+      "segwit": false,
+      "address": {
+        "base58": {
+          "p2pkh": { "mainnet": 0, "testnet": 111 },
+          "p2sh": { "mainnet": 5, "testnet": 196 }
+        }
+      },
+      "explorer": {
+        "block": "https://whatsonchain.com/block/{hash}",
+        "tx": "https://whatsonchain.com/tx/{txid}",
+        "address": "https://whatsonchain.com/address/{address}"
+      }
     }
   }
 }
