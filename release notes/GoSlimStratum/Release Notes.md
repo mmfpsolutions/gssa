@@ -1,5 +1,36 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.1.6
+## v5.x Series through v5.2.0
+
+---
+
+## v5.2.0 — DigiDollar Stats for DigiByte Pools
+
+DigiDollar — the US-dollar stablecoin built into the DigiByte blockchain — is now live on mainnet, and GoSlimStratum is the first pool software* to put it on your dashboard.
+
+<sub>*That we know of — show us another! 👀</sub>
+
+If you run a DigiByte pool, you'll see a new **DigiDollar** badge on the coin dashboard and a new page at **`/coin/{your-coin}/digidollar`** showing, straight from your own node:
+
+- **System health** — the chain-wide collateralization ratio and status
+- **DigiDollar supply** and active collateral positions
+- **Locked collateral** — total DGB backing the system, with its USD value
+- **DGB oracle price** — the decentralized price feed, its 24-hour range, freshness, and how many oracles are reporting
+- **Deployment details** — activation status and the oracle signing session
+- **A collateral calculator** — pick an amount ($100–$100K) and a lock period (30 days to 10 years) and see exactly how much DGB collateral minting would require at the current oracle price
+
+Everything is **read-only and free on every tier** — no license needed. GSS displays what your node reports; it never mints, redeems, or holds anyone's coins. Your node, your coins, your DigiDollars.
+
+**New Oracles page.** From the DigiDollar page, open **Oracle Network** to see the decentralized DGB/USD price-feed network in full — the current consensus price, how many oracles signed the latest on-chain price, and a live roster of every oracle: who's reporting, who's signing, heartbeat freshness, software version, and endpoint. It's the same public data every DigiByte node sees, presented clearly — and if you happen to run an oracle yourself, yours is flagged.
+
+**Refined look.** The DigiDollar page got a visual polish — a collateralization bar, health and tier indicators, and clearer cards — while staying consistent with the rest of your dashboard. Both DigiDollar pages load their data once and include a **Refresh** button that shows when the figures were last read from your node, so they stay light on your node.
+
+A few practical notes:
+
+- The page appears only on DigiByte coin pools. Nothing changes for any other coin.
+- If your DigiByte node predates DigiDollar, the page simply says so — no errors, no log noise. Upgrade the node and the stats appear within a minute, no GSS restart needed.
+- The calculator is exactly that — a calculator. It tells you what minting *would* require; actually minting DigiDollar is done from your own wallet, not from GSS.
+
+Drop-in upgrade — no config changes, nothing to do.
 
 ---
 
