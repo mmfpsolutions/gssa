@@ -1,5 +1,133 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.0
+## v5.x Series through v5.2.3
+
+---
+
+## v5.2.3 — Merged Mining, Round Two: DigiByte Joins, and the Feature Grows Up
+
+Merged mining has been part of GoSlimStratum since the LTC + DOGE days. This release is its
+coming-of-age: **DigiByte-Scrypt pools can now be merged-mining parents too**, the whole
+feature moves to **explicit per-miner opt-in with honest dashboards**, and it's been
+hardened by a real production soak — including multiple DigiByte-Scrypt blocks found live in merged
+mode.
+
+One Scrypt share now works two chains: your miners mine DGB (or LTC) exactly as before, and
+every share also gets checked against the Dogecoin network. When one clears the DOGE
+target, the DOGE block reward pays **directly from the DOGE coinbase to the miner's own
+DOGE address** — Direct-to-Miner on both chains, zero pool custody, nothing to distribute.
+
+### ⚠️ Action needed if you already run merged mining
+
+**Merged mining is now opt-in per miner.** A miner earns aux rewards only when its username
+carries its own aux payout address in pipe format:
+
+```
+PARENTADDRESS|DOGEADDRESS.workername
+```
+
+Previously, miners connecting *without* an aux address were silently merge-mined anyway,
+with their DOGE rewards paid to the pool's configured DOGE address. That undocumented
+fallback is gone — it could send rewards somewhere the miner never chose. Miners without a
+pipe address keep mining the parent chain completely normally; they just don't merge-mine,
+and the log says so plainly at connect. **If your miners relied on the old fallback, add
+the pipe address to their usernames — that's the whole migration.**
+
+A mistyped DOGE address is caught the moment the miner connects: one clear warning in the
+log, the miner keeps mining the parent chain, and nothing is silently misdirected.
+
+### 🐕 Setting up a DigiByte + Dogecoin pair
+
+Same configuration shape as LTC + DOGE — a `merged_mining` block on each side:
+
+```jsonc
+"DGB":  { "algorithm": "scrypt", "enable_dtm": true,
+          "merged_mining": { "role": "parent", "aux_chains": ["DOGE"] } },
+"DOGE": { "algorithm": "scrypt", "enable_dtm": true,
+          "merged_mining": { "role": "aux", "aux_of": "DGB" } }
+```
+
+Parent and aux must share an algorithm (Scrypt with Scrypt), and both sides run
+Direct-to-Miner. The aux pool keeps running as a normal standalone pool throughout.
+
+### 🏷️ The dashboard tells the truth
+
+- **Per-miner M badge.** Each worker on the miners card shows an **M** badge only while it
+  is *actually* merge-mining — connected, authorized, valid aux address registered. Hover
+  it and you see the exact DOGE address its aux rewards pay to. No badge = not
+  merge-mining, and that absence is now your diagnostic.
+- **Aux Odds on the Block Odds card.** Merged-parent dashboards gain an **Aux Odds** row —
+  pool share, estimated time to block, blocks/day and blocks/month against the *Dogecoin*
+  network, computed from only the miners actually merge-mining (`2 of 3 miners
+  merge-mining → DOGE`). DOGE's network is orders of magnitude larger than DGB-Scrypt's,
+  and this row is where that reality lives — think of it as the odds printed on the
+  lottery ticket.
+
+### 👛 One wallet address, one decision
+
+Miners that share a parent wallet address share one coinbase — so they share one
+merged-mining decision. If any worker on an address opts in, every worker on that address
+contributes to the aux chain (and shows the M badge with the real payout address). If two
+workers on one address supply *different* DOGE addresses, the most recent one wins and the
+log warns you loudly, naming both. Want genuinely separate aux payouts? Use separate
+parent wallet addresses — every wallet in the world will happily give you another one.
+
+### 🤝 Revenue share now applies on the aux chain
+
+Unlicensed operators run merged mining under the same terms as everything else in
+Direct-to-Miner mode: the 0.5% revenue share you accepted on each coin now applies on the
+aux chain too, collected directly in the DOGE coinbase alongside the miner's payout —
+previously it was only collected on the parent side. Licensed operators are unaffected:
+no revenue share on either chain, as always.
+
+### 🛡️ Hardened by soak
+
+Running this on our own mainnet pool before releasing it surfaced three issues you'll
+never meet:
+
+- **A memory leak in long-running merged pools** — aux job data accumulated for the life
+  of the process (a fast parent chain could add ~170 MB/day). Now strictly bounded; a
+  once-per-aux-block log line (`aux_jobs=N, parent_jobs=N`) lets you watch the bound hold.
+- **Aux node down at GSS startup no longer disables merged mining.** Previously, if the
+  Dogecoin node wasn't answering the moment GSS started, merged mining stayed dead until a
+  restart. Now GSS warns, keeps retrying, and merged mining starts by itself the moment
+  the node responds — same as it always did for a node that dropped mid-run.
+- **A database housekeeping fix** — the internal schema version record now correctly reads
+  18 on upgraded installs. Purely cosmetic; no action, no data change.
+
+### ⚡ Job delivery rebuilt — for every pool, merged or not
+
+This one's for everyone. Digging through the dispatch path for the work above, we found a
+long-standing structural weakness in how Stratum V1 delivers jobs: new work went out to
+miners **one socket at a time**, and a single miner whose connection had genuinely wedged
+(a dying NAT, a collapsed Wi-Fi link, a device that stopped reading) could hold up job
+delivery to *every other miner on that coin* — V1 and V2 alike — for up to ten seconds
+per new block. Worse, the delay landed on the same internal path that watches the
+blockchain for new blocks, so fresh work itself arrived late. The victims were random
+each time, which made it look like ordinary network flakiness: scattered, unexplainable
+stale shares.
+
+Now every V1 connection gets its own outbound queue with a dedicated writer, the same
+design Stratum V2 has used since day one. A wedged miner delays only itself; everyone
+else gets their work in microseconds, every block.
+
+You also get the receipts in the log:
+
+- Every job dispatch now reports how long it took (`elapsed=`) — healthy pools sit in
+  the low milliseconds, flat.
+- Any single miner socket that stalls a write for over a second gets a **Warn naming the
+  worker** — so if you've been chasing phantom stale shares, the culprit now signs its
+  work.
+
+A few practical notes:
+
+- Merged mining requires Direct-to-Miner mode on both coins, and matching algorithms.
+- For merged parents we recommend `"max_job_history": 5` (already the DTM recommendation)
+  — it directly bounds merged-mining memory on large fleets.
+- SHA256d pools are unaffected by all of this unless you configure them as merged parents
+  with a SHA256d aux chain — nothing here touches ordinary solo pools.
+
+Drop-in upgrade — **existing merged-mining operators, see the action-needed note above**;
+everyone else has no config changes and nothing to do.
 
 ---
 
