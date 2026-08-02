@@ -54,6 +54,8 @@ services:
       - /data/mim/data:/app/data
       - /data/mim/config:/app/config
       - /data/mim/logs:/app/logs
+    environment:
+      - TZ=America/New_York
     logging:
       driver: "json-file"
       options:
@@ -69,6 +71,8 @@ services:
     volumes:
       - /data/gssm/config:/app/config
       - /data/gssm/logs:/app/logs
+    environment:
+      - TZ=America/New_York      
     logging:
       driver: "json-file"
       options:

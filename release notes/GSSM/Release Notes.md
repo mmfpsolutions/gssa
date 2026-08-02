@@ -1,6 +1,54 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.6
+
+A feature release for **controlling** your miners, not just watching them: put a device into **standby** with one click, or set up a **schedule** that holds it in a chosen state by time of day — run overnight, idle on weekends, drop to a quieter work mode while you're asleep. Plus a fix, for everyone, that stops a deliberately-idled miner from firing false alarms.
+
+> **No operator action required on upgrade.** Nothing in your configuration changes, and nothing starts controlling your miners unless you set it up. **If you do create a schedule**, please read the timezone note under *Good to know* first — it's the one thing that can quietly go wrong.
+
+### New Features
+
+- **Standby & Wake** *(Pro/Enterprise)* — Idle a miner without unplugging it. On the miner's **Settings** page, a new **Power** control puts the device into standby — mining stops, fans wind down, and power draw falls to a trickle (roughly **124 W** on an Avalon Q) — while it stays on the network so you can wake it again from the same screen. Handy for a hot afternoon, a noisy evening, or an expensive hour on your power tariff.
+
+  > **Who this affects:** Avalon Q owners. Standby appears only on devices where GSSM can genuinely idle the hardware. Other miners reach the same result through their work mode — an ElphaPex DG-Home1's **Sleep** mode *is* its standby, and GSSM treats it as one.
+
+- **Schedules — put your miners on a timer** *(Pro/Enterprise)* — Open any capable miner's **Details** page and click the new **Schedule** badge. Set a **resting state** (what you want most of the time) and add **windows** for the exceptions — each with its own name, days of the week, start and end times, and the state to hold while it's active. Windows can cross midnight, so "9 PM to 7 AM, every day" is a single window, and different days can do different things: full power midweek, quieter at weekends.
+
+  What you can schedule depends on the device — **power** (run / standby) on an Avalon Q, and **work mode** on Avalon Q, Nano3s, and ElphaPex DG-Home1. The Schedule badge appears only where there's something to schedule, and each device only offers the modes it actually has.
+
+  > **Who this affects:** anyone who'd rather not be at the keyboard at 9 PM every night. A schedule is per-device, so you can put one miner on a timer and leave the rest alone.
+
+- **Know when your schedule fires.** A new **Schedule Applied** event under *Notifications → Events → Miner Events* sends a message whenever a schedule changes a device — naming the miner, the window responsible, and what was applied — through whichever channels your miner alerts already use (Telegram, email, webhooks, alert history). The same switch also tells you if a schedule **couldn't** apply, which is the more useful half: a schedule that silently never fires is otherwise invisible.
+
+### Bug Fixes
+
+- **An intentionally idled miner no longer sets off false alarms.** Putting a miner to sleep — for example, setting **Sleep** on an ElphaPex DG-Home1 — used to trigger a **Zero Hashrate** alert, because from the outside a sleeping miner looks exactly like one with dead hashboards: online, but hashing nothing. GSSM now recognises when a device reports itself deliberately idled and stays quiet, resuming normal alerting the moment it wakes.
+
+  This works **however** the device was idled — GSSM's own schedule, the new Standby button, the manufacturer's app, or your own script — because it reads the state from the miner itself rather than tracking what it was told.
+
+  > **Who this affects:** everyone, on any licence. If you've ever used ElphaPex Sleep mode and wondered why you got an alert, this is that.
+
+### Improvements
+
+- **Sleeping miners look asleep, not broken.** A miner that's intentionally idled now carries a **⏾ Standby** badge on its dashboard card and in the list view, so a device showing 0 H/s with stopped fans reads as "resting" at a glance instead of "something's wrong".
+
+- **The schedule page shows you what your schedule will actually do.** Windows are flexible enough to overlap — that's how one window can set power while another adjusts work mode — so the editor spells out the result rather than leaving you to work it out. It marks which windows are **active now**, flags a setting that's **overridden** by another window, points out a window that has **no effect** at all, and asks about two windows that **nearly meet** — a short stretch between them where the device dips into the resting state and straight back out. It also shows the server's clock and the next change due, so you can confirm GSSM agrees with your intent before trusting it overnight.
+
+- **A new Help section for all of this.** The in-app **Help** page (linked in the footer) gains a **Device Control** group covering Standby & Wake and Schedules — the resting-state model, a worked example, when changes actually happen, the timezone check, and what each on-screen note means.
+
+### Good to know
+
+- **Set your timezone before trusting a schedule.** Window times use the **server's** clock. If no `TZ` is set in your docker-compose, the container runs on **UTC** — so a "21:00" window still works perfectly, just at 9 PM UTC, and nothing looks wrong until you notice your miner sleeping at the wrong hour. Set it (for example `TZ=America/Toronto`) and restart. The Schedule page shows the timezone it resolved, the current app time, and the next change due, and warns you when `TZ` isn't set. Named zones handle daylight saving automatically.
+
+- **Schedules change your miner only at window edges.** GSSM acts when a window opens or closes, and at no other time. In between, the device is yours — change its work mode by hand, use Standby/Wake, use the vendor app — and nothing will be undone until the next edge, when the schedule takes back over. Restarting GSSM doesn't disturb anything either: it adopts whatever state your devices are in and waits for the next edge.
+
+- **Saving a schedule doesn't command the device.** Your changes take effect at the next window edge, so editing a schedule can't yank a running miner out from under you. Use the **Standby / Wake** buttons when you want something to happen right now. *(This also means you can't test a schedule by saving it in the middle of the window you just created — set one to start a couple of minutes out and watch it cross.)*
+
+- **Schedule a miner from one GSSM instance only.** If two instances schedule the same device they'll each assert their own windows and fight over it — the same guidance that already applies to Auto Fan Control. GSSM reminds you when you switch a schedule on.
+
+---
+
 ## v3.0.5
 
 A quick fix for pools mining scrypt-based coins.
