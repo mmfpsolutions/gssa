@@ -1,5 +1,95 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.3
+## v5.x Series through v5.2.4
+
+---
+
+## v5.2.4 — VarDiff Simulator: "What Should My Difficulty Settings Be?"
+
+It's the question we get more than any other, and until now the honest answer was
+*"run it and see what vardiff settles on."* This release replaces that with arithmetic.
+
+Open the **calculator icon** on any coin dashboard, type in the miners you run, and get the
+settings for that coin — bounds, starting difficulty, and a per-device mapping — shown as
+the exact fields on the Coin Config page, ready to type in.
+
+### 🧮 One number in, a whole configuration out
+
+The simulator already knows your coin, so there's almost nothing to enter:
+
+- **Algorithm is worked out for you.** Open it from a Scrypt pool and it does Scrypt maths;
+  from a SHA256d pool, SHA256d. No dropdown to get wrong — and getting that wrong puts you
+  off by a factor of 65,536.
+- **Your current settings are the baseline**, so the output is a *difference*, not an
+  abstract number. Anything already correct is marked **no change** in green; only genuine
+  edits stand out.
+- **Target time and retarget window are pre-filled** from that coin, and both are editable
+  so you can try "what if" without touching your pool.
+
+Everything is calculated from standard proof-of-work probability and the hashrate **you**
+state — never from the pool's own share-derived estimate, which moves with the very
+difficulty you're choosing.
+
+### 👀 It catches things you cannot see
+
+A wrong difficulty setting never errors. The pool runs, shares arrive, and nothing tells
+you anything is off. The simulator names thirteen of these, with the numbers attached:
+
+- **A ceiling that's too low.** An Antminer S19 on stock settings needs around 384,000 but
+  the default `maxDiff` is 32,768 — so it sits pinned at the ceiling submitting a share
+  every **1.3 seconds** instead of every 15. Twelve times the intended load, silently.
+- **A miner you configured correctly that still doesn't work.** Set `d=384000` on the device
+  itself and the pool clamps it right back to your `maxDiff`. Device right, pool wrong, no
+  error anywhere. The simulator shows both together so the interaction is visible.
+- **Small miners that look dead.** Anything needing below difficulty 1 gets rounded up to 1
+  unless **Use Float Difficulty** is ticked — a NerdMiner ends up thousands of times too
+  hard and simply stops reporting.
+- **A ceiling being touched by chance.** VarDiff measures each miner from its last ten
+  shares, so its estimate naturally wanders. If your `maxDiff` sits too close to a miner's
+  natural difficulty, ordinary luck lands it on the ceiling — the simulator tells you
+  roughly **how many times a day** to expect that, and what headroom stops it.
+
+### 🎯 Built for mixed fleets
+
+An Antminer S21 and a NerdMiner are about **four billion times apart** in difficulty. Set
+your bounds for one and you break the other.
+
+So per-device difficulties go in the **User Agent Difficulty Map**, where each device class
+starts exactly where it belongs — no compromise — while the min/max bounds simply *span*
+the fleet. Add every miner class you run, and if the suggested ceiling comes out lower than
+what you have today, the simulator says so, because that usually means you left a miner out.
+
+### 🔭 Where it earns its keep
+
+Beyond fixing what is already wrong:
+
+- **Planning ahead.** Work out the settings for a new rig before it arrives, or before a
+  hashrate rental drops a few PH/s on your pool for a weekend. You cannot measure
+  hardware you do not own yet, but you can calculate for it.
+- **Predictable load.** A difficulty set too low means a miner submitting many times more
+  often than intended — more shares to validate, store and retain, and more network work
+  for a device that would rather be hashing. The simulator projects the daily share volume
+  for your whole fleet before you commit to a target time.
+- **Sharper numbers.** A miner reporting twice a minute gives the 1-minute hashrate column
+  almost nothing to work with. Six or twelve times a minute makes it a figure you can
+  actually trust — and spot problems in.
+
+**Why the advice is worth following.** The arithmetic itself is standard proof-of-work
+probability; there is nothing exotic about it. What is specific to GoSlimStratum is the
+model behind the recommendations: how our VarDiff samples share times, how far it will move
+in a single step, the deadband it waits for before acting at all, and when it applies a
+change. The simulator mirrors every one of those, so what it tells you describes what
+*your pool* will actually do — not what a generic calculator assumes.
+
+A few practical notes:
+
+- The simulator is **read-only** — it never changes your configuration. It shows you the
+  fields and the values; you decide and type them in.
+- Suggestions are a **starting point**, not gospel. Nameplate hashrate isn't what a device
+  always delivers, and a week of watching your own pool beats any calculator.
+- Nothing about mining behaviour changed in this release. If you never open the page,
+  GoSlimStratum works exactly as it did in v5.2.3.
+
+Drop-in upgrade — no config changes, nothing to do.
 
 ---
 
