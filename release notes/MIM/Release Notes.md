@@ -1,6 +1,43 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.3
+
+**Consistent mining pool settings, whichever coin you install.** MIM ships a starter
+GoSlimStratum configuration with every crypto node, and over time those seven starter
+configs had drifted apart — a setting added for one coin often never made it to the others.
+Which pool settings you began with depended on which coin you happened to install first.
+
+They are now identical in structure. Same sections, same options, same order, for every coin.
+
+### Improved
+
+- **Two settings that were missing are now on by default.**
+  - **Accept miner suggested difficulty** was absent for Bitcoin, Bitcoin Cash and eCash,
+    which meant *off*. A miner that knows its own hashrate was ignored and had to be walked
+    to the right difficulty instead of simply starting there.
+  - **Flood protection** was absent for Bitcoin and Bitcoin Cash. It is what stops a powerful
+    miner swamping your pool in the first seconds after it connects, before the pool's normal
+    difficulty adjustment can catch up.
+- **Every coin now starts with the full set of options visible**, including block explorer
+  settings and coin alerts, rather than having to be added by hand later. Anything previously
+  left out was already running on a sensible default — the config now simply states it, so
+  you can see and change it.
+- **GSSM config files are now visible in MIM**, and its container runs on local time so the
+  timestamps in its logs match yours.
+
+### Good to know
+
+- **Existing installs are untouched.** These are the starter templates used when you install
+  a *new* node — nothing on a pool you are already running changes.
+- **Your coin-specific settings are unchanged.** Ports, wallet addresses, difficulty ranges,
+  block timing and payout intervals are all still tuned per coin. Only genuinely missing
+  options were filled in.
+- If you want to review these settings on a pool you already run, GoSlimStratum 5.2.5's new
+  **Diagnostics** page reports on all of them and says which are worth changing.
+
+---
+
 ## v3.3.2
 
 A small enhancement to the **Bitcoin Cash II (BCH2)** node. When you install BCH2, MIM now creates a wallet address for you and shows it in the installation output — so you no longer have to hop onto the server and run a command yourself to get one. This matches how every other crypto node (Bitcoin, Bitcoin Cash, BC2, DigiByte, Litecoin, eCash) already behaves.

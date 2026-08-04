@@ -1,6 +1,9 @@
     "DGB": {
       "enabled": true,
+      "enable_dtm": false,
+      "dtm_revenue_share_accepted": false,
       "coin_type": "digibyte",
+      "algorithm": "sha256d",
       "display_name": "DigiByte",
       "node": {
         "host": "127.0.0.1",
@@ -9,26 +12,27 @@
         "password": "{RPC_PASSWORD}",
         "use_ssl": false,
         "wallet_name": "default",
+        "wallet_passphrase": "",
         "zmq_block_notify": "tcp://127.0.0.1:28332",
         "template_refresh_interval": 15,
         "zmq_enabled": true,
         "zmq_stale_detection_time": 2000,
-        "dual_node_comm": true,
-        "wallet_passphrase": ""
+        "dual_node_comm": true
       },
       "stratum": {
         "host": "0.0.0.0",
         "port": 3333,
         "difficulty": 512,
-        "accept_miner_suggested_diff": true,
-        "probe_difficulty": 0,
-        "user_agent_difficulty_map": {},
         "connection_timeout_seconds": 600,
-        "ping_enabled": true,
-        "ping_interval_seconds": 30,
+        "consolidation_threshold_seconds": 3,
+        "disambiguation_enabled": false,
         "auto_worker_id": true,
         "default_worker_id": "",
-        "disambiguation_enabled": false
+        "ping_enabled": true,
+        "ping_interval_seconds": 30,
+        "accept_miner_suggested_diff": true,
+        "probe_difficulty": 0,
+        "user_agent_difficulty_map": {}
       },
       "mining": {
         "address": "{WALLET_ADDRESS}",
@@ -41,17 +45,17 @@
       },
       "vardiff": {
         "enabled": true,
-        "useFloatDiff": false,
-        "floatDiffBelowOne": true,
-        "floatDiffPrecision": 4,
         "minDiff": 512,
         "maxDiff": 32768,
         "targetTime": 15,
         "retargetTime": 600,
         "variancePercent": 30,
         "onNewBlock": true,
+        "useFloatDiff": false,
+        "floatDiffPrecision": 4,
+        "floatDiffBelowOne": true,
         "floodProtection": {
-          "enabled": false,
+          "enabled": true,
           "sharesToCheck": 4,
           "triggerThreshold": 0.25,
           "maxAdjustmentMultiplier": 16
@@ -62,9 +66,27 @@
         "pool_fee_percent": 1.0,
         "maturity_confirmations": 100,
         "payment_interval_seconds": 600,
-        "minimum_confirmations": 6,
         "maturity_check_interval_seconds": 60,
         "confirmation_check_interval_seconds": 300,
+        "minimum_confirmations": 6,
         "wallet_rpc_timeout_seconds": 30
+      },
+      "explorer": {
+        "use_rest_api": true,
+        "use_alternate_host": false
+      },
+      "alerts": {
+        "enabled_coin_alerts": false,
+        "best_share_minimum_value": 0,
+        "notable_share_minimum_value": 0,
+        "notable_share_max_alert_rate": 0,
+        "share_rejection_threshold_count": 0,
+        "share_rejection_window_minutes": 10,
+        "share_rejection_max_alert_rate": 0,
+        "network_difficulty": {
+          "enabled": false,
+          "below_threshold": 0,
+          "above_threshold": 0
+        }
       }
     }

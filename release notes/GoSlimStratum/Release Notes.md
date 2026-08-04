@@ -1,5 +1,184 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.4
+## v5.x Series through v5.2.5
+
+---
+
+## v5.2.5 — Diagnostics: "Is It GSS, Or Is It My Node?"
+
+The most common support message we get is *"GSS is broken."* It almost never is &mdash;
+usually the node is slow, or ZMQ is off, or a setting quietly cancels out another one. This
+release adds a page that can tell the difference, and says so in plain words.
+
+Open **Global Configuration**, find your coin in the **Configured Coins** table, and click the
+**pulse icon** in its Actions column (next to the new gear icon, which replaces the old
+"Configure →" link). Press **Run Diagnostics** and you get **one table** &mdash; your node, your database and the
+pool itself, one line per measurement, each marked good, marginal or bad:
+
+| Group | Component | Measurement | Result | Endpoint |
+|---|---|---|---|---|
+| Node | RPC | Get Block Template | 3ms | 192.168.7.149:14022 |
+| Node | ZMQ | ZMQ Last Received | 2s ago | tcp://192.168.7.149:28332 |
+| Database | SQL | DB Query | 1ms | 192.168.7.138:5432 |
+| GSS | DTM | Total Job Queue | 25 | |
+| GSS | Routines | SV1 Miners | 24 | |
+| GSS | Stratum | SV1 Port | 3333 | |
+
+Each result is **green when it is fine, amber when it is worth a look, red when it needs
+attention** &mdash; so the whole table is one glance. Anything amber or red is explained
+underneath by name. Everything else stays a single line, so the page can be scanned rather
+than read.
+
+Note the ZMQ row carries **your ZMQ address**, not your RPC one &mdash; different port, and
+often a different machine. A ZMQ feed pointed at the wrong node is invisible everywhere else
+in GSS.
+
+### 🩺 It can tell your node apart from your pool
+
+The clever part is how simple it is. Diagnostics asks your node three questions back to
+back &mdash; one that takes it almost no effort, one slightly harder, and one that makes it
+build a full block template. Because all three travel the same path, comparing them cancels
+out everything the network adds:
+
+- **The easy question is slow too?** Then it is the connection or the machine your node runs
+  on &mdash; not the chain, and not GSS. Nothing else on the page can be trusted until that
+  is fixed, and the page says so rather than burying you in numbers.
+- **Easy questions fast, template slow?** Then it is your node's template building
+  specifically &mdash; a big mempool, a slow disk, or a block it is busy checking.
+- **Everything answers except the template?** That one has always been invisible. Your node
+  reads as perfectly "online" everywhere else in GSS while miners get nothing new to work
+  on. It now has its own line.
+
+### 🧭 Mining the chain you think you are
+
+Three checks come straight from your node's own account of itself:
+
+- **Are you on the network you configured?** If your coin is set to mainnet and the node is
+  actually on testnet or regtest &mdash; or the other way round &mdash; everything downstream
+  belongs to the node's chain, not the one your config names. Both look perfectly normal on
+  the dashboard. This is the one check on the page that can save you a very bad afternoon.
+- **Is your node actually caught up?** Not from the "verification progress" figure, which
+  reads 0.99999997 on a perfectly synced node and never quite reaches 100%, but from the gap
+  between the blocks it has validated and the headers it knows about. A node quietly behind
+  the tip builds work on a stale block, and anything you find on it is orphaned.
+- **Is the node trying to tell you something?** Bitcoin-family nodes carry a warnings field
+  &mdash; unknown consensus rules activating, unrecognised block versions &mdash; that nothing
+  in GSS has ever shown you. On a mining pool that is worth reading.
+
+### 🔍 Settings that cancel each other out
+
+Two configurations look completely reasonable and do precisely nothing:
+
+- **A grace period that can never apply.** If your stale share grace period is longer than
+  your job expiration time, the extra is wasted &mdash; by the time the grace would help, the
+  job is already gone and the share is refused for a different reason entirely. You think you
+  configured forgiveness; you configured nothing.
+- **A keep-alive that can never fire.** If the ping interval is longer than the connection
+  timeout, the keep-alive is switched on but the timeout always wins first. On, and inert.
+
+### 📏 Settings sized wrong for your coin, or for your mode
+
+These are not broken, just wrong for your particular setup &mdash; which is exactly the kind
+of thing you would never go looking for:
+
+- **A job history sized for the wrong mode.** The setting means two different things. In
+  **pool mode** there is one shared queue, so depth is nearly free &mdash; sitting below the
+  default of 20 costs you late shares for no saving. In **DTM** every miner gets its own
+  queue, so the same 20 becomes 20 &times; your miner count, and the page suggests coming down
+  to 5. It shows the actual entry count, so the number is not abstract.
+- **A stale grace period pulling the wrong way.** Too long and it forgives practically every
+  stale share, so the setting stops protecting anything and miners are credited for work that
+  cannot find a block &mdash; the page shows the actual percentage being forgiven at your
+  setting, worked out from your coin's block interval. Too short (under 5 seconds) and a share
+  that was simply in flight when a block landed gets rejected, putting an error on the miner's
+  screen it had no way to avoid.
+- **Difficulty changes held for a block that never comes.** Whether VarDiff waits for the next
+  block before changing difficulty is right or wrong depending on how long your blocks take
+  &mdash; on a ten-minute chain a miner can sit at the wrong difficulty for most of a block,
+  while on a fifteen-second chain the next block is already here. The page knows your coin's
+  block time and says which way round yours should be.
+- **A keep-alive that is off, or slower than it needs to be.** With the ping keep-alive
+  disabled, a miner that has gone away keeps its slot until the connection timeout expires
+  &mdash; and keeps showing on your dashboard. The same goes for a connection timeout set well
+  past the default: miners without ping support linger for that whole window.
+- **VarDiff switched off**, so every miner sits at your fixed starting difficulty &mdash; on a
+  mixed fleet, wrong for all of them at once. The page links to the VarDiff Simulator for this
+  coin, which works out what to set.
+- **Flood protection off**, which is what stops a powerful miner swamping the pool in the
+  seconds after it connects, before an ordinary retarget can catch up.
+- **A miner asking for a difficulty and being ignored.** With suggested difficulty turned off,
+  a device that knows its own hashrate starts wherever the pool puts it instead. Requests stay
+  clamped to your bounds either way, so there is little reason to refuse them.
+
+It also flags a poll interval too coarse for your coin's block time, a ZMQ feed that has gone
+quiet, a slow database round trip, and &mdash; if it applies &mdash; that you are currently
+running on your **backup node**, which explains a lot of otherwise baffling behaviour.
+
+### 🧵 Goroutine counts, so a leak has somewhere to show up
+
+Three more lines: how many internal routines GSS is running for your **SV1 miners**, for your
+**SV2 miners**, and across the whole process. In normal running each connected miner accounts
+for two, so the numbers should track your miner count and come back down when miners leave.
+
+If a count keeps climbing while your miner count does not, something is not letting go. The
+page flags that and tells you to re-run in a minute &mdash; a number that stays high is a real
+leak, one that settles was just miners disconnecting. The per-protocol counts are measured
+directly rather than estimated, so they stay honest.
+
+### 🤐 And it tells you what it cannot know
+
+Every diagnostics tool is tempted to show a wall of green ticks. This one lists its own
+blind spots on the page:
+
+- It **cannot** tell you whether your stratum ports are reachable from the internet. It can
+  only see that it is listening. Ports are listed as *configured and listening* &mdash;
+  never as a tick that implies more.
+- It **cannot** measure your miners' own latency. A pool cannot ping a miner.
+- If you have not pressed the button, it says the node was not checked rather than showing
+  you a clean-looking page.
+
+A check that always passes is worse than no check, so the ones that would always pass were
+left out.
+
+### 🖱️ Runs once, only when you ask
+
+The page never refreshes on its own. Building a block template is real work for your node,
+so it happens on a button press and nowhere else &mdash; never on a timer. There is also a
+**Run Diagnostics** shortcut on the *Node Offline* and *Node Failover* banners &mdash; they
+only appear when something is actually wrong, which is exactly when you want it.
+
+Nothing on this page changes your configuration.
+
+### 🔧 Also fixed: cloning a coin that uses Stratum V2
+
+Cloning a coin gave the copy a new V1 stratum port but left its **V2 listener ports
+unchanged** &mdash; so the clone quietly claimed ports that were already taken. The clone
+reported success and the problem only appeared later, when the configuration refused to load.
+
+The clone dialog now asks for a new port for each V2 listener, pre-filled with a free one,
+and checks every port you enter against every port already in use &mdash; V1 and V2 together,
+which is how GSS has always enforced it internally. Coins without V2 listeners are unaffected
+and the dialog looks exactly as it did.
+
+### 🧹 Also in this release: the `miner_accounts` table is gone
+
+GoSlimStratum has been writing to a database table called `miner_accounts` on every miner
+connection and every matured block — and **nothing has ever read it**. Not a page, not an
+endpoint, not the payout system. It was noticed twice over the years and half-cleaned up
+both times; this release finishes the job.
+
+It also had a quiet flaw: miners that connect **without a `.worker` suffix** were recorded
+under their connection ID rather than a worker name, so every reconnect created another
+row. On busy pools it grew without limit, and it was skipped by the normal retention
+cleanup. If you've been pruning it by hand, you can stop.
+
+### ⬆️ What happens when you upgrade
+
+The database moves to **schema v19** automatically on first startup, and the table is
+dropped. Nothing else in the schema changes.
+
+**No action is needed.** Nothing reads the table, so nothing loses a number — the block
+counts on your dashboard come from a different table and are unaffected. The drop is
+permanent, so if you're curious about the rows, `pg_dump` them before you upgrade.
 
 ---
 
