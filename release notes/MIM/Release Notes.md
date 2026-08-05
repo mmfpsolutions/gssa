@@ -1,6 +1,51 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.4
+
+**Set your timezone from MIM.** Your MMFP products read the clock — GSS Miners schedules,
+GoSlimStratum alert windows, the timestamps in every log. Which clock they read comes from a
+single timezone setting on each container, and until now that setting was only written when
+you installed something new, always as US Eastern. If you installed before that default
+existed, your products have quietly been running on UTC. If you're not in Eastern, they've
+been running on the wrong time.
+
+The Products page now has a **Set Timezone** button that fixes both, for every affected
+product on a server, in one go.
+
+### What's new
+
+- **Set Timezone.** Pick your timezone from the full worldwide list and apply. MIM updates
+  GoSlimStratum, GSS Miners, GoSlimStratum User Client and MIM itself — whichever of them are
+  installed on that server. Nothing else on the server is touched.
+- **Every product now shows the timezone it's running on**, on its own line in the products
+  list. If a product has none set, it says **Not Set** — that product is running on UTC, and
+  it's the one to fix.
+- **MIM keeps its own logs on your local time.** Log timestamps and log filenames now follow
+  the timezone you set, including daylight saving changes.
+
+### Fixed
+
+- **Bitcoin Knots pools started with the wrong difficulty setting.** New Bitcoin Knots
+  installs held difficulty changes until the next block, which on a ten-minute chain can
+  leave a miner at the wrong difficulty for most of that block. New installs now adjust
+  straight away, matching Bitcoin Cash. Pools you already run are unchanged — if you'd like
+  to check yours, GoSlimStratum's Diagnostics page reports on this setting directly.
+
+### Good to know
+
+- **Your products keep running.** MIM writes the new timezone but deliberately does *not*
+  restart anything — you choose when to take the downtime. MIM tells you which products need
+  a restart to pick the change up, and until you do, they carry on with the old timezone.
+- **Nothing else in your setup changes.** Only the timezone line is edited; the rest of your
+  configuration, including your own services running alongside, is left exactly as it is.
+- **A quick sanity check after applying:** if a product still shows the old zone, it simply
+  hasn't been restarted yet.
+- GoSlimStratum picks up its side of this in its next release; you can set the value from MIM
+  today either way.
+
+---
+
 ## v3.3.3
 
 **Consistent mining pool settings, whichever coin you install.** MIM ships a starter

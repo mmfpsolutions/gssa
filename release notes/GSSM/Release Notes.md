@@ -1,6 +1,29 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.7
+
+A small hardening release for the **schedule timezone** introduced in 3.0.6 — making sure the zone you set is the zone you actually get, and that GSSM tells you plainly when it isn't.
+
+> **No operator action required on upgrade.** If your schedules are already running at the right times, nothing changes.
+
+### Improvements
+
+- **Timezones now work even on a stripped-down host.** GSSM carries its own copy of the world timezone database, used only as a backup when the system it's running on doesn't provide one. Previously, if the zone data was missing, setting `TZ=America/Toronto` would silently fall back to **UTC** — your schedule would run flawlessly, just at the wrong hour, with nothing to indicate why. Your system's own timezone data is still preferred when present, so daylight-saving updates from your OS continue to apply as normal.
+
+  > **Who this affects:** mainly anyone running GSSM outside the official Docker image, which already includes timezone data. It removes the possibility of the problem entirely rather than depending on the image to prevent it.
+
+### Bug Fixes
+
+- **A timezone that can't be loaded now says so, instead of looking correct.** If GSSM couldn't load the zone you asked for, the Schedule page would still display it back to you — `America/Toronto (UTC+00:00)` — which reads as properly configured while the schedule actually runs on UTC. That was the one thing the timezone display exists to catch, so it was precisely the wrong moment to be reassuring. The page now shows the zone GSSM **really** resolved, and distinguishes two different situations that both end up on UTC:
+
+  - **No `TZ` set** — an amber note telling you to set one.
+  - **`TZ` set but not loadable** — a red warning naming the value you asked for, so you can check the spelling against the IANA zone list (e.g. `America/Toronto`) or, if it's correct, look at the container's timezone data.
+
+  > **Who this affects:** in practice, only installs without system timezone data — the official Docker image was never at risk. With the improvement above, this warning should now only appear for a genuinely mistyped zone name.
+
+---
+
 ## v3.0.6
 
 A feature release for **controlling** your miners, not just watching them: put a device into **standby** with one click, or set up a **schedule** that holds it in a chosen state by time of day — run overnight, idle on weekends, drop to a quieter work mode while you're asleep. Plus a fix, for everyone, that stops a deliberately-idled miner from firing false alarms.
