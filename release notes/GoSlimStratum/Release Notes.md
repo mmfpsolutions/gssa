@@ -1,5 +1,87 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.5
+## v5.x Series through v5.2.6
+
+---
+
+## v5.2.6 — Merged Mining Survives a Reboot
+
+**If you run merged mining, this release matters.** A bug going back to v4.1.0 meant merged
+mining could quietly stop working after a server restart &mdash; and nothing told you.
+
+### 🔁 The reboot problem
+
+Reboot the machine, run `docker compose up -d`, and everything starts at once. GoSlimStratum
+usually wins that race: it is up and asking questions before your coin node has finished warming
+up. That is normal, and GSS has always recovered from it &mdash; your pool comes online a few
+minutes later on its own.
+
+What did **not** recover was merged mining. The parent chain came back and mined perfectly well
+on its own, but the aux chain was quietly dropped. No warning, no error you would recognise
+&mdash; the only clue was a single line at startup blaming a setting that was, in fact,
+correctly configured. Merged mining stayed off until GoSlimStratum itself was restarted, and
+restarting just the coin pool did not bring it back.
+
+**Now it recovers automatically.** When your node comes online, merged mining is re-established
+*before* the pool starts taking miners &mdash; the right order, so miners get merged work from
+their very first job. And the startup message tells the truth:
+
+> Merged mining with DOGE deferred &mdash; node not yet online; will be established
+> automatically when it connects
+
+### 🔧 Restarting a coin pool no longer drops merged mining
+
+The same problem in a smaller form: stopping and starting a single coin pool from the UI also
+dropped merged mining, on a pool that was working perfectly. Everything still *looked* right
+&mdash; the pool reported itself as a merged parent &mdash; while no aux work was being done at
+all. Fixed, and a plain stop/start now re-establishes it cleanly.
+
+### 🚨 The dashboard tells you when merged mining is not running
+
+Your coin dashboard has always had a merged mining warning banner, but it only ever checked your
+**configuration file**. If your settings were correct &mdash; and in every case above they were
+&mdash; it stayed quiet while merged mining was dead.
+
+It now also checks what is actually **running**, and appears on its own within about half a
+minute. No page refresh needed.
+
+| What is wrong | What you will see |
+|---|---|
+| Configured but not running | *Merged mining with DOGE is configured but not active on the running pool. Restart the DGB coin pool to activate it.* |
+| Aux coin reloaded underneath it | *Merged mining is bound to a previous instance of DOGE and is using its old configuration.* |
+| Aux node not answering | *The DOGE node has not responded for 2m25s &mdash; merged mining is running on a stale aux template and any aux blocks found will be rejected.* |
+
+That last one is worth dwelling on. When your aux node goes down, GoSlimStratum keeps the last
+block template it received &mdash; deliberately, so a brief hiccup does not interrupt mining. But
+if the node stays down, your pool goes on stamping aux proofs onto a block that no longer exists.
+Everything looks healthy: the M badge stays lit, aux job counts look normal. **Any aux block
+found in that state is rejected.** Nothing outside the log file ever told you. Now the dashboard
+does, with a live count of how long the node has been quiet, and it clears itself the moment the
+node answers again.
+
+The banner also stops crying wolf. It used to say "Merged Mining **Misconfigured**" for every
+problem &mdash; which was simply wrong when your config was perfect and the pool just needed a
+restart. Those now read "Merged Mining **Not Active**".
+
+Note that we check whether your aux node is **answering**, not whether new blocks are arriving.
+Block times vary enormously in normal operation &mdash; a chain can easily run far past its
+published target between blocks &mdash; so judging health by block arrivals would mean constant
+false alarms on a perfectly healthy node.
+
+### 🕐 Timezones now work in Docker
+
+Setting `TZ=America/New_York` in your `docker-compose.yml` had no effect: the container had no
+timezone database, so GoSlimStratum silently fell back to UTC and every timestamp on screen was
+hours off, with nothing to indicate why. The timezone database is now built into GoSlimStratum
+itself, so `TZ=` works with no changes to your setup.
+
+### Upgrading
+
+Nothing to do. No configuration changes, no database changes.
+
+One tip if you are setting up merged mining through the UI: after editing a coin, use
+stop &rarr; unload &rarr; start, and **finish with the parent coin**. Reloading the aux coin
+while the parent keeps running leaves the parent using the aux coin's *old* settings. That used
+to be invisible &mdash; now the dashboard tells you, and restarting the parent fixes it.
 
 ---
 

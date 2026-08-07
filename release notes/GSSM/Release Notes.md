@@ -1,6 +1,57 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.8
+
+**Triggers** — have GSSM act on its own when something happens. Idle a miner that gets too hot, or reboot one every Sunday. Where a schedule keeps a device in a chosen state at chosen hours, a trigger handles the things you cannot put in a calendar.
+
+> **No operator action required on upgrade.** Nothing acts on your miners unless you create a rule.
+
+### New Features
+
+- **Triggers — two kinds of rule, per miner** *(Pro/Enterprise)* — Open a miner's **Details** page and click the new **⚡ Triggers** badge. Pick the kind, and everything else follows:
+
+  - **Protective** — *"Hottest chip above 97 °C for 3 minutes."* The miner is idled, and everything else stands down: its schedule and its other rules, until you release it. Something went wrong enough to stop the device, so it stays stopped until you have looked.
+  - **Routine** — *"Sunday 03:00."* The miner restarts. Nothing else changes.
+
+  There is no action to choose — each kind does one thing. GSSM works out how *your* device idles (standby on an Avalon Q, sleep mode on an ElphaPex), so the same rule reads correctly on both.
+
+  > **Who this affects:** the Triggers badge appears on almost every miner GSSM supports, because nearly all of them can restart. **Protective** rules need somewhere to put the miner — a standby or sleep state — which today means an Avalon Q or an ElphaPex. The page tells you when your device cannot take one, rather than quietly leaving the option out.
+
+- **Know when a rule acts.** A new **Trigger Fired** switch under *Notifications → Events → Miner Events* messages you whenever a rule does something — naming the miner, the rule, what set it off, and what was done — through the channels your miner alerts already use. Protective rules alert at critical severity; routine ones as information.
+
+### Improvements
+
+- **Every reading shows what the miner is doing right now, right in the list you pick it from** — *"Hottest chip temperature — now 96 °C"*. Setting a threshold without knowing what the device normally reports is guesswork, and this particular guess power-cycles hardware. It is the same reading GSSM compares your rule against, so what you see is what the rule sees.
+
+- **Readings your miner does not report cannot be picked.** Not every device measures everything — a Bitaxe has no per-chip temperature. Those appear greyed out and marked *"not reported by this device"*, so you cannot build a rule that would quietly never fire. If you already have one, the page says so plainly.
+
+- **A rule waits in minutes, not in "checks".** You set how long a temperature must stay high before the rule acts, and that means the same thing no matter how often GSSM polls your miners. The editor also tells you how fast a rule can actually react on your setup — and if that is slow, it points at the *Miner Check Interval* under Notifications → Polling, which is the setting that governs it.
+
+- **A restart is skipped if the miner is already idle.** Restarting a sleeping device brings it back in whatever state its firmware defaults to — which would quietly undo a schedule that put it to sleep, or a protective hold. GSSM skips it and tells you, rather than doing it silently.
+
+- **Holds — and a ⚡ Held badge, so a paused schedule always explains itself.** When a protective rule idles a miner, your schedule would otherwise wake it at the next window and undo the protection. Instead the miner is *held*, and the dashboard marks it. The Triggers page shows which rule did it, why, and when, with a **Release hold** button.
+
+  > **Releasing is deliberately manual.** A device cools down *because* it is idle, so releasing automatically would let it warm straight back up and trip again. The hold also survives restarting GSSM — whatever caused it probably did too.
+
+- **Reset firing history** — one button that clears cooldowns, the 24-hour fire counts, and any parked rules for a miner. The button you want after experimenting. It does not release an active hold.
+
+- **The Triggers page shows GSSM's clock**, exactly as the Schedules page does, and warns you if the timezone is not set. A rule that fires at a time of day uses the app's time — so a "Sunday 03:00" reboot on a container with no timezone would quietly run at 3 AM UTC, and nothing would look wrong.
+
+- **Temperature values for triggers are separate from your card thresholds**, on purpose. Adjusting what turns a card amber should never change the point at which a miner shuts itself down.
+
+- **A new Help section** covering triggers vs schedules, the two kinds of rule, the guards, and holds.
+
+### Good to know
+
+- **Why so few choices?** Rules like *"hashrate below X → restart"* sound useful and are quietly dangerous: a miner that is booting, waking from sleep, or deliberately idle reports almost nothing, so the rule fires on perfectly healthy hardware. Every reading a trigger can watch is one that reads *low* when a device is not running, and rules only fire on a value going **above** yours — which makes that whole class of mistake impossible rather than merely unlikely. GSSM still **alerts** you about low hashrate; it just will not act on it.
+- **Guards on every rule.** It fires on the change rather than every minute the condition holds; the temperature must stay high for the time you set; it re-arms only once things return to normal; and a rule that fires five times in 24 hours is parked and you are told.
+- **Disabled and offline miners never fire triggers.** An unreachable device cannot act on a command it will not receive.
+- **Set up triggers for a device on one GSSM instance only.** Two instances will each fire their own rules — restarting a miner twice, or arguing over whether it should be idle. GSSM reminds you when you switch triggers on.
+- **Rules are checked on the same cycle GSSM already polls your miners**, so nothing new is asked of your devices.
+
+---
+
 ## v3.0.7
 
 A small hardening release for the **schedule timezone** introduced in 3.0.6 — making sure the zone you set is the zone you actually get, and that GSSM tells you plainly when it isn't.
