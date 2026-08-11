@@ -1,6 +1,9 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.5
+**Bitcoin Knots** Quick template change to remove the consensusrules=rdts since BIP110/RDTS failed to activate on the blockchain.
+
 ## v3.3.4
 
 **Set your timezone from MIM.** Your MMFP products read the clock — GSS Miners schedules,
