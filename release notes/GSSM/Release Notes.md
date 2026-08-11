@@ -1,6 +1,30 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.10
+
+**Spot a miner that's fallen back to its backup pool, at a glance.** Its coin badge now carries an amber ring — on the dashboard cards, in the list view, and on the miner's detail page.
+
+> **No operator action required on upgrade.**
+
+### New Features
+
+- **Failover ring on the coin badge.** When a miner is mining on its backup pool rather than its primary, the coin icon is ringed in amber. Hover or long-press it and the tooltip says so.
+
+  Amber rather than red on purpose — running on backup is *degraded*, not broken. Your miner is still working, it's just not where you pointed it.
+
+### Good to know
+
+- **Miners with no ring are on their primary pool**, which is the normal case — there's no badge to learn, just an absence.
+- **The ring often stays on, and that's the miner, not the display.** Most miners pick a pool at connect time and then stay there — nothing re-checks once the connection is healthy. So a device that failed over during a brief pool outage will happily sit on its backup for days after the primary is fine again. **Restarting it is what makes it retry the primary.** That's your call to make; GSSM won't do it behind your back, because if the primary is genuinely still down a restart just lands you back on the backup.
+
+- **Dual-pool miners never show the ring.** On a NerdQAxe++ mining two coins at once, both pools are intentional, so "backup" doesn't mean anything there.
+
+- **NerdMiner devices can't report this.** Their firmware only ever exposes a single pool, so there's no primary-versus-backup for GSSM to compare — those miners never show a ring, whatever they're connected to. Nothing to fix on our side; the information simply isn't there.
+- **It costs no space.** The ring is drawn outside the badge, so nothing shifts and no column gets wider — which is exactly why it lives on the coin icon rather than becoming a fourth automation badge.
+
+---
+
 ## v3.0.9
 
 **See what's running your miners, from the dashboard.** Three small badges now sit beside each miner's coin icon showing which GSSM automations are driving it — no more opening a miner's details and digging through sub-pages to remember what you set up.
