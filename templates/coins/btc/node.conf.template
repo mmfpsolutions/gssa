@@ -66,5 +66,5 @@ blockmintxfee=0.00001000
 # Additional spam protection
 dustrelayfee=0.00003000
 
-# New consensus rule 05/08/2026
-consensusrules=rdts
+# New consensus rule 05/08/2026 - Commented out 8/11/2026 - BIP110 failed to activate   
+#consensusrules=rdts
