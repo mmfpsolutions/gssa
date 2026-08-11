@@ -1,6 +1,46 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.9
+
+**See what's running your miners, from the dashboard.** Three small badges now sit beside each miner's coin icon showing which GSSM automations are driving it — no more opening a miner's details and digging through sub-pages to remember what you set up.
+
+> **No operator action required on upgrade.** Nothing changes about how your miners behave; this only makes what you already configured visible.
+
+### New Features
+
+- **Automation badges on every miner view** — gallery cards, list rows, and the miner detail page:
+
+  - A purple **clock** — a schedule is holding this device to a state by time of day.
+  - An amber **bolt** — at least one trigger rule is armed.
+  - A blue **snowflake** — automatic fan control is running.
+
+  Hover or long-press any badge for what it means.
+
+### Improvements
+
+- **A badge only appears when something can actually happen.** A schedule that's switched on but has no windows, or triggers with every rule disabled, won't show one — those settings don't drive anything, and a badge for them would tell you a device is being managed when it isn't.
+
+- **A held miner shows only the ⚡ Held badge.** When a protective trigger has idled a device, that's the one thing worth your attention, so the automation badges step aside rather than crowd it.
+
+- **Disabled miners show no badges.** Automations don't run on a disabled device, so claiming otherwise would be misleading.
+
+- **Offline miners keep theirs.** Knowing a device has a schedule is *more* useful when it isn't responding, not less.
+
+- **The Standby badge moved next to the miner name**, so it no longer sits right beside the purple Schedule badge where the two could blur together.
+
+### Bug Fixes
+
+- **Miner cards fit properly on a phone now.** The card header — status, name, badges, coin, and the stats when collapsed — has been overflowing the screen even with short miner names. It now breaks into tidy rows: the **V1/V2 badge and name on the first line**, everything else on the second, with the action buttons alongside. Every card breaks in the same place regardless of name length, so the list reads evenly instead of each card wrapping differently.
+
+- **Long miner names no longer run off the card.** They wrap to a second line instead of disappearing past the edge or colliding with the action buttons.
+
+- **The list view no longer clips automation badges.** The coin column was a fixed width sized for a single coin icon, so a miner with two pools and all three automations had its badges cut off. The column now sizes itself to what's actually there — and it's fixed at every screen width, not just wide desktops.
+
+- **Badges on the miner detail page are properly aligned** with the coin icon beside them, rather than sitting slightly low.
+
+---
+
 ## v3.0.8
 
 **Triggers** — have GSSM act on its own when something happens. Idle a miner that gets too hot, or reboot one every Sunday. Where a schedule keeps a device in a chosen state at chosen hours, a trigger handles the things you cannot put in a calendar.
