@@ -1,0 +1,49 @@
+# Bitcoin Core Node Configuration
+server=1
+# Turn off listener, not needed for outbound only
+listen=0
+# Enabled REST API - faster for GSS Block Explorer
+rest=1
+# Network - Bitcoin P2P port left at the client default (8333).
+# Set `port=` here if you need to move it.
+
+# RPC Configuration
+rpcauth={RPC_AUTH_STRING}
+rpcport=9009
+rpcworkqueue=64
+rpcthreads=16
+rpcallowip=127.0.0.1
+rpcbind=127.0.0.1
+
+# Blockchain storage
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+maxmempool=1000
+
+#Disable Tor, needless on a mining node, actually hurts Performance
+listenonion=0
+i2psam=
+
+# Wallet settings
+keypool=100
+wallet=default
+walletbroadcast=1
+
+# ZMQ notifications
+zmqpubhashblock=tcp://0.0.0.0:28344
+
+# Connection limits
+maxuploadtarget=500
+maxreceivebuffer=5000
+maxsendbuffer=1000
+#maxconnections=32 #Set this to limit the number of connections
+
+
+# Whitelist trusted connections
+whitelist=127.0.0.1
+
+# Data Carrier settings
+datacarrier=0
+datacarriersize=83

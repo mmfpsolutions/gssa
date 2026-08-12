@@ -1,8 +1,45 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.6
+
+**Bitcoin Core is now a product you can install.** Bitcoin has two node clients in common
+use, and until now MIM only offered one of them — Bitcoin Knots. Earlier this month a
+consensus change Knots was expecting didn't activate, and anyone running it had to be moved
+back to an older build. That's a bad position to be in with only one option, so **Bitcoin Core
+31.1** now sits alongside Knots in the Crypto Nodes list.
+
+Same chain, same mining, different node software. Pick whichever you prefer.
+
+### What's new
+
+- **Bitcoin Core Node.** Installs exactly like every other node: choose full or pruned,
+  set an RPC username and password, and MIM builds the node, creates its wallet, shows you the
+  address, and wires it into GoSlimStratum as a ready-to-mine pool.
+- **You can run Core and Knots at the same time.** They use separate data folders, separate
+  ports and appear as two separate pools, so you can bring Core up and let it sync while Knots
+  keeps mining, then switch your miners over when you're ready.
+
+### Good to know
+
+- **Point your miners at port 3336 for Bitcoin Core.** Knots stays on 3335. If you run both,
+  they're genuinely separate pools — a miner connects to one or the other.
+- **Bitcoin Knots isn't going anywhere.** It's still in the catalog, still installable, still
+  supported. This is a second option, not a replacement.
+- **A full Bitcoin node needs a lot of disk and a long first sync.** MIM defaults to a pruned
+  node for that reason; choose Full at install time if you have the space and want the
+  complete chain.
+- **Migrating from Knots?** Install Core and let it finish syncing first, then uninstall
+  Knots. Uninstalling a node removes its data folder, so don't remove the one you're relying
+  on until the new one is caught up.
+
+---
+
 ## v3.3.5
+
 **Bitcoin Knots** Quick template change to remove the consensusrules=rdts since BIP110/RDTS failed to activate on the blockchain.
+
+---
 
 ## v3.3.4
 

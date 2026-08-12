@@ -356,10 +356,11 @@ collect_config() {
   echo ""
   echo -e "    1) DigiByte  (DGB)"
   echo -e "    2) Bitcoin Cash (BCH)"
-  echo -e "    3) Bitcoin   (BTC)"
+  echo -e "    3) Bitcoin - Knots (BTC)"
+  echo -e "    4) Bitcoin - Core  (BTC)"
   echo ""
   local coin_choice
-  coin_choice=$(prompt_value "Select [1-3]" "1")
+  coin_choice=$(prompt_value "Select [1-4]" "1")
 
   case "$coin_choice" in
     1)
@@ -386,8 +387,18 @@ collect_config() {
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
       WALLET_ADDR_TYPE="bech32m"
       ;;
+    4)
+      # Bitcoin Core — same chain as option 3, different node client. Ports are
+      # deliberately distinct from Knots so the two can coexist on one host.
+      COIN_ID="btc-core";  COIN_ID_UPPER="BTC-CORE";  COIN_NAME="Bitcoin Core"
+      COIN_TYPE="bitcoin";  COIN_NODE_TYPE="btc-core";  COIN_NODE_ID="btc-core1"
+      CONTAINER_NAME="btc-core";  DATA_SUBDIR="btc-core";  DEFAULT_RPC_USER="bitcoinrpc"
+      RPC_PORT=9009;  ZMQ_PORT=28344;  STRATUM_PORT=3336
+      NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      WALLET_ADDR_TYPE="bech32m"
+      ;;
     *)
-      error "Invalid selection. Please enter 1, 2, or 3."
+      error "Invalid selection. Please enter 1, 2, 3, or 4."
       exit 1
       ;;
   esac

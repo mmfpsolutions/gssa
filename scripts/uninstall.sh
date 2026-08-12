@@ -95,7 +95,7 @@ if [[ -f "$COMPOSE_FILE" ]]; then
   fi
 else
   # Try to stop containers by name if compose file is missing
-  local_containers=(dgb bch btc goslimstratum postgres mim gssm dozzle watchtower)
+  local_containers=(dgb bch btc btc-core goslimstratum postgres mim gssm dozzle watchtower)
   running=false
   for c in "${local_containers[@]}"; do
     if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^${c}$"; then
@@ -130,7 +130,7 @@ if [[ -d "$DATA_DIR" ]]; then
   echo ""
 
   # Show wallet addresses if available
-  for coin_dir in dgb bch btc; do
+  for coin_dir in dgb bch btc btc-core; do
     for wallet_file in "${DATA_DIR}/${coin_dir}/"*_wallet.txt; do
       if [[ -f "$wallet_file" ]]; then
         wallet_addr=$(cat "$wallet_file" 2>/dev/null || echo "unknown")
@@ -140,7 +140,7 @@ if [[ -d "$DATA_DIR" ]]; then
     done
   done
   # Show warning if any wallet was found
-  if ls "${DATA_DIR}"/dgb/*_wallet.txt "${DATA_DIR}"/bch/*_wallet.txt "${DATA_DIR}"/btc/*_wallet.txt 2>/dev/null | grep -q .; then
+  if ls "${DATA_DIR}"/dgb/*_wallet.txt "${DATA_DIR}"/bch/*_wallet.txt "${DATA_DIR}"/btc/*_wallet.txt "${DATA_DIR}"/btc-core/*_wallet.txt 2>/dev/null | grep -q .; then
     echo -e "    ${RED}Make sure you have backed up any funds before proceeding!${NC}"
     echo ""
   fi
