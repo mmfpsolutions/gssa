@@ -45,5 +45,5 @@ maxsendbuffer=1000
 whitelist=127.0.0.1
 
 # Data Carrier settings
-datacarrier=0
+datacarrier=1
 datacarriersize=83
