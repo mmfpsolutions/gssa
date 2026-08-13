@@ -1,6 +1,36 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.11
+
+**What is this costing me to run?** Enter your electricity rate and the Fleet page shows an estimated running cost — for the whole fleet, and broken down per miner.
+
+> **No operator action required on upgrade.** Nothing appears until you enter a rate.
+
+### New Features
+
+- **Electricity cost estimate on the Fleet page.** Set your cost per kWh under *Configuration → App Settings*, pick your currency, and the **Total Power** card gains an estimated cost per day, month and year. Free on every licence.
+
+- **Per-miner breakdown.** A new **Estimated Cost by Miner** card lists every device sorted dearest first, with its power draw and daily and monthly cost — so "what's costing me the most?" is answered at a glance rather than worked out.
+
+### Good to know
+
+- **It's an estimate at what your miners are drawing right now**, not a bill. Multiply-out from the current moment: a fleet idling overnight on a schedule will project low, and a busy one high. Handy for a sense of scale, not for reconciling against your utility statement — real bills carry tiered rates, delivery charges and taxes that GSSM knows nothing about.
+
+- **Some miners can't report their power draw.** NerdMiner devices don't expose it at all. Those appear in the table as *"not reported"* rather than being quietly dropped, and when any are present the fleet figure says so plainly — the real cost is **higher** than shown.
+
+- **Idle, offline and disabled miners say why** they show no cost, instead of a misleading $0.00.
+
+- **Currency is a label, not a conversion.** GSSM doesn't fetch exchange rates or convert anything; it just puts the right symbol next to your own number.
+
+- **Leave the rate blank and nothing appears at all** — no empty card, no nag.
+
+### Bug Fixes
+
+- **Some configuration settings could silently fail to save.** The config page would report success while certain newer settings never actually reached disk. Fixed, with a guard so it can't happen to future settings either.
+
+---
+
 ## v3.0.10
 
 **Spot a miner that's fallen back to its backup pool, at a glance.** Its coin badge now carries an amber ring — on the dashboard cards, in the list view, and on the miner's detail page.
