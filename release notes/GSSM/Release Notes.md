@@ -1,6 +1,48 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.0.12
+
+**Know what your miners actually cost you in electricity — from records, not estimates.** GSSM can now meter each miner's energy use, keep a permanent daily record, and report it back for any date range — so when the tax year comes round the number is already there.
+
+> **Off by default. No operator action required on upgrade** — nothing changes until you switch it on.
+>
+> Requires **Pro or Enterprise** and the optional Historicals database.
+
+### New Features
+
+- **Track power consumption.** A new toggle under *Historicals → Collection*. Once on, GSSM records **kWh per miner per day** from what your devices actually report, and keeps it. No fixed wattage guesses, no "hours × nameplate" arithmetic.
+
+- **Your records are kept until you delete them.** Unlike the rest of Historicals, energy history is **never** aged out — not at 7 days, not at 90. It is the one thing GSSM stores that cannot be rebuilt afterwards, so nothing removes it but you.
+
+- **A new Energy report page.** Under *Historicals → Energy*. Pick a period — **This month, Last month, Year to date, Last year**, or your own dates — and see total kWh for the fleet and a breakdown per miner, sorted by heaviest first. **Last year** is one click, which is the whole point come filing season.
+
+- **Download it as a spreadsheet.** The CSV holds **one row per miner per day**, so you can apply whatever your electricity actually costs — tiered rates, seasonal rates, a mid-year price change — in Excel or Google Sheets. That's deliberately your job rather than GSSM's, because real tariffs are far more complicated than any single number we could ask you for.
+
+- **Energy History in Data Management.** See what's stored per miner — total kWh, how many days, and the period covered — and delete one miner's history or all of it, both behind a confirmation.
+
+### Good to know
+
+- **It measures, it doesn't model.** GSSM reads each miner's real power draw every poll and adds it up. So a rig that sits in standby overnight on a schedule is recorded at its **actual** idle draw, and switching a miner from Low to High mid-afternoon is picked up the moment the wattage moves. Nothing needs teaching about work modes or schedules.
+
+- **Idle time is not free, and now you can see it.** An ElphaPex DG-Home1 draws around 25 W asleep and an Avalon Q around 124 W — roughly 130 and 630 kWh a year respectively if they idle 14 hours a day. That is invisible to any hours-times-nameplate estimate.
+
+- **When GSSM can't know, it records nothing rather than guessing.** If GSSM is stopped, if a miner is removed or disabled, or if a device doesn't report power at all (NerdMiner), that time is simply left unmeasured — never filled in with an assumption. Your totals may be slightly conservative; they will not be invented.
+
+- **Every figure comes with its coverage, and its dates.** A total is shown as something like *"1,482.66 kWh · 96% measured · 2026-01-01 → 2026-12-31"*. That percentage is how much of the period GSSM was actually watching, so you can tell at a glance whether a number is solid or whether an outage left a hole in it. Miners GSSM has nothing recorded for say **not reported** rather than showing a misleading zero.
+
+- **Miners you've since removed still count.** If you sold a rig in August, it still drew power in July — so it stays in the total, marked *no longer configured*, and the report tells you how many such miners are included.
+
+- **Cost is shown, never stored.** If you've entered an electricity rate, the report multiplies it out as a convenience. But only the energy is kept, because rates change and a price baked into last year's records would simply be wrong. If your rate moved during the period, the CSV is the honest answer.
+
+- **Start now, not in December.** Every month before you switch it on is a month that can't be recovered. Turn it on today and you have a full year of real figures by next filing season.
+
+- **Energy is recorded, cost is not.** Rates change, and a rate baked into old records would be wrong the day it moved. Export the kWh and apply whatever rate you need in a spreadsheet. The Fleet page's cost estimate (v3.0.11) is separate and unchanged.
+
+- **Devices that don't report power are still not counted.** A NerdMiner exposes no power figure at all, so it appears as *not reported* rather than being estimated. Letting you supply a wattage for such devices by hand is planned for a future release.
+
+---
+
 ## v3.0.11
 
 **What is this costing me to run?** Enter your electricity rate and the Fleet page shows an estimated running cost — for the whole fleet, and broken down per miner.
