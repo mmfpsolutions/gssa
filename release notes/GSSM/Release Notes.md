@@ -1,6 +1,44 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.1.0
+
+**Your Bitaxe and NerdQAxe can now be put to sleep — on a schedule, or automatically when they get too hot.** Standby, Schedules and Triggers previously only worked on Nano3s, Avalon Q and ElphaPex hardware. Now they work on the miners more people actually own.
+
+> **No operator action required on upgrade.** New controls appear on supported miners; nothing changes until you use them.
+>
+> Standby, Schedules and Triggers require **Pro or Enterprise**.
+
+### New Features
+
+- **Standby / Wake for Bitaxe and NerdQAxe.** A Power control on the miner's settings page, the same one Avalon Q owners have had. Idling a Bitaxe drops it from about **20.6 W to 5 W**; a NerdQAxe drops to **almost nothing**. Both stay reachable the whole time, so GSSM keeps monitoring them and you can wake them from the dashboard.
+
+- **Schedules.** Run overnight and idle through the expensive hours, or whatever fits your tariff — the same per-miner schedule editor, now offered on AxeOS hardware.
+
+- **Protective triggers — the one worth having.** Set a temperature limit and GSSM idles the miner if it's exceeded for long enough, then holds it there until *you* release it. Previously impossible on a Bitaxe: the only option was a restart, which brings an overheating device straight back up hot.
+
+### Good to know
+
+- **Idled miners stop alerting.** GSSM reads the device's own paused state, so a miner you deliberately put to sleep won't fire "zero hashrate" warnings. That works even if you idled it from the miner's own web page rather than from GSSM.
+
+- **Idle power still gets metered.** If you're using power tracking, the reduced draw is recorded like any other reading — so you can see exactly what your schedule saved you.
+
+- **Bitaxe needs firmware v2.14.0 or newer.** Older firmware simply doesn't have the pause command; you'll get a clear error if you try. Most devices are well past this.
+
+- **Waking a NerdQAxe restarts it.** That's how its firmware works — the shutdown can only be undone by a reboot. Nothing is lost, but expect the usual restart delay rather than an instant wake.
+
+- **Neither survives a power cut.** If mains power drops while a miner is idled, it comes back mining. GSSM will re-apply a schedule at the next window, but it deliberately won't silently re-idle a device you may have just power-cycled on purpose.
+
+- **Per-chip temperatures on multi-ASIC devices.** Miners with more than one ASIC — a Bitaxe GammaHex, or the NerdQAxe boards whose firmware reports it — now show a per-chip temperature grid on the miner card, colour-coded against your thresholds. It's the same grid Avalon Nano3s owners have had.
+
+  Devices with a single ASIC are unchanged, and so are boards whose firmware doesn't actually report per-chip readings — GSSM shows nothing rather than a row of zeros.
+
+### Bug Fixes
+
+- **Bitaxe firmware version showed as "Unified"** after upgrading to AxeOS 2.15. GSSM was reading a field the new firmware repurposed as a label. It now reads the correct version on every AxeOS device.
+
+---
+
 ## v3.0.12
 
 **Know what your miners actually cost you in electricity — from records, not estimates.** GSSM can now meter each miner's energy use, keep a permanent daily record, and report it back for any date range — so when the tax year comes round the number is already there.
