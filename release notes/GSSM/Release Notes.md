@@ -1,6 +1,24 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.1.1
+
+**Two fixes for AxeOS miners**, both found while reviewing the AxeOS 2.15 firmware update.
+
+> **No operator action required on upgrade.**
+
+### Bug Fixes
+
+- **Pool settings silently failed to save on Bitaxe running AxeOS 2.15 or newer.** The new firmware changed how pool settings are stored, and quietly ignored the old format — so GSSM reported "Settings saved" while the pool never actually changed. GSSM now detects which format your miner speaks and uses the right one. Older Bitaxe firmware and all NerdQAxe devices were never affected, and nothing else on the settings page was.
+
+  If you changed a pool on a 2.15 Bitaxe through GSSM recently and it didn't take effect, this is why — please re-apply it.
+
+### Improvements
+
+- **Temperature alerts now watch the hottest chip on multi-ASIC miners.** On devices with more than one ASIC — such as the Bitaxe GammaHex — a protective trigger previously watched only the first chip's temperature. It now watches whichever is hottest, which is the one that matters. Single-ASIC miners are unchanged.
+
+---
+
 ## v3.1.0
 
 **Your Bitaxe and NerdQAxe can now be put to sleep — on a schedule, or automatically when they get too hot.** Standby, Schedules and Triggers previously only worked on Nano3s, Avalon Q and ElphaPex hardware. Now they work on the miners more people actually own.
