@@ -1,5 +1,64 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.6
+## v5.x Series through v5.2.7
+
+---
+
+## v5.2.7 — Stratum V2 Fixes: Found Blocks, and Wider Miner Support
+
+**If you use Stratum V2, update.** Two problems, both invisible in normal operation, and one of
+them was throwing away blocks.
+
+### 🧱 Blocks found on a Standard channel were being rejected
+
+If you ran Stratum V2 in **Standard channel** mode, GoSlimStratum built each block's coinbase
+transaction eight bytes shorter than the transaction itself declared. Your node could not read
+it, so any block you found was refused at the moment it was submitted.
+
+Everything else looked perfect. Shares were accepted, difficulty was correct, hashrate read
+normally, alerts fired &mdash; because the pool checked its own work against the same slightly
+wrong coinbase and found it entirely consistent. Only your node ever saw the problem, and only
+in the seconds after you found a block. A pool could have run this way for months without a
+single sign anything was wrong.
+
+We found it the only way it can be found: by finding a real block on a test network and
+watching the node turn it down.
+
+**Extended channel was never affected**, and Extended is the default for most firmware &mdash;
+Bitaxe ships with it, and NerdQAxe++ supports nothing else. If you have never deliberately
+switched to Standard, this did not reach you.
+
+**Worth checking:** if you did run Standard, look back through your logs for
+`Failed to submit block`. Any block found on that path before this release was lost.
+
+### 🔌 Braiins-based miners can now connect
+
+An S19 running BraiinsOS would connect, report the pool as active, then sit idle and eventually
+reboot &mdash; over and over.
+
+Every Stratum V2 message carries a marker saying whether it is addressed to the connection or to
+a specific mining channel. GoSlimStratum was setting that marker on some messages but not on the
+ones carrying actual work. Bitaxe and NerdQAxe++ never read it, so twelve miners ran happily for
+months and nothing looked wrong. BraiinsOS *does* read it, could not recognise the work being
+sent, and discarded all of it.
+
+Fixed, and verified against every combination our own hardware supports &mdash; Bitaxe on both
+channel types, NerdQAxe++ on Extended &mdash; so existing miners are unaffected.
+
+Our thanks to Cam, who reported this with miner logs detailed enough to point straight at the
+cause, and whose testing prompted the Standard-channel work that uncovered the block problem
+above.
+
+### Not affected
+
+- **Stratum V1** &mdash; untouched. Every change in this release is confined to the V2 code.
+- **Merged mining** &mdash; Stratum V2 runs only on SHA256d coins, and merged mining runs on
+  Scrypt, so the two never meet.
+- **Extended-channel V2** &mdash; unaffected by the coinbase problem, and unchanged apart from
+  the message marker.
+
+### Upgrading
+
+Nothing to do. No configuration changes, no database changes.
 
 ---
 
