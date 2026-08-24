@@ -1,6 +1,41 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.7
+
+**A health page for MIM.** There's now a **Health** link in the footer, on every page. It opens
+a one-glance snapshot of how the MIM application itself is doing — how long it's been running,
+how hard it's working, and how much memory it's using.
+
+Most of the time you'll never need it. When something feels slow, or you're wondering whether
+MIM has been quietly restarting, it's the first place to look — and the first thing to screenshot
+if you ever ask us about it.
+
+### What's new
+
+- **Health page**, reachable from the **Health** link at the bottom right of any page.
+  - **At a glance** — uptime, how many tasks MIM is running concurrently, how many CPU cores it
+    can see, and the Go version it was built with.
+  - **Memory** — what MIM is using right now versus what it has reserved from the system, shown
+    as a breakdown chart, plus the size of your log file if you have file logging switched on.
+  - **Garbage Collection** — how often MIM has tidied up its own memory and how much time that
+    has taken. Healthy numbers here are small ones.
+- **The two sections collapse**, and they remember what you closed — same as the cards on the
+  Server and Performance pages.
+
+### Good to know
+
+- **It's a snapshot, not a live feed.** The numbers are read once when the page opens; refresh
+  to update them. Nothing polls in the background.
+- **This is about MIM itself, not your mining servers.** For the machines MIM manages, the
+  Server and Performance pages are still where you look.
+- **Nothing to configure, and nothing leaves your machine.** The page reads values the
+  application already knows about itself.
+- **Freshly restarted MIM shows zeros** in Garbage Collection. That's expected — it just hasn't
+  needed to tidy up yet. The numbers fill in as it runs.
+
+---
+
 ## v3.3.6
 
 **Bitcoin Core is now a product you can install.** Bitcoin has two node clients in common
