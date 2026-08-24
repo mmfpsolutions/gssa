@@ -1,6 +1,24 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.1.2
+
+**A small addition for AxeOS miners, and a faster release pipeline behind the scenes.**
+
+> **No operator action required on upgrade.**
+
+### Improvements
+
+- **Target temperature now shows on Bitaxe and NerdQAxe cards.** The temperature your miner's own fan control is aiming for, in the same **Target** row Avalon Nano3s owners already see. Useful next to the actual reading — it tells you whether the device is holding its setpoint or fighting to.
+
+  Miners whose firmware doesn't report a target (some NerdQAxe boards have no PID controller) simply don't show the row, rather than showing a placeholder.
+
+### Behind the scenes
+
+- **ARM64 images are now built on real ARM hardware.** Previously the arm64 image was produced by emulating an ARM machine on an Intel one, which was slow. Releases now build each architecture natively. The images themselves are unchanged — same contents, same tags — they just arrive sooner.
+
+---
+
 ## v3.1.1
 
 **Two fixes for AxeOS miners**, both found while reviewing the AxeOS 2.15 firmware update.
