@@ -1,6 +1,24 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.1.3
+
+**Fixes NerdQAxe miners showing "V1" when they are actually mining on Stratum V2.**
+
+> **No operator action required on upgrade.** The correct protocol appears on the next poll.
+
+### Bug Fixes
+
+- **NerdQAxe stratum protocol showed as V1 instead of SV2.** NerdQAxe firmware **v1.1.0-rc3** stopped reporting the protocol in the place GSSM was reading it, and GSSM fell back to assuming V1. Your miners were connected on SV2 the whole time — only the badge was wrong.
+
+  GSSM now reads the protocol from the miner's pool configuration instead, which every firmware version reports. It also picks the right one per pool, so a miner running on its backup pool shows that pool's protocol rather than the primary's.
+
+  **This also corrects older NerdQAxe firmware.** Devices on the pre-1.1.0 LTS release never reported the protocol in that spot either, so they have been showing V1 on an SV2 connection all along — the recent firmware change is simply what made it noticeable.
+
+  Bitaxe miners were never affected.
+
+---
+
 ## v3.1.2
 
 **A small addition for AxeOS miners, and a faster release pipeline behind the scenes.**
