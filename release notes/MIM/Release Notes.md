@@ -1,6 +1,39 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.8
+
+**Bitcoin Knots is no longer offered for new installs.** Knots has become unstable for mining
+use, and the project is moving in a direction that no longer lines up with what a mining node
+needs to do. **Bitcoin Core** — added in 3.3.6 — is the supported way to run Bitcoin with MIM
+from here on.
+
+**If you already run Bitcoin Knots, nothing on your server changes.** Your node keeps running,
+your pool keeps mining, and MIM keeps managing it. This only affects installing a *new* one.
+
+### Changed
+
+- **Bitcoin Knots now shows a "Deprecated" badge** in the Products list, with no Install button.
+- **Existing Knots nodes stay fully manageable** — you can still Disable, Enable, Uninstall and
+  download the config, exactly as before.
+- **Update is no longer offered for Knots.** When the expected consensus change didn't activate
+  back in 3.3.5, we moved everyone back to an older build; an Update button would just walk you
+  forward again into the releases we're stepping away from.
+
+### Good to know
+
+- **Nothing is removed for you, and nothing happens automatically.** MIM will not touch, stop or
+  delete a Knots node. Moving off it is your call, on your timing.
+- **Moving to Bitcoin Core:** install Core and let it finish syncing *first*, then point your
+  miners at port **3336** (Knots is on 3335), and only uninstall Knots once you're happy. The
+  two run side by side quite happily — separate data folders, separate ports, separate pools.
+- **Don't uninstall the node you're relying on until the new one has caught up.** Uninstalling a
+  node removes its data folder, and a fresh Bitcoin sync is not a quick job.
+- Bitcoin Knots stays in the products list rather than disappearing, so you keep the buttons you
+  need to manage and eventually remove it.
+
+---
+
 ## v3.3.7
 
 **A health page for MIM.** There's now a **Health** link in the footer, on every page. It opens

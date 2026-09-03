@@ -356,11 +356,10 @@ collect_config() {
   echo ""
   echo -e "    1) DigiByte  (DGB)"
   echo -e "    2) Bitcoin Cash (BCH)"
-  echo -e "    3) Bitcoin - Knots (BTC)"
-  echo -e "    4) Bitcoin - Core  (BTC)"
+  echo -e "    3) Bitcoin - Core (BTC)"
   echo ""
   local coin_choice
-  coin_choice=$(prompt_value "Select [1-4]" "1")
+  coin_choice=$(prompt_value "Select [1-3]" "1")
 
   case "$coin_choice" in
     1)
@@ -380,16 +379,13 @@ collect_config() {
       WALLET_ADDR_TYPE="legacy"
       ;;
     3)
-      COIN_ID="btc";  COIN_ID_UPPER="BTC";  COIN_NAME="Bitcoin"
-      COIN_TYPE="bitcoin";  COIN_NODE_TYPE="btc";  COIN_NODE_ID="btc1"
-      CONTAINER_NAME="btc";  DATA_SUBDIR="btc";  DEFAULT_RPC_USER="bitcoinrpc"
-      RPC_PORT=9003;  ZMQ_PORT=28334;  STRATUM_PORT=3335
-      NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
-      WALLET_ADDR_TYPE="bech32m"
-      ;;
-    4)
-      # Bitcoin Core — same chain as option 3, different node client. Ports are
-      # deliberately distinct from Knots so the two can coexist on one host.
+      # Bitcoin Core. Bitcoin Knots was removed as an option in MIM 3.3.8 — it
+      # became unstable for mining use and the project moved to a blake2b path.
+      # Its templates and its entry in uninstall.sh stay in place so EXISTING
+      # Knots installs can still be managed and removed.
+      #
+      # Ports stay distinct from Knots (3335/9003/28334) so Core can be brought
+      # up alongside a still-running Knots node during a migration.
       COIN_ID="btc-core";  COIN_ID_UPPER="BTC-CORE";  COIN_NAME="Bitcoin Core"
       COIN_TYPE="bitcoin";  COIN_NODE_TYPE="btc-core";  COIN_NODE_ID="btc-core1"
       CONTAINER_NAME="btc-core";  DATA_SUBDIR="btc-core";  DEFAULT_RPC_USER="bitcoinrpc"
@@ -398,7 +394,7 @@ collect_config() {
       WALLET_ADDR_TYPE="bech32m"
       ;;
     *)
-      error "Invalid selection. Please enter 1, 2, 3, or 4."
+      error "Invalid selection. Please enter 1, 2, or 3."
       exit 1
       ;;
   esac
