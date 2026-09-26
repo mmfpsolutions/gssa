@@ -1,5 +1,42 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.7
+## v5.x Series through v5.2.8
+
+---
+
+## v5.2.8 — Orphaned Blocks Now Notify You
+
+**If you use notifications, this one's for you.** When a block you found was orphaned,
+GoSlimStratum recorded it correctly but, in almost every case, never told you.
+
+### 🔔 Orphan notifications now arrive
+
+An orphan is a block you found that lost out to another miner's block at the same height.
+GoSlimStratum spots this within a block or two and marks the block as orphaned on your
+dashboard. That part always worked.
+
+The notification didn't. GoSlimStratum checks for orphans at two points, and only the later
+one sent a notification. The early check almost always catches the orphan first, so the
+later one had nothing left to report. The result: orphans were recorded, but the
+**Block ORPHANED** message never reached Telegram, email, Discord or your webhook.
+
+Now every orphan sends its notification as soon as it's detected, and you'll get it exactly
+once. It shows the block height, both block hashes and the reward lost.
+
+If your node has lost track of the block completely, so there is no competing block to show,
+the message says **"Chain Hash: none (block no longer on node)"**.
+
+### Good to know
+
+- **Past orphans won't be sent now.** Orphans from before this update are still on your
+  dashboard, but no notifications will be sent for them.
+- **eCash (XEC) Avalanche rejections** still don't send a notification. That's planned for a
+  later release.
+- Orphan checks run for coins with **payouts enabled**, as they always have.
+- Block notifications must be licensed and turned on for the coin, as before.
+
+### Upgrading
+
+Nothing to do. No configuration changes, no database changes.
 
 ---
 
