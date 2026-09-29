@@ -1,5 +1,44 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.2.8
+## v5.x Series through v5.3.0
+
+---
+
+## v5.3.0 — New Algorithm: DigiByte Odocrypt
+
+**GoSlimStratum now mines all five DigiByte algorithms.** Odocrypt ("Odo") joins SHA256d,
+Scrypt, Skein and Qubit, so if you run Odo hardware you can now point it at your own pool.
+
+### ⛏️ Odocrypt mining for DigiByte
+
+Odo is DigiByte's FPGA-friendly algorithm. Its hashing recipe changes on a fixed schedule:
+every 10 days on mainnet, and daily on testnet. GoSlimStratum follows that schedule
+automatically, so there's nothing to track or update yourself.
+
+To set it up, add a DigiByte coin, give it its own stratum port, and choose **Odo** as the Mining
+Algorithm on the Config page (or set `"algorithm": "odo"` in your config). Odo runs alongside your
+other DigiByte algorithms, each on its own port, just like DGB SHA256d and Scrypt today.
+
+We checked GoSlimStratum's Odo hashing against the DigiByte node itself, on real mainnet and
+testnet blocks from several of those 10-day periods, then mined Odo blocks on testnet that the
+node accepted.
+
+### Good to know
+
+- **Odo support is new.** We tested with a CPU miner on testnet. We haven't yet tested it with
+  FPGA hardware, so if you run Odo FPGAs, we'd love to hear how it goes.
+- **Using odo-miner (the FPGA miner)?** Set your username to `<your DGB address>.<worker>`,
+  the same as other GoSlimStratum miners. Don't use the stratum proxy's `--workers` option: it
+  joins the worker name with `_`, which GoSlimStratum reads as part of your address, so the
+  connection is refused. On testnet, start the proxy with `--testnet`. Coming from m2pool? Keep
+  your worker name and replace your m2pool account name with your DGB address.
+- **Odo is DigiByte-only,** and GoSlimStratum won't start if it's set on any other coin.
+- **Stratum V1 only.** Stratum V2 remains SHA256d-only.
+- **Existing coins aren't affected.** Nothing changes for SHA256d, Scrypt, Skein or Qubit.
+
+### Upgrading
+
+Nothing to do unless you want to mine Odo. No configuration changes are required, and there are
+no database changes.
 
 ---
 

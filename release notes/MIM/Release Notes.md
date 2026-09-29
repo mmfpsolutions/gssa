@@ -1,6 +1,40 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.3.9
+
+**Bitcoin Silver (BTCS) is now in the Crypto Nodes list.** It works like the BCH2 node: MIM
+builds the node, creates its wallet, and shows you the address. You then add BTCS to your
+GoSlimStratum `coins.json` yourself to start mining it.
+
+### What's new
+
+- **Bitcoin Silver Node.** Choose full or pruned (pruned is the default), set an RPC username
+  and password, and MIM does the rest: it downloads the node, writes its config, starts it,
+  and creates a wallet with a receiving address.
+
+### Improved
+
+- **Every node now shows its mining algorithm.** Each description in the Crypto Nodes list
+  starts with the algorithm(s) it mines, for example SHA256d or Scrypt. DigiByte lists all
+  five of its algorithms.
+- **Bitcoin II (BC2) is now marked AMD64-only**, so you'll know before you install it on an
+  ARM machine.
+
+### Good to know
+
+- **Set `maturity_confirmations` to at least 200 for BTCS.** New Bitcoin Silver coins can't
+  be spent until they are 200 blocks deep. If your `coins.json` entry uses 100, the pool tries
+  to pay out too early and the payment fails with "insufficient funds". If that has already
+  happened, change the value to 200 and use **Retry Failed Payments**. Restarting won't retry
+  it.
+- **Bitcoin Silver runs on Intel/AMD (AMD64) servers only.** It won't install on ARM machines
+  such as a Raspberry Pi.
+- **It installs the node only.** Like BCH2, Bitcoin Silver does not wire itself into
+  GoSlimStratum and does not restart GSS. Adding it to `coins.json` is up to you.
+
+---
+
 ## v3.3.8
 
 **Bitcoin Knots is no longer offered for new installs.** Knots has become unstable for mining
