@@ -1,5 +1,56 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.3.0
+## v5.x Series through v5.4.0
+
+---
+
+## v5.4.0 — Two New Built-In Coins: Bitcoin Silver and Bitcoin Cash II
+
+**Bitcoin Silver (BTCS) and Bitcoin Cash II (BCH2) are now built into GoSlimStratum.** Until now you had to
+add them yourself in `coins.json`. Now they're available out of the box, with everything the other
+built-in coins get.
+
+### 🪙 What built-in gets you
+
+- **Direct-to-Miner (DTM) without a license.** Accept the 0.5% revenue share and each miner's reward goes
+  straight to their own address in the block itself. There's no payout step and no transaction fees.
+- **Wallet Sweep.** Move coins out of your node's wallet from the Earnings page.
+- **Everything else set up correctly:** addresses, block building and defaults, with nothing to maintain in
+  `coins.json`.
+
+Both coins support every address type their wallets create:
+
+- **BTCS:** `B…`, `3…`, `bs1q…`, and Taproot `bs1p…`
+- **BCH2:** CashAddr (`bitcoincashii:q…`, with or without the `bitcoincashii:` part) and legacy
+  `1…` / `3…` addresses
+
+### ⚠️ Bitcoin Silver needs 200 confirmations
+
+BTCS block rewards can't be spent until **200** confirmations, twice the usual 100. Set **Maturity
+Confirmations to 200** for any BTCS pool. If it's lower, payouts are attempted too early and fail with
+"insufficient funds". If you install BTCS with MIM, this is set for you.
+
+### Already mining BTCS or BCH2 with `coins.json`?
+
+- **If you used our example entries** (named `bitcoinsilver` and `bitcoincashii`), there's nothing to do.
+  GoSlimStratum switches to the built-in coin automatically when you upgrade, and your blocks, shares and
+  payment history carry on as before. You can delete the old `coins.json` entry whenever you like.
+- **If you named the entry something else,** it keeps working exactly as today. To switch to the built-in
+  coin, stop GoSlimStratum, change that pool's `coin_type` in `config.json` to `bitcoinsilver` or
+  `bitcoincashii`, and start it again. Coin type can't be changed from the Config page. Your history is
+  kept, because it's stored under the pool's name, not its coin type.
+
+### Good to know
+
+- Both coins were tested end to end: blocks found and accepted, payouts, Wallet Sweep, and DTM with and
+  without the revenue share.
+- **Wallet Sweep tip:** if the node's wallet holds a very large number of small rewards, the node may refuse
+  to sweep everything in one transaction ("Transaction too large"). Sweep in parts with **Amount** mode.
+- Existing coins aren't affected. Nothing changes for BTC, BCH, BC2, DGB, DOGE, LTC or XEC.
+
+### Upgrading
+
+Nothing to do unless you mine BTCS. If you do, check its **Maturity Confirmations is 200**. There are no
+database changes.
 
 ---
 

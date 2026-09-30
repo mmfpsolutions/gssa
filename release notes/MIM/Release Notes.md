@@ -1,6 +1,61 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.4.0
+
+> **Requires GoSlimStratum 5.4.0 or higher.** Update GoSlimStratum first. Older versions of
+> GoSlimStratum don't know these two coins, and won't start once one is added.
+
+**Bitcoin Cash II and Bitcoin Silver are now fully supported.** GoSlimStratum 5.4.0 supports
+both coins out of the box, so MIM now sets them up the same way as every other node. Until now
+MIM installed only the node, and you added the coin to GoSlimStratum yourself. Now MIM installs
+the node, creates the wallet, adds a ready-to-mine pool to GoSlimStratum, and restarts it.
+Nothing to do by hand.
+
+### What's new
+
+- **Bitcoin Cash II (BCH2): full install.** Node, wallet, and a GoSlimStratum pool on port
+  **3339**.
+- **Bitcoin Silver (BTCS): full install.** Node, wallet, and a GoSlimStratum pool on port
+  **3340**, already set to wait the 200 confirmations Bitcoin Silver needs before paying out.
+- **Uninstall cleans up after itself.** Removing either node also removes its pool from
+  GoSlimStratum.
+
+### Improved
+
+- **Crypto nodes now show their coin.** Each node in the Products list has its coin's logo and
+  ticker beside the name, so you can tell them apart at a glance.
+- **Mining algorithms are shown as colour-coded badges** under each node's description, for
+  example **SHA256d** or **Scrypt**. Each algorithm has its own colour, the same one it uses in
+  GSS Miners. DigiByte shows all five of its algorithms.
+- **Nodes that only run on Intel/AMD servers are marked "AMD64 only"**, currently Bitcoin
+  Silver and Bitcoin II. You can still see them on an ARM device such as a Raspberry Pi. The
+  badge is there so you know before you install.
+- **Tidier descriptions.** The codes that used to sit at the start of each description, like
+  `(DGB)(SHA256d)`, are now badges, so the descriptions read as plain text.
+
+### Fixed
+
+- **Dogecoin pools waited too few confirmations before paying out.** New DOGE pools now wait
+  the 240 confirmations Dogecoin requires, instead of 100. Most DOGE pools run in DTM mode,
+  where miners are paid directly and this doesn't come into play. In pool mode, paying at 100
+  could fail with "insufficient funds".
+
+- **The Set Timezone and Discover buttons ran off the edge of the screen on phones.** They now
+  move onto their own line under the Products heading.
+
+### Good to know
+
+- **Point your miners at the new ports:** BCH2 on **3339**, BTCS on **3340**.
+- **Already running BCH2 or Bitcoin Silver from an earlier version?** Nothing changes for you.
+  Your node and any pool you set up yourself keep working as they are. The new automatic setup
+  applies to new installs.
+- **Running DOGE in pool mode?** Existing pools keep their current setting. Check that
+  **Maturity Confirmations** for DOGE is 240 in GoSlimStratum's config.
+- Bitcoin Silver still runs on Intel/AMD (AMD64) servers only.
+
+---
+
 ## v3.3.9
 
 **Bitcoin Silver (BTCS) is now in the Crypto Nodes list.** It works like the BCH2 node: MIM
