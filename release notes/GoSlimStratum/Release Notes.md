@@ -1,5 +1,49 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.4.0
+## v5.x Series through v5.4.1
+
+---
+
+## v5.4.1 — Choose Your Default Pool
+
+**You can now choose which coin pool the dashboard opens on.** Until now GoSlimStratum always opened on
+DGB if you had it, and otherwise on the first pool in the list. If the pool you actually watch is a
+different one, every visit cost you an extra click.
+
+### 🏠 Default Pool
+
+On the **Global Config** page, under Animated Background, there's a new **Default Pool** setting. Pick any
+of your pools, save, and that's where the dashboard opens from then on. It applies to the home page, the
+installed app on your phone, and anywhere else the dashboard has to pick a pool for you.
+
+- **It takes effect as soon as you save.** No restart.
+- **Automatic** is the default, and it's exactly how GoSlimStratum has always behaved. If you never touch
+  the setting, nothing changes.
+- **If your chosen pool isn't running,** the dashboard opens on the automatic choice instead, and a short
+  note on the Global Config page tells you why. Your choice is kept, and takes over again once the pool is
+  loaded.
+- **If you remove the pool,** the setting goes back to Automatic.
+
+### 🔧 Fixed
+
+- **Saving the Global Config page no longer resets the TCP keepalive settings.** These four advanced
+  settings (`tcp_keepalive_idle_seconds`, `tcp_keepalive_interval_seconds`, `tcp_keepalive_count` and
+  `tcp_user_timeout_ms` in the `global` section of `config.json`) can only be changed by editing the file.
+  Saving anything on the Global Config page was writing them back as `0`, which means "use the default" at
+  the next restart. If you've never changed them, you weren't affected.
+
+### Good to know
+
+- The example configuration file, `config.example.json`, has been brought up to date. It now shows every
+  current setting, including a merged mining example (Litecoin with Dogecoin).
+- Mining, payouts and block handling aren't touched by this release.
+
+### Upgrading
+
+Nothing to do for most pools, and there are no database changes.
+
+**Only if you edited the global TCP keepalive settings by hand:** open `config.json` and check those four
+values in the `global` section. If they show `0` and you wanted your own values, set them again. From this
+version on they stay put.
 
 ---
 

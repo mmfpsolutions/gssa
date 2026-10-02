@@ -32,44 +32,6 @@
         "address": "https://explorer.fractalbitcoin.io/address/{address}"
       }
     },
-    "bitcoincashii": {
-      "name": "Bitcoin Cash II",
-      "symbol": "BCH2",
-      "segwit": false,
-      "address": {
-        "base58": {
-          "p2pkh": { "mainnet": 0, "testnet": 111 },
-          "p2sh": { "mainnet": 5, "testnet": 196 }
-        },
-        "cashaddr": {
-          "prefix": { "mainnet": "bitcoincashii", "testnet": "bchtest" }
-        }
-      },
-      "explorer": {
-        "block": "https://explorer.bch2.org/block/{hash}",
-        "tx": "https://explorer.bch2.org/tx/{txid}",
-        "address": "https://explorer.bch2.org/address/{address}"
-      }
-    },
-    "bitcoinsilver": {
-      "name": "Bitcoin Silver",
-      "symbol": "BTCS",
-      "segwit": true,
-      "address": {
-        "base58": {
-          "p2pkh": { "mainnet": 26, "testnet": 111 },
-          "p2sh": { "mainnet": 5, "testnet": 196 }
-        },
-        "bech32": {
-          "hrp": { "mainnet": "bs", "testnet": "tbs" }
-        }
-      },
-      "explorer": {
-        "block": "https://explorer.bitcoinsilver.top/block/{hash}",
-        "tx": "https://explorer.bitcoinsilver.top/tx/{txid}",
-        "address": "https://explorer.bitcoinsilver.top/address/{address}"
-      }
-    },
     "bitcoinsv": {
       "name": "Bitcoin SV",
       "symbol": "BSV",
