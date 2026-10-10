@@ -1,5 +1,134 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.4.1
+## v5.x Series through v5.5.2
+
+---
+
+## v5.5.2 — Block Notifications: No C Libraries Left
+
+**No new features in this release, and nothing to configure.** The part of GoSlimStratum that listens for
+new-block notifications from your node (ZMQ) has been rewritten in Go, replacing the last C library that
+was bundled with it (libzmq). GoSlimStratum is now Go from top to bottom.
+
+### 🔧 What changed
+
+- **GoSlimStratum manages its own connection to your node's ZMQ port.** Before, the bundled library did
+  that out of sight. Your `zmq_block_notify` setting and everything else in your config stay as they are.
+- **Smaller, simpler install.** The Docker image no longer carries libzmq, and building GoSlimStratum from
+  source needs nothing but Go.
+
+### What you'll notice
+
+- **Node restarts are now visible.** When your node restarts or the connection drops, the dashboard's ZMQ
+  indicator shows *disconnected*, then *reconnecting*, and the log says so. Before, it stayed on
+  *connected* straight through a restart, because the old library reconnected quietly on its own. If you
+  see these after upgrading, nothing new is wrong: the same drops happened before and were hidden.
+- **Reconnecting is quick and doesn't miss a block.** GoSlimStratum retries after 1, 2, 4, 8 and 15
+  seconds, then every 30. The moment it is back, it asks your node for the latest block, so a block that
+  arrived while it was away is picked up straight away.
+- **A wrong ZMQ address is caught at once.** If `zmq_block_notify` points at a port that isn't your node's
+  ZMQ port, GoSlimStratum now says so when it connects. Before, it showed *connected* and simply never
+  received anything.
+
+### Good to know
+
+- **Miners aren't affected.** Stratum V1 and V2 work exactly as before.
+- **Keep polling switched on.** While ZMQ is reconnecting, GoSlimStratum falls back to asking the node for
+  new blocks on a timer. That only works if `template_refresh_interval` is above 0. The example config
+  uses 15 to 30 seconds.
+- **Node failover benefits too.** The connection to your backup node's ZMQ port uses the same quicker
+  reconnect.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
+
+---
+
+## v5.5.1 — Stratum V2: Lighter Under the Hood
+
+**No new features in this release, and nothing to configure.** The part of GoSlimStratum that sets up
+each Stratum V2 connection has been rewritten in Go, replacing a C library (libsecp256k1) that used to be
+bundled for it.
+
+### 🔧 What changed
+
+- **Stratum V2 connections are set up by Go code now.** Miners see exactly the same handshake as before.
+  We checked the new code against the old library on hundreds of fixed test cases and thousands of random
+  ones, and every result is identical.
+- **Your keys are unchanged.** The authority key and static key you already have keep working. Miners
+  don't need to be reconfigured, and the authority key you gave them stays the same.
+- **Smaller, simpler install.** The Docker image no longer carries libsecp256k1, and building
+  GoSlimStratum from source no longer needs it.
+
+### Good to know
+
+- **Stratum V1 isn't affected at all.**
+- **A very small one-off cost per connection.** Setting up a V2 connection takes the pool a little under a
+  millisecond, where it used to take a tenth of one. It happens once when a miner connects, not while it
+  mines.
+- **A note for larger operators.** Unlike the C library, the Go code's timing is not constant: how long
+  the pool takes to set up a connection varies very slightly with its key. We measured it, and reading
+  anything useful from it would take millions of precisely timed connections. We consider the risk very
+  low. If your Stratum V2 port is open to the internet, limit how fast any one address can connect, which
+  is good practice against connection floods anyway.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
+
+---
+
+## v5.5.0 — Coin Value: See What Your Coins Are Worth
+
+**GoSlimStratum can now show your coin's price, and what your pool's rewards are worth, in your own
+currency.** Turn it on once and the figures appear on your dashboard and Earnings page.
+
+### 💰 Coin price and value
+
+On the dashboard, the **Blocks Found** card gets two new lines under the amount paid:
+
+```
+1,234.56 paid
+$5.28 value
+$0.004274 price
+```
+
+- **value** is what the coins already paid are worth at today's price.
+- **price** is what one coin is worth today. It shows even before your first block pays out.
+
+The **Earnings** page gets a value under **Total Earned** and **Pool Fees**, and a **Price** figure. These
+follow the range you pick on that page (7 days, 30 days, 90 days or 1 year), so they won't match the dashboard's
+all-time figure.
+
+Hover over a value or price to see where the price came from and how old it is.
+
+### ⚙️ Turning it on
+
+On the **Global Config** page, under Web Server Settings, tick **Show Coin Price and Value** and pick your
+currency, then save. It takes effect straight away, with no restart. Any fiat currency the price source
+supports is available: US dollar, euro, pound, yen and dozens more.
+
+**It's off by default.** When it's on, GoSlimStratum asks CoinGecko (`api.coingecko.com`) for prices every
+15 minutes. It asks for all the built-in coins in one request, so it doesn't reveal which coins you mine.
+When it's off, GoSlimStratum makes no price requests at all.
+
+### Good to know
+
+- **Built-in coins only, mainnet only:** DigiByte, Bitcoin, Bitcoin Cash, eCash, Litecoin, Dogecoin,
+  BitcoinII, Bitcoin Silver and Bitcoin Cash II. Coins you've added in `coins.json`, and testnet or regtest
+  pools, don't show a price.
+- **It's today's value, not a record.** GoSlimStratum doesn't store what your coins were worth when a
+  block was found or paid, so this isn't a tax or accounting figure. Your coins are still coins until you
+  sell them.
+- **No price, no number.** If a price isn't available (for example, no internet connection), the value and
+  price lines simply don't appear. You'll never see a made-up or zero price.
+- **API:** the rewards and earnings-history endpoints now include the price and value when the feature is
+  on. See the API documentation.
+- Mining, payouts and block handling aren't touched by this release.
+
+### Upgrading
+
+Nothing to do. Coin Value stays off until you turn it on, and there are no database changes.
 
 ---
 

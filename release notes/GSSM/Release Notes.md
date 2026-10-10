@@ -1,6 +1,58 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.2.0
+
+**Triggers can now watch your cooling, not just your temperature — and can simply tell you about a problem instead of acting on it.** Temperature only moves once cooling has already failed. A pump that stops, or a fan quietly working harder every day, shows up much earlier.
+
+> **No operator action required on upgrade.** Your existing rules are untouched and keep doing what they did. Nothing new happens until you add a rule.
+>
+> Triggers require **Pro or Enterprise**.
+
+### New Features
+
+- **Fan speed rules.** Watch the RPM of a fan — or a pump, if that is what's plugged into the header — and fire when it goes **below** a value you set, or **above** it. Below catches one that has stopped or is failing: a dead pump reads 0. Above catches a pump with air in it, which spins faster while moving less coolant.
+
+- **Fan duty rules.** Watch how hard the fan is being *asked* to work, and fire when it stays **above** a value. A fan held near 100% means cooling is at its limit even while the temperature still looks fine — drying paste, a loose cold plate or a hot room all show up here days before anything overheats.
+
+- **Choose what a rule does when it fires.** Every protective rule — the new fan rules and your existing temperature ones — now offers two choices:
+  - **Standby and hold its schedule** — the miner is idled and stays idle until you release it. This is what protective rules have always done.
+  - **Alert and take no action** — GSSM tells you and leaves the miner alone. Its schedule and other rules carry on.
+
+- **Triggers on Antminers and Whatsminers.** These devices had no Triggers page before, because GSSM can neither restart nor idle them. They can now carry alert-only rules, so you can be told about a stopped fan or a high temperature.
+
+### Good to know
+
+- **Each rule watches one fan and makes one comparison.** For a pump you want held between two speeds, add two rules. For a miner with several fans, add a rule for each. The editor lists the fans your device is reporting, with what each reads right now, so you can set a value from the real number.
+
+- **Name the rule after what's plugged in.** GSSM can't tell a fan from a pump — it only sees a speed on a header. "Pump stalled" in an alert is far more useful than "Fan 1".
+
+- **Many boards only report the speed of one header.** A Bitaxe GammaHex with two fans and a pump reports only whichever is on header 1. The other two can't be watched by speed; fan duty and temperature are what cover the whole cooling loop.
+
+- **A "below" rule is not checked while a miner is in standby.** An idle miner slows or stops its fans on purpose, and that must not look like a failure. When it wakes, the reading has to stay low for your full number of minutes again before the rule can fire.
+
+- **A "below" rule detects a fan that has stopped, not one running a bit slow.** Most fans stop slowing down below about a third of full duty, so the value you set needs to sit under that floor.
+
+- **Alert-only rules stay quiet for a while after firing.** With nothing holding the miner, a reading hovering right at your value would otherwise alert over and over. Each alert-only rule has a quiet period — 60 minutes unless you change it. A reading that simply stays past your value alerts once, not on every check.
+
+- **Alert-only rules are never parked.** A rule that *acts* on a miner is parked after five firings in 24 hours, because it clearly isn't solving the problem. A rule that only watches keeps watching.
+
+- **Not every device can be idled.** Where a miner has no standby or sleep state, the Standby option is shown greyed out with the reason, and the rule can alert instead.
+
+### Bug Fixes
+
+- **Protective trigger alerts arrived marked as "info" instead of critical.** A thermal cutoff firing is exactly the alert you don't want to look routine. Protective rules now alert at **critical** severity — whether they idled the miner or only alerted — and routine restarts stay informational. If you filter or route notifications by severity, expect trigger alerts to land differently from now on.
+
+- **The Details list in a notification came in a different order every time.** Two alerts sent a second apart could list the same four lines in two different orders. Details are now always in the same (alphabetical) order, on Telegram, email and Discord, for every kind of alert.
+
+- **Plain browser popups replaced.** "Reset firing history" on the Triggers page asked for confirmation with the browser's own popup box; it now uses the same styled dialog as the rest of the page. A failed disable or enable on the Nodes and Pools pages now shows a normal error message in the corner instead of a browser alert.
+
+### Behind the scenes
+
+- **Release pipeline updated for the current GitHub build runtime.** No change to the images. This was built as 3.1.4 and never published, so there is no 3.1.4 release — it is included here.
+
+---
+
 ## v3.1.3
 
 **Fixes NerdQAxe miners showing "V1" when they are actually mining on Stratum V2.**
