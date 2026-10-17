@@ -1,7 +1,36 @@
 # MIM Release Notes
 ## v3.x Series
 
-## v3.4.0
+## v3.4.1
+
+> **Requires GoSlimStratum 5.5.4 or higher.** Update GoSlimStratum first. Older versions of
+> GoSlimStratum don't know WojakCoin, and won't start once it's added.
+
+**WojakCoin (WJK) is now in the Crypto Nodes list.** It's fully supported from the start: MIM
+installs the node, creates its wallet, adds a ready-to-mine pool to GoSlimStratum, and restarts
+it. Nothing to do by hand.
+
+### What's new
+
+- **WojakCoin Node.** Choose full or pruned (pruned is the default), set an RPC username and
+  password, and MIM does the rest. The GoSlimStratum pool listens on port **3341**.
+- **Set up for small miners.** WojakCoin's network difficulty is very low, so the pool starts
+  miners at a lower difficulty than the other SHA256d coins, which suits Bitaxe-class devices.
+- **Fast payouts.** WojakCoin rewards can be spent after 20 blocks, about 40 minutes, and the
+  pool is set to pay out on that schedule.
+- **Uninstall cleans up after itself.** Removing the node also removes its pool from
+  GoSlimStratum.
+
+### Good to know
+
+- **Point your miners at port 3341.**
+- **Runs on both Intel/AMD and ARM**, including a Raspberry Pi.
+- **WojakCoin addresses start with "W".** It doesn't support the newer "wj1…" style of address,
+  so MIM always creates the classic kind for your pool.
+
+---
+
+
 
 > **Requires GoSlimStratum 5.4.0 or higher.** Update GoSlimStratum first. Older versions of
 > GoSlimStratum don't know these two coins, and won't start once one is added.

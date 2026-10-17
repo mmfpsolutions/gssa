@@ -1,5 +1,89 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.5.2
+## v5.x Series through v5.5.4
+
+---
+
+## v5.5.4 — New Built-In Coin: WojakCoin
+
+**WojakCoin (WJK) is now built into GoSlimStratum.** WojakCoin pays part of every block reward to its
+development fund, and those payments have to be in the block in exactly the right place, so it can't be
+added through `coins.json`. As a built-in coin, GoSlimStratum builds them in for you.
+
+### 🪙 What you get
+
+- **Mine WJK out of the box**, in pool mode or Direct-to-Miner.
+- **Direct-to-Miner (DTM) without a license.** Accept the 0.5% revenue share and each miner's reward goes
+  straight to their own address in the block itself.
+- **Wallet Sweep** from the Earnings page.
+- **The development fund handled for you.** Each block pays WojakCoin's LP incentive pool and dev vault
+  the amounts your node asks for. Your pool, or your miners in DTM, share the rest. Pool fees and the
+  revenue share are taken from that rest, not from the fund.
+
+**Addresses:** `W…` and `3…` on mainnet; `m…`, `n…` and `2…` on testnet and regtest. WojakCoin has no
+`wj1…` addresses on mainnet or testnet, and GoSlimStratum says so if you enter one.
+
+### ⚠️ Check `3…` addresses
+
+WojakCoin's `3…` addresses start the same way as Bitcoin's, and a Bitcoin `3…` address is accepted as a
+WojakCoin one. Coins sent to a Bitcoin address by mistake are most likely lost. Use a `W…` address where you
+can, and make sure any `3…` address came from a WojakCoin wallet. The add-coin form and the coin's config
+page remind you.
+
+### Good to know
+
+- **Your node needs peers.** A WojakCoin node won't hand out work until it's connected to at least one
+  other node, and GoSlimStratum shows its "not connected" error until then. The pool starts by itself
+  once the node has peers. On testnet, that means running two nodes connected to each other.
+- **Maturity Confirmations:** WojakCoin rewards can be spent after 20 confirmations. The default of 100 is
+  safe but pays out later; set it to 20 if you want payouts sooner.
+- **Payouts and Wallet Sweep need `fallbackfee` on a quiet chain.** If a send fails with "Fallbackfee is
+  disabled", your node hasn't seen enough recent transactions to estimate a fee. Add `fallbackfee=0.001` to
+  the node's `.conf` and restart it.
+- **No price for WJK** in Coin Value: our price source doesn't list it.
+- **Share time limit.** A WojakCoin node rejects a block timed more than 15 minutes ahead of its clock, so
+  GoSlimStratum rejects shares that are, with "ntime too far in the future". You're unlikely to see
+  it.
+- Existing coins aren't affected.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
+
+---
+
+## v5.5.3 — Coins That Start Themselves
+
+**A bug-fix release, with nothing to configure.** It fixes a case where a coin pool could get stuck and
+refuse to start until GoSlimStratum was restarted, and it makes GoSlimStratum try a failed start again by
+itself.
+
+### 🐛 Fixed
+
+- **A coin could become impossible to start.** If a coin's start failed twice in a row, for example
+  because one of its ports was briefly in use, the coin held on to its own stratum port and every later
+  start failed with "address already in use". Only restarting GoSlimStratum cleared it. A failed start now
+  cleans up completely, so the next one works.
+
+### 🔧 Improved
+
+- **GoSlimStratum retries a failed start by itself.** Before, if a coin failed to start once its node was
+  up, it stayed stopped until you pressed Start. Now GoSlimStratum tries again on its regular health check
+  and carries on until the coin is running. This helps most when everything is started together and a
+  node takes a few minutes to load: the coin comes up when its node is ready, with no action from you.
+- **A clearer message when a port is in use.** The error now says which port, why that usually happens,
+  and what to do about it.
+
+### Good to know
+
+- **A coin you stopped stays stopped.** The retry only applies to coins that are meant to be running.
+- **About "port is in use" on Stratum V2 ports.** Ports from 32768 to 60999 are also the ones Linux hands
+  out for outgoing connections, and the usual Stratum V2 port, 34254, is in that range. A coin that starts
+  late can find its port taken for a moment. With this release that clears by itself. If you want to avoid
+  it altogether, use a port below 32768.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
 
 ---
 

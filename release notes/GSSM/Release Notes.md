@@ -1,6 +1,30 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.2.1
+
+**WojakCoin (WJK) support**, to go with its arrival in GoSlimStratum.
+
+> **No operator action required on upgrade.**
+
+### New Features
+
+- **WojakCoin pools and nodes.** WJK can now be chosen as the coin for a GoSlimStratum pool and as the type of a node, and shows its own coin badge on the cards and detail pages.
+
+- **WJK miners are recognised by their wallet address.** A miner paying to a WojakCoin address starting with **W** shows the WJK badge on the miner dashboard.
+
+### Good to know
+
+- **Some WJK addresses can't be told apart from Bitcoin.** WojakCoin reuses Bitcoin's address formats for everything except its standard **W** addresses. A miner paying to a WJK address starting with **3**, or to any WJK **testnet** address, can't be recognised from the address alone. It shows a Bitcoin badge or the generic GSSM badge instead. This only affects the badge — monitoring, alerts and everything else work normally.
+
+- **XRO miners are unaffected.** XRO and WojakCoin addresses can both start with **W**, and GSSM now tells them apart by checking the address itself rather than its first letter.
+
+### Bug Fixes
+
+- **Bitcoin Cash II (BCH2) and Bitcoin Silver (BTCS) were missing from Autodiscover.** They could be chosen when adding a pool or node by hand, but not when assigning a coin to one found by Autodiscover. They're in both places now.
+
+---
+
 ## v3.2.0
 
 **Triggers can now watch your cooling, not just your temperature — and can simply tell you about a problem instead of acting on it.** Temperature only moves once cooling has already failed. A pump that stops, or a fan quietly working harder every day, shows up much earlier.
