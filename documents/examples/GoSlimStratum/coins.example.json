@@ -13,25 +13,6 @@
         }
       }
     },
-    "fractalbitcoin": {
-      "name": "Fractal Bitcoin",
-      "symbol": "FB",
-      "segwit": true,
-      "address": {
-        "base58": {
-          "p2pkh": { "mainnet": 0, "testnet": 111 },
-          "p2sh": { "mainnet": 5, "testnet": 196 }
-        },
-        "bech32": {
-          "hrp": { "mainnet": "bc", "testnet": "tb" }
-        }
-      },
-      "explorer": {
-        "block": "https://explorer.fractalbitcoin.io/block/{hash}",
-        "tx": "https://explorer.fractalbitcoin.io/tx/{txid}",
-        "address": "https://explorer.fractalbitcoin.io/address/{address}"
-      }
-    },
     "bitcoinsv": {
       "name": "Bitcoin SV",
       "symbol": "BSV",
