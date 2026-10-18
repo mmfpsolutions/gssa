@@ -1,6 +1,22 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.2.2
+
+**Fractal Bitcoin (FB) support**, to go with its arrival in GoSlimStratum and MIM.
+
+> **No operator action required on upgrade.**
+
+### New Features
+
+- **Fractal Bitcoin pools and nodes.** FB can now be chosen as the coin for a GoSlimStratum pool and as the type of a node — by hand or from Autodiscover — and shows its own coin badge on the cards and detail pages.
+
+### Good to know
+
+- **Fractal Bitcoin miners show the Bitcoin badge.** Fractal uses exactly the same address formats as Bitcoin on every network, so a miner's wallet address can't say which of the two it is mining. FB miners are labelled Bitcoin on the miner dashboard. This only affects the badge — monitoring, alerts and everything else work normally.
+
+---
+
 ## v3.2.1
 
 **WojakCoin (WJK) support**, to go with its arrival in GoSlimStratum.

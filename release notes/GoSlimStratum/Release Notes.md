@@ -1,5 +1,62 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.5.4
+## v5.x Series through v5.5.5
+
+---
+
+## v5.5.5 — New Built-In Coin: Fractal Bitcoin
+
+**Fractal Bitcoin (FB) is now built into GoSlimStratum.** Fractal is a SHA-256 chain built from Bitcoin
+Core, with a block about every 30 seconds. GoSlimStratum mines Fractal's regular
+(permissionless) blocks; merged mining with Bitcoin isn't part of this release.
+
+### 🪙 What you get
+
+- **Mine FB out of the box**, in pool mode or Direct-to-Miner.
+- **Direct-to-Miner (DTM) without a license.** Accept the 0.5% revenue share and each miner's reward goes
+  straight to their own address in the block itself.
+- **Wallet Sweep** from the Earnings page.
+- **Coin Value** shows FB's price. Block links use GoSlimStratum's built-in explorer, reading your own
+  node; payout and sweep transaction links open Fractal's explorer (mempool.fractalbitcoin.io).
+
+**Addresses:** Fractal uses Bitcoin's address formats: `1…`, `3…`, `bc1q…` and Taproot `bc1p…`.
+
+### ⚠️ Any Bitcoin address passes the check
+
+Because Fractal's addresses look exactly like Bitcoin's, GoSlimStratum can't tell a Fractal address from
+a Bitcoin one. Use an address from your own wallet or a Fractal wallet. Never use an exchange's Bitcoin
+deposit address: coins sent there are most likely lost. The add-coin form and the coin's config page
+remind you.
+
+### Testnet and regtest
+
+- **Fractal's testnet uses mainnet-style addresses** (`1…`, `3…`, `bc1…`), unlike Bitcoin's testnet. Set
+  the coin's Network to **testnet** for a Fractal testnet node, and use the same kind of address you would
+  on mainnet.
+- **Regtest** uses `m…`, `n…`, `2…` and `bcrt1…` addresses. Set Network to **regtest**.
+
+### Good to know
+
+- **Fractal reports more than one difficulty.** Fractal has three kinds of blocks, each with its own
+  difficulty, and the difficulty a Fractal node or explorer shows can be far higher than the one for the
+  blocks GoSlimStratum mines. GoSlimStratum mines at the difficulty in your node's block template, which is
+  the right one.
+- **Payouts and Wallet Sweep need `fallbackfee` on a quiet chain.** If a send fails with "Fallbackfee is
+  disabled", add `fallbackfee=0.001` to the node's `.conf` and restart it. You're most likely to need this
+  on testnet or regtest.
+- **Same ports as Bitcoin.** A Fractal node uses Bitcoin's default ports (RPC 8332, P2P 8333). If you run
+  both nodes on one machine, give one of them different ports.
+- **Your node must be fully synced.** A Fractal mainnet node won't hand out work while it's still syncing.
+- **Maturity Confirmations:** FB rewards can be spent after 100 confirmations, the default.
+- Existing coins aren't affected.
+
+### 🐛 Fixed
+
+- **Regtest on the config page.** The coin config page's Network setting now offers `regtest`, as the
+  add-coin form already did. Before, a regtest coin's config page showed no network and couldn't be saved.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
 
 ---
 

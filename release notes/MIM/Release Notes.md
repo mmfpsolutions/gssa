@@ -1,6 +1,40 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.4.2
+
+> **Requires GoSlimStratum 5.5.5 or higher.** Update GoSlimStratum first. Older versions of
+> GoSlimStratum don't know Fractal Bitcoin, and won't start once it's added.
+
+**Fractal Bitcoin (FB) is now in the Crypto Nodes list.** It's fully supported from the start:
+MIM installs the node, creates its wallet, adds a ready-to-mine pool to GoSlimStratum, and
+restarts it. Nothing to do by hand.
+
+### What's new
+
+- **Fractal Bitcoin Node.** Choose full or pruned (pruned is the default), set an RPC username
+  and password, and MIM does the rest. The GoSlimStratum pool listens on port **3342**.
+- **Uninstall cleans up after itself.** Removing the node also removes its pool from
+  GoSlimStratum.
+
+### Good to know
+
+- **Point your miners at port 3342.**
+- **Fractal Bitcoin runs on Intel/AMD (AMD64) servers only.** It won't install on ARM machines
+  such as a Raspberry Pi.
+- **It needs a fair amount of disk, even pruned.** Fractal recommends keeping at least 30 GB of
+  blocks, so that's MIM's minimum for a pruned node. A full node needs far more.
+- **Already mining Fractal Bitcoin through a `coins.json` entry?** You don't need to install
+  anything from MIM. Once you're on GoSlimStratum 5.5.5, a `coins.json` entry named
+  `fractalbitcoin`, the name used in our example, is handled by the new built-in support
+  automatically. **Don't install the Fractal Bitcoin node from MIM on a server where you already
+  run one.** MIM would replace your existing FB pool's settings, including its wallet address,
+  with a new node's.
+
+---
+
+
+
 ## v3.4.1
 
 > **Requires GoSlimStratum 5.5.4 or higher.** Update GoSlimStratum first. Older versions of
@@ -31,6 +65,8 @@ it. Nothing to do by hand.
 ---
 
 
+
+## v3.4.0
 
 > **Requires GoSlimStratum 5.4.0 or higher.** Update GoSlimStratum first. Older versions of
 > GoSlimStratum don't know these two coins, and won't start once one is added.

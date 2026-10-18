@@ -1,6 +1,6 @@
 {
-  "latest": "5.5.4",
-  "released_at": "Oct 16, 2026",
+  "latest": "5.5.5",
+  "released_at": "Oct 17, 2026",
   "release_notes_url": "https://github.com/mmfpsolutions/gssa/blob/main/release%20notes/GoSlimStratum/Release%20Notes.md",
   "min_recommended": "5.4.0"
 }
