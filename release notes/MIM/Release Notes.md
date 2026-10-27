@@ -1,6 +1,65 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.5.0
+
+**MIM can now tell you when a server stops responding.** Choose the hosts to watch, and MIM checks
+them around the clock and sends an alert when one goes down and again when it comes back, by
+email, Telegram, Discord, or a webhook of your own. MIM also now shuts down cleanly when it's
+stopped or restarted.
+
+### What's new
+
+- **Notifications.** A new **Notifications** page (the bell next to Config in the header) sets up
+  where alerts go:
+  - **Email**, **Telegram**, and any number of **webhooks**, either Discord or plain JSON for
+    your own receivers.
+  - Pick which channels each kind of alert goes to.
+  - Each channel has a **Send Test** button, which works before you save. Check a channel first,
+    then save.
+  - Passwords, tokens and webhook addresses are stored encrypted and never shown again once saved.
+- **Host monitoring.** Tick the hosts you want watched. MIM checks each one's SSH service every
+  minute, without logging in.
+  - It catches a server that has hung even when it still answers ping, which is exactly the
+    failure that's easy to miss.
+  - A host is reported down after **3 failed checks in a row**, so you hear about it within 2 to
+    3 minutes, without alerts from brief network blips.
+  - You get one alert per outage, not one per failed check. You get another when the host
+    recovers, telling you how long it was down.
+- **Monitoring page.** See every watched host at a glance: up or down, response time, how long
+  it's been in that state, and why a down host is failing. Open it from the Notifications page.
+- **No alert storms.** If several hosts go down together, for example when a switch fails, the
+  first alert goes out at once and the rest arrive as a single summary a minute later.
+- **MIM started / MIM shutting down** alerts, if you want them.
+- **Clean shutdown.** Stopping, restarting or upgrading MIM now lets it finish what it's doing:
+  it stops monitoring, sends the "shutting down" alert, and closes connections properly.
+
+### Good to know
+
+- **Notifications and host monitoring are included with any MIM license.** Without one, both
+  pages show what's needed to unlock them.
+- **Monitoring and notifications are off until you turn them on**, and each has its own switch:
+  monitoring can run and show results on the Monitoring page without sending anything.
+- **A host that's already down when monitoring starts won't trigger a "down" alert.** MIM only
+  alerts on changes it sees, so restarting MIM doesn't resend alerts for hosts that are already
+  off. You will still get the "back up" alert when that host returns.
+- **MIM can't report its own outage.** If the server MIM runs on goes down, MIM goes down with
+  it. That host is marked **MIM host** in the host list. To watch it, use a MIM running on
+  another machine.
+- **Using fail2ban, sshguard or CrowdSec?** Each check shows up in the host's login log as a
+  connection that closed before logging in. Add MIM's address to your ban tool's allow list
+  (for fail2ban, `ignoreip` in `jail.local`) so MIM's checks can't get it blocked.
+- **Docker users, optional:** new installs give MIM up to 120 seconds to shut down. On an
+  existing install you can add `stop_grace_period: 120s` to the `mim` service in your
+  `docker-compose.yml`. MIM's shutdown fits in Docker's default 10 seconds and the "shutting
+  down" alert is sent in the first few, so this is only headroom.
+- **MIM now saves settings to its config folder.** If you mount that folder read-only (`:ro`),
+  remove the `:ro` so your notification and monitoring settings can be saved.
+
+---
+
+
+
 ## v3.4.2
 
 > **Requires GoSlimStratum 5.5.5 or higher.** Update GoSlimStratum first. Older versions of

@@ -1,6 +1,38 @@
 # GSSM Release Notes
 ## v3.x Series
 
+## v3.2.3
+
+**NerdQAxe miners now show a hardware error rate, and the miner detail page can break it down chip by chip.** Plus every bar chart on the detail page now runs horizontally, and the comparison bars on Antminer charts are easier to see.
+
+> **No operator action required on upgrade.**
+>
+> The NerdQAxe error rate needs NerdQAxe++ firmware **1.1.1 or newer** (currently in beta). On older firmware, nothing changes.
+
+### New Features
+
+- **HW error % for NerdQAxe.** Bitaxe miners have always shown how much of their work is lost to hardware errors. NerdQAxe miners on firmware 1.1.1+ now show the same figure on their card, worked out the same way and coloured against the same thresholds, so the two are directly comparable.
+
+- **Hashrate · By Chip and HW Errors · By Chip.** Two new cards in the **Mining Performance** section of the miner detail page, one row per chip:
+  - **Hashrate · By Chip** shows how fast each chip is hashing, and turns a chip amber or red when it's out of step with the others.
+  - **HW Errors · By Chip** shows each chip's error rate, with a line marking the miner's overall figure, and turns a chip amber or red when it errors more than its neighbours.
+
+  Hover over a chip on either card to see both of its numbers together. It's a quick way to spot one chip that's struggling while the miner as a whole looks fine.
+
+### Improvements
+
+- **Horizontal bar charts throughout the detail page.** Fans, per-board hashrate, temperature, frequency and chip counts, and per-domain hashrate now run horizontally, one row per fan, board or domain. They're easier to read and to hover.
+
+- **Clearer comparison bars on Antminers.** The gray **Expected** bars on per-board hashrate and **PCB** bars on per-board temperature were hard to see against the dark background. They're brighter now.
+
+### Good to know
+
+- **The error rate moves from moment to moment.** The miner measures it over its last few seconds, so it can read 0.07% on one refresh and 0.3% on the next. That's normal, and it's the same for Bitaxe. Use the colours to see which chip stands out.
+
+- **Older NerdQAxe firmware simply shows no error rate,** rather than a zero. GSSM checks each time, so the figure appears on its own once the miner is updated.
+
+---
+
 ## v3.2.2
 
 **Fractal Bitcoin (FB) support**, to go with its arrival in GoSlimStratum and MIM.
