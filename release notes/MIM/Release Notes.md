@@ -1,6 +1,25 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.5.1
+
+**Fix: Update no longer offers an update you already have.** On servers where Docker was newly
+installed (Docker 29 or later), clicking **Update** on any product said an update was available
+every time. Going ahead found nothing new and reported "no change detected". Now Update says
+**"already up to date"** when you are, and offers an update only when there's a new one.
+
+### Good to know
+
+- **Nothing was ever updated wrongly.** Going ahead with a false offer pulled the image, found it
+  unchanged, and left your container running as it was.
+- **Servers where Docker was installed before version 29 were not affected**, even after
+  upgrading Docker.
+- **If you installed Docker yourself rather than with our installer,** the check needs Docker's
+  `buildx` plugin, which comes with Docker's own packages (`docker-buildx-plugin`). Without it,
+  Update works as before and may still offer an update you already have.
+
+---
+
 ## v3.5.0
 
 **MIM can now tell you when a server stops responding.** Choose the hosts to watch, and MIM checks
