@@ -42,7 +42,6 @@
             "addressType": "http",
             "deviceType": "axeos",
             "id": "mXk9pQ2r",
-            "model": "bitaxe",
             "name": "AxeOS1",
             "port": 80
         },
@@ -51,7 +50,6 @@
             "addressType": "http",
             "deviceType": "axeos",
             "id": "jW5vT9yC",
-            "model": "nerdqaxe",
             "name": "NerdQAxe1",
             "port": 80
         },
@@ -68,7 +66,6 @@
             "addressType": "tcp",
             "deviceType": "canaan",
             "id": "pZ6wU0zD",
-            "model": "avalonq",
             "name": "AvalonQ",
             "port": 4028
         },
@@ -77,7 +74,6 @@
             "addressType": "tcp",
             "deviceType": "canaan",
             "id": "4XNz3WzI",
-            "model": "nano3s",
             "name": "Nano3s",
             "port": 4028
         }

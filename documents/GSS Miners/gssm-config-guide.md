@@ -76,8 +76,7 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
         "address": "http://192.168.1.100",
         "port": 80,
         "addressType": "http",
-        "deviceType": "axeos",
-        "model": "bitaxe"
+        "deviceType": "axeos"
     }
 ]
 ```
@@ -90,7 +89,6 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
 | `port` | Yes | Port to connect to. Typically `80` for HTTP devices and `4028` for TCP devices. |
 | `addressType` | Yes | Connection protocol: `"http"` or `"tcp"`. |
 | `deviceType` | Yes | The type of miner firmware/API. See device types below. |
-| `model` | No | Specific hardware model. Refines display and threshold defaults. See models below. |
 
 ### Device Types
 
@@ -100,16 +98,9 @@ The `miners` array defines each mining device GSSM monitors. Each entry represen
 | `cgminer` | CGMiner API-compatible miners (Antminer S-series, etc.) | TCP |
 | `canaan` | Canaan-based miners (AvalonQ, Nano3S) | TCP |
 
-### Models
+### No model to set
 
-| `model` | Used With | Description |
-|-------|---------|-----------|
-| `bitaxe` | `axeos` | Bitaxe single-chip miners |
-| `nerdqaxe` | `axeos` | NerdQAxe miners |
-| `avalonq` | `canaan` | Canaan AvalonQ series |
-| `nano3s` | `canaan` | Canaan Nano 3S series |
-
-> **Note:** `model` is optional but recommended. It allows GSSM to apply the correct threshold defaults and display the proper device icon.
+Since GSSM 4.0, every miner names itself: GSSM reads the model from the device on every check (for example **Gamma 601**, **Avalon Q** or **NMMiner**) and picks the matching thresholds and settings. There's no `model` field to configure. A `model` value in a configuration from an earlier version is left in place and ignored.
 
 ---
 
