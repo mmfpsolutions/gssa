@@ -354,19 +354,30 @@ collect_config() {
   echo ""
   echo -e "  ${BOLD}Which coin would you like to mine?${NC}"
   echo ""
+  # AMD64-only coins (4, 6, 7) are hidden on ARM64. Numbers stay fixed on
+  # every system so a coin's number never changes (7 is always FB).
   echo -e "    ${BOLD}SHA256d${NC}"
   echo -e "    1) DigiByte  (DGB)"
   echo -e "    2) Bitcoin Cash (BCH)"
   echo -e "    3) Bitcoin - Core (BTC)"
-  echo -e "    4) Bitcoin II (BC2)          ${YELLOW}(AMD64 only)${NC}"
+  if [[ "$ARCH" == "amd64" ]]; then
+    echo -e "    4) Bitcoin II (BC2)"
+  fi
   echo -e "    5) Bitcoin Cash II (BCH2)"
-  echo -e "    6) Bitcoin Silver (BTCS)     ${YELLOW}(AMD64 only)${NC}"
-  echo -e "    7) Fractal Bitcoin (FB)      ${YELLOW}(AMD64 only)${NC}"
+  if [[ "$ARCH" == "amd64" ]]; then
+    echo -e "    6) Bitcoin Silver (BTCS)"
+    echo -e "    7) Fractal Bitcoin (FB)"
+  fi
   echo -e "    8) WojakCoin (WJK)"
   echo ""
   echo -e "    ${BOLD}Scrypt${NC}"
   echo -e "    9) Litecoin (LTC)"
   echo ""
+  if [[ "$ARCH" != "amd64" ]]; then
+    echo -e "  ${YELLOW}Bitcoin II (BC2), Bitcoin Silver (BTCS) and Fractal Bitcoin (FB) are not${NC}"
+    echo -e "  ${YELLOW}listed: they need an AMD64 (Intel/AMD) system, and this one is ARM64.${NC}"
+    echo ""
+  fi
   local coin_choice
   coin_choice=$(prompt_value "Select [1-9]" "1")
 
@@ -463,7 +474,7 @@ collect_config() {
   esac
 
   if [[ "$AMD64_ONLY" == "yes" && "$ARCH" != "amd64" ]]; then
-    error "${COIN_NAME} (${COIN_ID_UPPER}) is only available on AMD64. This system is ${ARCH}."
+    error "${COIN_NAME} (${COIN_ID_UPPER}) needs an AMD64 (Intel/AMD) system. This system is ARM64."
     exit 1
   fi
   success "Selected: ${COIN_NAME} (${COIN_ID_UPPER})"
