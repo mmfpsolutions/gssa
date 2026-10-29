@@ -1,0 +1,13 @@
+  wjk:
+    image: ghcr.io/mmfpsolutions/wjk:latest
+    container_name: wjk
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/wjk/data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped

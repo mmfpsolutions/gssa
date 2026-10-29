@@ -1,0 +1,13 @@
+  ltc:
+    image: ghcr.io/mmfpsolutions/ltc:latest
+    container_name: ltc
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/ltc/data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped

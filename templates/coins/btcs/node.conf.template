@@ -1,0 +1,48 @@
+# BTCS Node Configuration
+# Enabled Server mode
+server=1
+
+#Change to listen=1 to enable inbound, default is 10566
+listen=0
+#Uncomment if you set listen=1
+#bind=0.0.0.0
+#port=10566
+
+#Disable Debug Mode
+debug=0
+
+#Enable REST API - faster for GSS blockexplorer
+rest=1
+
+#RPC Stuff
+rpcauth={RPC_AUTH_STRING}
+rpcport=10567
+rpcworkqueue=64
+rpcthreads=16
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# Load wallets
+wallet=default
+
+# Blockchain storage
+# Pruning: prune=563 for pruned node, #prune=563 (commented) for full node
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+
+# ZMQ notifications
+zmqpubhashblock=tcp://0.0.0.0:29334
+
+# Connection limits
+maxuploadtarget=500      # 500mb per day upload limit
+maxreceivebuffer=5000    # Limit receive buffer per connection
+maxsendbuffer=1000       # Limit send buffer per connection
+#maxconnections=32
+
+# Whitelist
+whitelist=127.0.0.1
+
+#Bootstrap Nodes
+addnode=213.165.83.94:10566

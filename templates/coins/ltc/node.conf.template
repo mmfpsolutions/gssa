@@ -1,0 +1,47 @@
+# Run in server mode
+server=1
+
+# Don't listen for inbound
+listen=0
+
+# REST API
+rest=1
+# RPC
+rpcauth={RPC_AUTH_STRING}
+rpcport=9332
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# Blockchain storage
+# Pruning: prune=563 for pruned node, #prune=563 (commented) for full node
+{PRUNE_VALUE}
+
+# Performance
+dbcache=1000
+maxmempool=300
+
+# ZMQ (if needed for block notifications)
+zmqpubhashblock=tcp://0.0.0.0:28338
+
+# Logging
+printtoconsole=1
+
+#Wallet
+wallet=default
+
+#Bandwidth connection / limits
+maxuploadtarget=500           # 500 MiB/day upload cap (was 5000 = 5 GB)
+maxreceivebuffer=2500         # KiB per connection (default 5000)
+maxsendbuffer=500             # KiB per connection (default 1000)
+
+# Disable filter serving (saves CPU/bandwidth on a mining node)
+peerbloomfilters=0            # BIP37 bloom filters
+peerblockfilters=0            # BIP157/158 compact block filters (already default)
+
+# Always trust loopback (stratum, RPC clients, dashboards)
+whitelist=noban,mempool,relay,download@127.0.0.1
+
+# Mining
+blockminimumsize=0
+blockmaxsize=750000
+blockmaxweight=3000000

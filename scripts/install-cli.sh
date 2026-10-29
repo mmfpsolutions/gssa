@@ -30,7 +30,7 @@ if [[ ! -t 0 ]]; then
 fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-INSTALLER_VERSION="1.0.2"
+INSTALLER_VERSION="1.1.0"
 GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
@@ -354,13 +354,24 @@ collect_config() {
   echo ""
   echo -e "  ${BOLD}Which coin would you like to mine?${NC}"
   echo ""
+  echo -e "    ${BOLD}SHA256d${NC}"
   echo -e "    1) DigiByte  (DGB)"
   echo -e "    2) Bitcoin Cash (BCH)"
   echo -e "    3) Bitcoin - Core (BTC)"
+  echo -e "    4) Bitcoin II (BC2)          ${YELLOW}(AMD64 only)${NC}"
+  echo -e "    5) Bitcoin Cash II (BCH2)"
+  echo -e "    6) Bitcoin Silver (BTCS)     ${YELLOW}(AMD64 only)${NC}"
+  echo -e "    7) Fractal Bitcoin (FB)      ${YELLOW}(AMD64 only)${NC}"
+  echo -e "    8) WojakCoin (WJK)"
+  echo ""
+  echo -e "    ${BOLD}Scrypt${NC}"
+  echo -e "    9) Litecoin (LTC)"
   echo ""
   local coin_choice
-  coin_choice=$(prompt_value "Select [1-3]" "1")
+  coin_choice=$(prompt_value "Select [1-9]" "1")
 
+  # AMD64_ONLY: the node image is only published (or only works) on amd64.
+  # PRUNE_MIN:  the smallest prune size the node accepts, in MB.
   case "$coin_choice" in
     1)
       COIN_ID="dgb";  COIN_ID_UPPER="DGB";  COIN_NAME="DigiByte"
@@ -368,7 +379,7 @@ collect_config() {
       CONTAINER_NAME="dgb";  DATA_SUBDIR="dgb";  DEFAULT_RPC_USER="digibyterpc"
       RPC_PORT=9001;  ZMQ_PORT=28332;  STRATUM_PORT=3333
       NODE_CLI="digibyte-cli";  NODE_CONF="digibyte.conf"
-      WALLET_ADDR_TYPE="bech32m"
+      WALLET_ADDR_TYPE="bech32m";  AMD64_ONLY="no";  PRUNE_MIN=550
       ;;
     2)
       COIN_ID="bch";  COIN_ID_UPPER="BCH";  COIN_NAME="Bitcoin Cash"
@@ -376,7 +387,7 @@ collect_config() {
       CONTAINER_NAME="bch";  DATA_SUBDIR="bch";  DEFAULT_RPC_USER="bitcoincashrpc"
       RPC_PORT=9002;  ZMQ_PORT=28333;  STRATUM_PORT=3334
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
-      WALLET_ADDR_TYPE="legacy"
+      WALLET_ADDR_TYPE="legacy";  AMD64_ONLY="no";  PRUNE_MIN=550
       ;;
     3)
       # Bitcoin Core. Bitcoin Knots was removed as an option in MIM 3.3.8 — it
@@ -391,13 +402,70 @@ collect_config() {
       CONTAINER_NAME="btc-core";  DATA_SUBDIR="btc-core";  DEFAULT_RPC_USER="bitcoinrpc"
       RPC_PORT=9009;  ZMQ_PORT=28344;  STRATUM_PORT=3336
       NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
-      WALLET_ADDR_TYPE="bech32m"
+      WALLET_ADDR_TYPE="bech32m";  AMD64_ONLY="no";  PRUNE_MIN=550
+      ;;
+    4)
+      # BC2 publishes an arm64 image, but it hasn't been updated in recent
+      # releases and doesn't work, so it's treated as AMD64-only.
+      COIN_ID="bc2";  COIN_ID_UPPER="BC2";  COIN_NAME="Bitcoin II"
+      COIN_TYPE="bitcoinii";  COIN_NODE_TYPE="bc2";  COIN_NODE_ID="bc21"
+      CONTAINER_NAME="bc2";  DATA_SUBDIR="bc2";  DEFAULT_RPC_USER="bc2user"
+      RPC_PORT=9005;  ZMQ_PORT=28335;  STRATUM_PORT=3338
+      NODE_CLI="bitcoinII-cli";  NODE_CONF="bitcoinII.conf"
+      WALLET_ADDR_TYPE="legacy";  AMD64_ONLY="yes";  PRUNE_MIN=563
+      ;;
+    5)
+      COIN_ID="bch2";  COIN_ID_UPPER="BCH2";  COIN_NAME="Bitcoin Cash II"
+      COIN_TYPE="bitcoincashii";  COIN_NODE_TYPE="bch2";  COIN_NODE_ID="bch21"
+      CONTAINER_NAME="bch2";  DATA_SUBDIR="bch2";  DEFAULT_RPC_USER="bch2user"
+      RPC_PORT=8342;  ZMQ_PORT=29333;  STRATUM_PORT=3339
+      NODE_CLI="bitcoincashII-cli";  NODE_CONF="bitcoincashII.conf"
+      WALLET_ADDR_TYPE="legacy";  AMD64_ONLY="no";  PRUNE_MIN=563
+      ;;
+    6)
+      COIN_ID="btcs";  COIN_ID_UPPER="BTCS";  COIN_NAME="Bitcoin Silver"
+      COIN_TYPE="bitcoinsilver";  COIN_NODE_TYPE="btcs";  COIN_NODE_ID="btcs1"
+      CONTAINER_NAME="btcs";  DATA_SUBDIR="btcs";  DEFAULT_RPC_USER="btcsuser"
+      RPC_PORT=10567;  ZMQ_PORT=29334;  STRATUM_PORT=3340
+      NODE_CLI="bitcoinsilver-cli";  NODE_CONF="bitcoinsilver.conf"
+      WALLET_ADDR_TYPE="bech32";  AMD64_ONLY="yes";  PRUNE_MIN=563
+      ;;
+    7)
+      # Container and data dir are "fractalbitcoin" (matches MIM), while the
+      # template dir and GSS coin key use the short "fb" / "FB".
+      COIN_ID="fb";  COIN_ID_UPPER="FB";  COIN_NAME="Fractal Bitcoin"
+      COIN_TYPE="fractalbitcoin";  COIN_NODE_TYPE="fb";  COIN_NODE_ID="fb1"
+      CONTAINER_NAME="fractalbitcoin";  DATA_SUBDIR="fractalbitcoin";  DEFAULT_RPC_USER="fbuser"
+      RPC_PORT=8003;  ZMQ_PORT=29335;  STRATUM_PORT=3342
+      NODE_CLI="bitcoin-cli";  NODE_CONF="bitcoin.conf"
+      WALLET_ADDR_TYPE="bech32m";  AMD64_ONLY="yes";  PRUNE_MIN=30000
+      ;;
+    8)
+      COIN_ID="wjk";  COIN_ID_UPPER="WJK";  COIN_NAME="WojakCoin"
+      COIN_TYPE="wojakcoin";  COIN_NODE_TYPE="wjk";  COIN_NODE_ID="wjk1"
+      CONTAINER_NAME="wjk";  DATA_SUBDIR="wjk";  DEFAULT_RPC_USER="wjkuser"
+      RPC_PORT=20760;  ZMQ_PORT=29332;  STRATUM_PORT=3341
+      NODE_CLI="wojakcoin-cli";  NODE_CONF="wojakcoin.conf"
+      WALLET_ADDR_TYPE="legacy";  AMD64_ONLY="no";  PRUNE_MIN=563
+      ;;
+    9)
+      COIN_ID="ltc";  COIN_ID_UPPER="LTC";  COIN_NAME="Litecoin"
+      COIN_TYPE="litecoin";  COIN_NODE_TYPE="ltc";  COIN_NODE_ID="ltc1"
+      CONTAINER_NAME="ltc";  DATA_SUBDIR="ltc";  DEFAULT_RPC_USER="ltcuser"
+      RPC_PORT=9332;  ZMQ_PORT=28338;  STRATUM_PORT=4335
+      NODE_CLI="litecoin-cli";  NODE_CONF="litecoin.conf"
+      WALLET_ADDR_TYPE="bech32";  AMD64_ONLY="no";  PRUNE_MIN=563
       ;;
     *)
-      error "Invalid selection. Please enter 1, 2, or 3."
+      error "Invalid selection. Please enter a number from 1 to 9."
       exit 1
       ;;
   esac
+
+  if [[ "$AMD64_ONLY" == "yes" && "$ARCH" != "amd64" ]]; then
+    error "${COIN_NAME} (${COIN_ID_UPPER}) is only available on AMD64. This system is ${ARCH}."
+    exit 1
+  fi
   success "Selected: ${COIN_NAME} (${COIN_ID_UPPER})"
 
   echo ""
@@ -435,7 +503,11 @@ collect_config() {
   # Pruning
   echo ""
   if confirm "Enable blockchain pruning? (saves disk space)"; then
-    PRUNE_MB=$(prompt_value "Prune size in MB (minimum 550)" "550")
+    PRUNE_MB=$(prompt_value "Prune size in MB (minimum ${PRUNE_MIN})" "$PRUNE_MIN")
+    if [[ ! "$PRUNE_MB" =~ ^[1-9][0-9]*$ ]] || (( PRUNE_MB < PRUNE_MIN )); then
+      error "Prune size must be a whole number of at least ${PRUNE_MIN} MB for ${COIN_NAME}."
+      exit 1
+    fi
     PRUNE_VALUE="prune=${PRUNE_MB}"
     success "Pruning enabled: ${PRUNE_MB} MB"
   else
@@ -707,11 +779,13 @@ start_node_and_wallet() {
   success "Default wallet created"
 
   # Get wallet address using the coin's preferred address type
-  # DGB/BTC: bech32m (Taproot) — modern default, lighter spend weight on
+  # DGB/BTC/FB: bech32m (Taproot) — modern default, lighter spend weight on
   #         payouts. Future-proofs DGB operators for any feature that
   #         prefers P2TR (e.g. DigiDollar minting works on legacy too,
   #         but starting on P2TR avoids a transfer step later).
+  # BTCS/LTC: bech32 (native SegWit), matching MIM's installers.
   # BCH:    legacy (P2PKH script type; node returns CashAddr format).
+  # BC2/BCH2/WJK: legacy (P2PKH), matching MIM's installers.
   info "Generating wallet address (${WALLET_ADDR_TYPE})..."
   WALLET_ADDRESS=$(docker exec "$CONTAINER_NAME" "$NODE_CLI" \
     -rpcuser="$RPC_USER" \

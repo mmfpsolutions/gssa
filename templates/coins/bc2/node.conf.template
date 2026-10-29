@@ -1,0 +1,35 @@
+server=1
+listen=0
+rest=1
+
+#RPC Configuration
+rpcauth={RPC_AUTH_STRING}
+rpcport=9005
+rpcbind=0.0.0.0
+rpcallowip=127.0.0.1
+rpcworkqueue=64
+rpcthreads=16
+
+# pruning setting
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+
+# ZMQ
+zmqpubhashblock=tcp://0.0.0.0:28335
+
+#Wallet
+keypool=100
+walletbroadcast=1
+wallet=default
+
+# Connection limits
+maxuploadtarget=500      # 500mb per day upload limit
+maxreceivebuffer=5000    # Limit receive buffer per connection
+maxsendbuffer=1000       # Limit send buffer per connection
+#maxconnections=32
+
+# Whitelist trusted connections
+whitelist=127.0.0.1      # Always allow local connections
+

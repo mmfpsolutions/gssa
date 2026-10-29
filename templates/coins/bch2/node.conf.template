@@ -1,0 +1,49 @@
+# BCH2 Node Configuration
+# Enabled Server mode
+server=1
+
+#Change to listen=1 to enable inbound, default is 8339
+listen=0
+
+#Disable Debug Mode
+debug=0
+
+#Enable REST API - faster for GSS blockexplorer
+rest=1
+
+#RPC Stuff
+rpcauth={RPC_AUTH_STRING}
+rpcport=8342
+rpcworkqueue=64
+rpcthreads=16
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# Load wallets
+wallet=default
+
+# Blockchain storage
+# Pruning: prune=563 for pruned node, #prune=563 (commented) for full node
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+
+# ZMQ notifications
+zmqpubhashblock=tcp://0.0.0.0:29333
+
+# Connection limits
+maxuploadtarget=500      # 500mb per day upload limit
+maxreceivebuffer=5000    # Limit receive buffer per connection
+maxsendbuffer=1000       # Limit send buffer per connection
+#maxconnections=32
+
+# Whitelist
+whitelist=127.0.0.1
+
+#Bootstrap Nodes
+addnode=144.202.73.66:18339
+addnode=108.61.190.83:8339
+addnode=64.176.215.202:8339
+addnode=45.32.138.29:8339
+addnode=139.180.132.24:8339

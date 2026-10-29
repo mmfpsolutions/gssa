@@ -1,0 +1,13 @@
+  bc2:
+    image: ghcr.io/mmfpsolutions/bc2:latest
+    container_name: bc2
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/bc2/data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped

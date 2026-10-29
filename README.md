@@ -8,13 +8,13 @@ Public repository for MMFP Solutions deployment scripts, configuration templates
 
 MMFP (MMFP Solutions Full Platform) is a complete, production-ready mining infrastructure stack. A single installer deploys 7 Docker containers that together provide a fully operational mining pool with monitoring, management, and automatic updates.
 
-**Supported cryptocurrencies:** DigiByte (DGB), Bitcoin Cash (BCH), Bitcoin (BTC/Knots)
+**Supported cryptocurrencies (CLI installer):** DigiByte (DGB), Bitcoin Cash (BCH), Bitcoin (BTC), Bitcoin II (BC2), Bitcoin Cash II (BCH2), Bitcoin Silver (BTCS), Fractal Bitcoin (FB), WojakCoin (WJK), Litecoin (LTC). BC2, BTCS, and FB are AMD64 only. Dogecoin (DOGE) and eCash (XEC) are available through MIM.
 
 **Deployed containers:**
 
 | Container        | Purpose                                             |
 |------------------|-----------------------------------------------------|
-| Coin Node        | Full or pruned blockchain node (DGB, BCH, or BTC)  |
+| Coin Node        | Full or pruned blockchain node (one supported coin) |
 | GoSlimStratum    | Mining stratum server and pool                      |
 | PostgreSQL 18    | Database for share tracking and metrics             |
 | MIM              | Infrastructure management dashboard                 |
@@ -60,7 +60,7 @@ gssa/
 │   ├── goslimstratum/
 │   ├── mim-config/
 │   ├── postgres/
-│   └── coins/                # Per-coin templates (dgb/, bch/, btc/)
+│   └── coins/                # Per-coin templates (dgb/, bch/, btc-core/, bc2/, ltc/, ...)
 ├── documents/                # Product documentation and configuration guides
 │   ├── GoSlimStratum/
 │   ├── GSS Miners/
@@ -165,7 +165,7 @@ Architecture diagrams for GoSlimStratum are available in [documents/diagrams/GoS
 
 ## Templates
 
-Configuration templates in `templates/` are served via GitHub Pages and consumed by the installer scripts. They contain placeholder variables (e.g., `{{RPC_USER}}`) that are substituted during installation.
+Configuration templates in `templates/` are served via GitHub Pages and consumed by the installer scripts. They contain placeholder variables (e.g., `{RPC_USER}`) that are substituted during installation.
 
 Templates are versioned — archived releases preserve backward compatibility with older installer versions.
 

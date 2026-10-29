@@ -61,6 +61,11 @@ DATA_DIR="/data"
 COMPOSE_DIR="${DATA_DIR}/docker-compose"
 COMPOSE_FILE="${COMPOSE_DIR}/docker-compose.yml"
 
+# Every coin data dir / container the CLI installer or MIM has ever created.
+# `btc` (Bitcoin Knots) stays so existing Knots installs remain removable;
+# `xec` and `doge` are MIM-only but can be added to a CLI-installed box.
+COIN_DIRS=(dgb bch btc btc-core bc2 bch2 btcs fractalbitcoin wjk xec ltc doge)
+
 # ── Banner ────────────────────────────────────────────────────────────────────
 echo -e "${RED}"
 echo "  ╔══════════════════════════════════════════════════╗"
@@ -95,7 +100,7 @@ if [[ -f "$COMPOSE_FILE" ]]; then
   fi
 else
   # Try to stop containers by name if compose file is missing
-  local_containers=(dgb bch btc btc-core goslimstratum postgres mim gssm dozzle watchtower)
+  local_containers=("${COIN_DIRS[@]}" goslimstratum postgres mim gssm dozzle watchtower)
   running=false
   for c in "${local_containers[@]}"; do
     if docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "^${c}$"; then
@@ -123,16 +128,18 @@ fi
 echo ""
 if [[ -d "$DATA_DIR" ]]; then
   warn "This will permanently delete ALL data including:"
-  echo -e "    ${YELLOW}-${NC} Blockchain data and wallet (DGB/BCH/BTC)"
+  echo -e "    ${YELLOW}-${NC} Blockchain data and wallets (all installed coin nodes)"
   echo -e "    ${YELLOW}-${NC} PostgreSQL database"
   echo -e "    ${YELLOW}-${NC} GoSlimStratum configuration and logs"
   echo -e "    ${YELLOW}-${NC} All other config files"
   echo ""
 
   # Show wallet addresses if available
-  for coin_dir in dgb bch btc btc-core; do
+  wallet_found=false
+  for coin_dir in "${COIN_DIRS[@]}"; do
     for wallet_file in "${DATA_DIR}/${coin_dir}/"*_wallet.txt; do
       if [[ -f "$wallet_file" ]]; then
+        wallet_found=true
         wallet_addr=$(cat "$wallet_file" 2>/dev/null || echo "unknown")
         coin_upper=$(echo "$coin_dir" | tr '[:lower:]' '[:upper:]')
         warn "${coin_upper} wallet address: ${wallet_addr}"
@@ -140,7 +147,7 @@ if [[ -d "$DATA_DIR" ]]; then
     done
   done
   # Show warning if any wallet was found
-  if ls "${DATA_DIR}"/dgb/*_wallet.txt "${DATA_DIR}"/bch/*_wallet.txt "${DATA_DIR}"/btc/*_wallet.txt "${DATA_DIR}"/btc-core/*_wallet.txt 2>/dev/null | grep -q .; then
+  if [[ "$wallet_found" == true ]]; then
     echo -e "    ${RED}Make sure you have backed up any funds before proceeding!${NC}"
     echo ""
   fi

@@ -1,0 +1,13 @@
+  btcs:
+    image: ghcr.io/mmfpsolutions/btcs:latest
+    container_name: btcs
+    network_mode: host
+    stop_grace_period: 120s
+    volumes:
+      - /data/btcs/data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped

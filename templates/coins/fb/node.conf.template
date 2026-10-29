@@ -1,0 +1,49 @@
+# FB Node Configuration
+# Enabled Server mode
+server=1
+
+#Change to listen=1 to enable inbound, default is 8333
+listen=0
+#Uncomment if you set listen=1
+#bind=0.0.0.0
+#port=8333
+
+#Disable Debug Mode
+debug=0
+
+#Enable REST API - faster for GSS blockexplorer
+rest=1
+
+#RPC Stuff
+rpcauth={RPC_AUTH_STRING}
+rpcport=8003
+rpcworkqueue=64
+rpcthreads=16
+rpcbind=127.0.0.1
+rpcallowip=127.0.0.1
+
+# Load wallets
+wallet=default
+
+# Blockchain storage
+# Pruning: prune=30000 for pruned node, #prune=30000 (commented) for full node
+{PRUNE_VALUE}
+
+# Performance tuning
+dbcache=1000
+
+# ZMQ notifications
+zmqpubhashblock=tcp://0.0.0.0:29335
+
+# Connection limits
+maxuploadtarget=500      # 500mb per day upload limit
+maxreceivebuffer=5000    # Limit receive buffer per connection
+maxsendbuffer=1000       # Limit send buffer per connection
+#maxconnections=32
+
+# Whitelist
+whitelist=127.0.0.1
+
+#Default fee: Fractal disables fallbackfee by default, so sends fail until the node
+#has fee history. Needed for GSS payouts and Wallet Sweep on a quiet node.
+fallbackfee=0.0001
