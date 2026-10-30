@@ -1,6 +1,50 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.6.0
+
+**MIM can now check your servers for OS updates on a schedule.** See what's pending across all your
+servers in one place, and get a notification when new updates appear. MIM only tells you; you still
+choose what to install, on each server's Updates page.
+
+### What's new
+
+- **OS update checks.** MIM checks each server you choose, every 24 hours by default. You can set
+  anywhere from 1 hour to 30 days.
+- **OS Updates on the Monitoring page.** For each server, see the number of pending updates, how many
+  are **Security** and how many are **Risky** (kernel and Docker packages, which need a reboot or restart
+  containers when upgraded), when it was last checked, and whether it needs a reboot. Each server has a
+  link to its Updates page, where you can install them or check again right away.
+- **Notifications about new updates.** Choose **All updates**, or any of **Security**, **Risky** and
+  **Other**. Security and Risky are on by default. Each run sends one summary covering all your servers,
+  and each new update is sent once, not every day it stays pending.
+- **Choose what's watched on each server.** The list of hosts on the Notifications page is now a table.
+  Each server has an **Armed** switch that turns it on, plus its own **SSH check** and **OS updates**
+  settings. Disarming a server stops its checks but remembers its settings for when you re-arm it.
+
+### Good to know
+
+- **OS update checks are included with any MIM license.** Checking and installing updates by hand on the
+  Updates page stays free.
+- **Nothing changes when you upgrade.** Servers you already monitor stay armed with the SSH check as it
+  was, and OS update checks stay off until you turn them on and choose where notifications go.
+- **Each check logs in to the server** with its saved SSH credentials and runs `apt update` with sudo.
+  If sudo needs a password that MIM doesn't have, the Monitoring page says so: you'll still see the
+  pending list, but it may be out of date.
+- **A server's first check doesn't send a notification.** MIM only reports changes, so turning this on
+  won't send you everything that's already pending. The Monitoring page shows all of it.
+- **Updates you install outside MIM,** in a terminal for example, show up at the next check. To refresh
+  sooner, click **Check** on that server's Updates page.
+- **If a server can't be checked,** the Monitoring page says so and MIM tries again every hour. This
+  doesn't count as the server being down.
+- **Updates installed from MIM now wait for apt.** If something else on the server is using apt, MIM waits
+  up to 2 minutes instead of failing straight away.
+- **SSH connections to a hung server now time out.** A server that accepted the connection and then stopped
+  responding could leave MIM waiting indefinitely.
+- **If you roll back to an earlier version,** you'll need to tick your monitored hosts again.
+
+---
+
 ## v3.5.1
 
 **Fix: Update no longer offers an update you already have.** On servers where Docker was newly
