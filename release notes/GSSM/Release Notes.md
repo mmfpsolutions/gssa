@@ -7,7 +7,7 @@
 
 > **Action required only for NerdMiner firmware older than 2.0.** GSSM 4.0 supports NerdMiner firmware **2.0 and newer**. A NerdMiner on older firmware shows as offline with the message "NerdMiner firmware older than 2.0 isn't supported — update the firmware". Update the miner and it reappears on its own. Every other miner needs no action.
 >
-> The NerdQAxe error rate needs NerdQAxe++ firmware **1.1.1 or newer** (currently in beta). On older firmware, nothing changes.
+> The NerdQAxe error rate needs NerdQAxe++ firmware **1.1.1 or newer**. On older firmware, nothing changes.
 
 ### New Features
 
