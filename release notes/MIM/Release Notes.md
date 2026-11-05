@@ -1,7 +1,7 @@
 # MIM Release Notes
 ## v3.x Series
 
-## v3.6.1
+## v3.6.1.
 
 **MIM's pages now load everything from MIM itself.** The charts on the Server, Performance and Health
 pages and the server terminal used to download their code from an outside website (a CDN) each time
