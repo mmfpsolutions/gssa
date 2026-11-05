@@ -1,6 +1,26 @@
 # GSSM Release Notes
 ## v5.x Series
 
+## v5.0.1
+
+**GSSM's pages now load everything from GSSM itself.** The charts on the miner, pool and node detail
+pages, Fleet, Metrics and Historicals used to download their code from an outside website (a CDN) each
+time those pages opened. That code is now built into GSSM.
+
+### What's changed
+
+- **Charts work without internet access.** Handy if the computer you open GSSM from can reach your
+  miners but not the internet.
+- **More secure.** The code that draws the charts can no longer be changed from outside GSSM. It only
+  changes when we release a new version.
+- **More private.** Opening those pages no longer contacts a third-party website.
+
+### Good to know
+
+- **The charts look and work as before.** It's the same code, just served by GSSM.
+
+---
+
 ## v5.0.0
 
 **Coin Map: bring your own coins.** GSSM no longer stops at the coins it ships with. A new **Coin Map** page lets you add your own coins with their own logos, use them on your pools and nodes, and tell GSSM which coin a miner is mining when it can't work that out by itself. Open it from the **Configuration** page. It's available on every license tier.
