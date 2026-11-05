@@ -1,6 +1,37 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.6.1
+
+**MIM's pages now load everything from MIM itself.** The charts on the Server, Performance and Health
+pages and the server terminal used to download their code from an outside website (a CDN) each time
+those pages opened. That code is now built into MIM.
+
+### What's changed
+
+- **Charts and the terminal work without internet access.** Handy if the computer you open MIM from
+  can reach your servers but not the internet.
+- **More secure.** The code that draws the charts and runs the terminal, where you type commands and
+  passwords, can no longer be changed from outside MIM. It only changes when we release a new version.
+- **More private.** Opening those pages no longer contacts a third-party website.
+- **One click to Monitoring.** A new button at the top of every page, next to the bell, opens the
+  Monitoring page directly.
+- **A cleaner header.** The Refresh, Notifications and Config buttons now show just their icons. Hover
+  over any of them to see its name.
+- **Host monitoring settings moved to the Config page,** in a new Host Monitoring section: which hosts
+  to watch, how often, and which OS updates to tell you about. The Notifications page is now just about
+  where alerts go. The Monitoring page's Settings button takes you straight to the new section.
+- **Clearer settings on the Config page.** Fields you can change now stand out as dark boxes, sized to
+  what they hold, matching the rest of MIM.
+- **Fixed:** the "upgrade your license" link in the message about having too many servers now goes to
+  the pricing page on mmfpsolutions.io.
+
+### Good to know
+
+- **The charts and terminal look and work as before.** It's the same code, just served by MIM.
+
+---
+
 ## v3.6.0
 
 **MIM can now check your servers for OS updates on a schedule.** See what's pending across all your
