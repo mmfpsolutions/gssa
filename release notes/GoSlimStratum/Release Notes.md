@@ -1,5 +1,35 @@
 # GoSlimStratum — Release Notes
-## v5.x Series through v5.5.5
+## v5.x Series through v5.5.6
+
+---
+
+## v5.5.6 — Everything Served by GoSlimStratum
+
+**GoSlimStratum's pages now load everything from GoSlimStratum itself.** The charts used to download
+their code from an outside website (a CDN) whenever a page opened. That code is now built into
+GoSlimStratum.
+
+### What's changed
+
+- **Charts work without internet access.** Handy if the computer you open GoSlimStratum from can reach
+  your pool but not the internet.
+- **More secure.** The code that draws the charts can no longer be changed from outside GoSlimStratum. It
+  only changes when we release a new version.
+- **More private.** Opening a page no longer contacts a third-party website.
+- **Updated Docker image.** The image is now built on a current Alpine Linux release, with up-to-date
+  system libraries.
+
+### 🐛 Fixed
+
+- The license window's link now goes to **www.mmfpsolutions.io**.
+
+### Good to know
+
+- **The charts look and work as before.** It's the same code, just served by GoSlimStratum.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
 
 ---
 
