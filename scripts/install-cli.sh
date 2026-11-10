@@ -30,7 +30,7 @@ if [[ ! -t 0 ]]; then
 fi
 
 # ── Configuration ─────────────────────────────────────────────────────────────
-INSTALLER_VERSION="1.1.0"
+INSTALLER_VERSION="1.1.1"
 GITHUB_RAW="https://get.mmfpsolutions.io/templates"
 DATA_DIR="/data"
 TEMPLATE_DIR="/tmp/mmfp-templates"
@@ -125,7 +125,7 @@ preflight() {
   fi
   success "Running as root"
 
-  # Must be Ubuntu
+  # Must be Ubuntu (or an allowed Debian / Linux Mint)
   if [[ ! -f /etc/os-release ]]; then
     error "Cannot detect OS. /etc/os-release not found."
     exit 1
@@ -134,8 +134,14 @@ preflight() {
   source /etc/os-release
 
   # Officially supported: Ubuntu 24.04+
-  # Allowed but unsupported: Debian (any version), older Ubuntu
+  # Allowed but unsupported: Debian (any version), older Ubuntu, Linux Mint
   # Blocked: everything else (apt-get / dpkg path won't work)
+  #
+  # Docker publishes apt repos per base distro and per that distro's codename
+  # (linux/ubuntu + noble, linux/debian + bookworm). Linux Mint reports its own
+  # ID and codename, so it's mapped to the base it's built on.
+  DOCKER_DISTRO="$ID"
+  DOCKER_CODENAME="${VERSION_CODENAME:-}"
   case "$ID" in
     ubuntu)
       success "OS: Ubuntu"
@@ -168,8 +174,33 @@ preflight() {
         exit 1
       fi
       ;;
+    linuxmint)
+      # Mint 22.x sets UBUNTU_CODENAME (noble); LMDE sets DEBIAN_CODENAME.
+      # Mint's own VERSION_ID (22.x) and codename (e.g. zena) mean nothing
+      # to Docker's repo, so they're not used.
+      local mint_base
+      if [[ -n "${UBUNTU_CODENAME:-}" ]]; then
+        DOCKER_DISTRO="ubuntu";  DOCKER_CODENAME="$UBUNTU_CODENAME";  mint_base="Ubuntu ${UBUNTU_CODENAME}"
+      elif [[ -n "${DEBIAN_CODENAME:-}" ]]; then
+        DOCKER_DISTRO="debian";  DOCKER_CODENAME="$DEBIAN_CODENAME";  mint_base="Debian ${DEBIAN_CODENAME}"
+      else
+        error "Linux Mint detected, but its Ubuntu/Debian base could not be determined."
+        echo "  /etc/os-release has neither UBUNTU_CODENAME nor DEBIAN_CODENAME."
+        exit 1
+      fi
+      warn "OS: Linux Mint ${VERSION_ID} (based on ${mint_base}) — unsupported."
+      echo ""
+      echo "  Linux Mint is not officially tested or supported. The installer may"
+      echo "  proceed but you are on your own for any issues you encounter."
+      echo "  No bug reports will be accepted for Mint-specific problems."
+      echo ""
+      if ! confirm "Proceed on unsupported OS?" "N"; then
+        error "Installation cancelled."
+        exit 1
+      fi
+      ;;
     *)
-      error "This installer requires Ubuntu or Debian. Detected: $ID"
+      error "This installer requires Ubuntu, Debian, or Linux Mint. Detected: $ID"
       echo "  Other distributions (Fedora, Arch, RHEL, etc.) are not supported."
       exit 1
       ;;
@@ -323,15 +354,16 @@ setup_docker() {
 
   info "Adding Docker GPG key..."
   install -m 0755 -d /etc/apt/keyrings
-  # ${ID} is sourced from /etc/os-release in preflight() — "ubuntu" or "debian"
-  curl -fsSL "https://download.docker.com/linux/${ID}/gpg" -o /etc/apt/keyrings/docker.asc
+  # DOCKER_DISTRO / DOCKER_CODENAME are set in preflight() — "ubuntu" or
+  # "debian", and that base's codename (Linux Mint is mapped to its base)
+  curl -fsSL "https://download.docker.com/linux/${DOCKER_DISTRO}/gpg" -o /etc/apt/keyrings/docker.asc
   chmod a+r /etc/apt/keyrings/docker.asc
-  success "Docker GPG key added (linux/${ID})"
+  success "Docker GPG key added (linux/${DOCKER_DISTRO})"
 
   info "Adding Docker repository..."
   echo \
-    "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${ID} \
-    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    "deb [arch=${ARCH} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/${DOCKER_DISTRO} \
+    ${DOCKER_CODENAME} stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null
   success "Docker repository added"
 

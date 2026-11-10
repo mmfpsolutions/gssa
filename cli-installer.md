@@ -74,6 +74,7 @@ sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 ## Requirements
 
 - Ubuntu Server 24.04 or later
+  - Debian and Linux Mint (including LMDE) also install, but are **unsupported**: the installer asks you to confirm before continuing
 - Root access
 - Internet connection
 - ARM64 or AMD64 architecture (BC2, BTCS, and FB require AMD64)

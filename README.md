@@ -42,7 +42,7 @@ Tiered removal — choose what to keep and what to remove.
 sudo bash -c "$(curl -sSL https://get.mmfpsolutions.io/scripts/uninstall.sh)"
 ```
 
-**System Requirements:** Ubuntu Server 24.04+, ARM64 or AMD64, root access, 16 GB RAM minimum, internet connection.
+**System Requirements:** Ubuntu Server 24.04+ (Debian and Linux Mint install but are unsupported), ARM64 or AMD64, root access, 16 GB RAM minimum, internet connection.
 
 For full installer details, see [cli-installer.md](https://github.com/mmfpsolutions/gssa/blob/main/cli-installer.md).
 
