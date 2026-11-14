@@ -1,6 +1,69 @@
 # GSSM Release Notes
 ## v5.x Series
 
+## v5.1.0
+
+**GSS Hash Hopper support.** GoSlimStratum 6.0.0's Hash Hopper mines whichever of your chains is best at
+the moment and moves your rigs as difficulties change. GSSM now shows it: a hopping miner shows the Hash
+Hopper badge, and the hopper gets a card of its own on the Pools tab.
+
+### New Features
+
+- **The Hash Hopper badge on hopping miners.** A miner logged in to the hopper (`hopper.<profile>.<rig>`)
+  shows the Hash Hopper badge on its card, in the list view and on its detail page, whichever chain it's
+  on at the moment. Hover over the badge to see the profile. This works for every miner GSSM supports
+  and needs nothing from GSS, so it keeps working while GSS is down.
+
+- **A Hash Hopper card on the Pools tab.** Add your GSS's Hash Hopper as a pool: tick **Hash Hopper** when
+  you add a GoSlimStratum pool (no coin needed), or let **Autodiscover** find it. The card shows:
+  - whether it's hopping, or in shadow mode
+  - the best chain right now
+  - which chain your rigs are on, and for how long
+  - the switch rules in force
+  - how many rigs are connected, and their hashrate
+
+  Its **Details** page lists your chains and how they rank, your profiles, every connected rig, the
+  switch log, and any logins the hopper turned away.
+
+- **Hash Hopper alerts.** If the hopper's port closes or GSS goes away, you get the usual pool offline
+  alert, and the card says why.
+
+- **GSS coin type for your custom coins.** GSS lets you name a coin's pool anything, such as `VTX-New`. In
+  the Coin Map, give a custom coin its **GSS coin type** (its key in GSS's `coins.json`, such as
+  `vertexcoin`), and the Hash Hopper card shows your logo for that coin whatever its pool is called.
+  GSSM already knows GSS's built-in coins. Set it when you add the coin, or later with the new **Edit**
+  button.
+
+### Improvements
+
+- **GoSlimStratum pools show the coin GSS says they're mining.** GSS knows what each of its pools mines,
+  so GSSM now takes the coin from GSS itself instead of from the pool's name. A pool called `DGBT`,
+  `DGB-DD` or `VTX-New` shows the right logo, and **Coin Type** on the pool form is now optional. GSS's
+  answer wins if the two disagree.
+
+- **Autodiscover fills in the coin for you.** Discovered GoSlimStratum pools come with their coin already
+  picked, straight from GSS. You only pick one for a GSS custom coin GSSM doesn't know.
+
+- **Icons on the pool details page's summary cards,** matching the dashboards.
+
+- **Tidier table headers on the pool and node details pages.** The small sort mark after every column name
+  is gone, which saves room on a phone. Click a header to sort, as before; the sorted column still shows
+  its arrow.
+
+### Good to know
+
+- **The Pools card needs GSS 6.0.0 or later.** On an older GSS the card reads offline and says so. The miner
+  badge works with any GSS.
+- **Blocks found through the hopper show on each coin's own pool card,** where GSS records them, not on the
+  hopper's card.
+- **The hopper card's share counts start when each rig connects,** which is why they're labelled
+  "(connected)".
+- **The Hash Hopper badge can't be replaced** with your own logo, just like the built-in coins.
+- **If you mapped the hopper's IP:Port to a custom coin in the Coin Map,** that mapping still wins.
+  Delete it to see the Hash Hopper badge.
+
+---
+
 ## v5.0.1
 
 **GSSM's pages now load everything from GSSM itself.** The charts on the miner, pool and node detail
