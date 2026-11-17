@@ -42,11 +42,11 @@ You need **at least two** such coins for the hopper to move between.
 ## Setting It Up
 
 1. **Open the Hash Hopper config page** from the Hash Hopper card on the Global Configuration page.
-2. **Select the chains** and leave each weight at `1` to begin with. The page tells you what a coin would need before it could take miners.
+2. **Select the chains** and leave each weight at `1` to begin with. The page tells you what a coin would need before it could take miners. Weights of `1` are a starting point, not a finished set-up: see [Choosing Weights](#choosing-weights) before you turn shadow mode off.
 3. **Add a profile.** A profile is a name plus one payout address per chain. Give it a short name such as `myfarm` (letters, digits, `-` or `_`; no dots).
 4. **Set the hopper's stratum port**, one that no coin uses.
 5. **Turn the hopper on and leave Shadow mode on.** Save. The Hash Hopper tab appears in the header.
-6. **Watch it in shadow mode** for a day or so. The Chains table shows each chain's cost and which is best; the Switch Log shows the switches it would have made.
+6. **Watch it in shadow mode** for a day or so, and settle your weights while you do. The Chains table shows each chain's next-block cost and which is best; the Switch Log shows the switches it would have made.
 7. **Turn Shadow mode off** and save. The hopper port opens.
 8. **Point your miners at the hopper port** (see below).
 
@@ -85,13 +85,48 @@ hopper.myfarm.bitaxe2    — profile "myfarm", rig "bitaxe2"
 
 A weight of `1` counts blocks only. A weight of `50` says one block on that chain is worth 50 blocks on a chain weighted `1`. Set each weight to what a block on that chain is worth to you compared with the others. The hopper only looks at how the weights compare with each other, not at their size.
 
+- **A weight is any number above 0.** Decimals and values below 1 are fine: `0.9`, `2.4` and `15.8` are ordinary weights. A weight left empty or at `0` counts as `1`.
+- **Only the proportions matter.** `1` / `2.5` / `16` and `6.25` / `15.625` / `100` are the same set. Multiply every weight by the same number and nothing the hopper does changes, so a set built up from `1` and a set scaled so that the largest is `100` are equally right. Use whichever you find easier to read.
+- **With every weight at `1` the hopper sits on the chain with the lowest next-block cost.** Chains often differ in cost by ten times or more, so with equal weights that is usually the same chain all day. Weights are what make it hop.
+
 Giving one chain a weight far above the rest keeps every rig on that chain. The hopper still moves the rigs if that chain's node goes down.
 
 **Presets** are named sets of weights kept on the config page's Chains card. Choosing one fills in the weights (a selected chain the preset doesn't name gets `1`), and Save Changes applies them. No rig reconnects when a preset is applied. A preset holds weights only.
 
+### Choosing Weights
+
+Weights do two jobs at once. They cancel the difference in cost between chains (a block on a large chain takes many more hashes than a block on a small one), and they say which chain you favour. A set that only ranks the chains by preference, such as `3` / `2` / `1`, does not do the first job and will not behave the way you expect.
+
+**Start from value, if your coins have a price.** On the Hash Hopper config page, the Chains card has a **Suggested weight** column: one block's reward at today's price, relative to the lowest-value selected chain that has a price. It needs **Show Coin Price and Value** turned on, on the Global Configuration page, and only built-in coins on mainnet that have a price get one. WojakCoin and `coins.json` coins do not. It is a hint only: nothing applies it. Type the figure into **Weight** if you want to use it.
+
+**Or start from cost: level the chains, then favour one.**
+
+1. On the Hash Hopper page, read each chain's **Next-block cost** in the Chains table. One reading is one moment, and costs move all day. Multiply it by the chain's **Opportunity** figure to get its average over the last day. (Opportunity appears once the hopper has 30 minutes of history.)
+2. Leave the cheapest chain at `1`. Give each other chain its usual cost divided by the cheapest chain's usual cost. The chains are now level, and the hopper moves among all of them as their costs rise and fall.
+3. To spend more time on a chain, raise its weight. To spend less, lower it. Halving a chain's weight means its cost must fall to half of its usual before it draws level again.
+
+An example, for three chains whose usual costs are 170 PH, 420 PH and 2.8 EH. These figures are an illustration. Use the costs on your own page.
+
+| Chain | Usual cost | Level weights | Mostly DGB, then BTCS, and WJK only when it is very cheap |
+|---|---|---|---|
+| WJK | 170 PH | `1` | `0.5` |
+| BTCS | 420 PH | `2.5` | `2` |
+| DGB | 2.8 EH (2,800 PH) | `16.5` | `16.5` |
+
+With the last column, and DGB at its usual cost, BTCS draws level with DGB when it is about 20% cheaper than usual, and WJK when it is at half its usual cost. A chain then has to be better by the switch threshold as well before rigs move to it.
+
+**Check the result before you rely on it.**
+
+- **Chosen now**, on the config page's Chains card, marks the chain that the weights on screen would pick, before you save them.
+- On the Hash Hopper page, the line under **Against the best chain** gives the cost at which a chain would take the rigs: "Needs to fall below 298 PH to beat DGB by 15.0%".
+- Run in shadow mode for a day and read the Switch Log: how often the hopper would have moved, and how long it stayed on each chain. With rigs connected, **Time and shares** on the Profiles table shows how their time was split between the chains.
+- New weights apply as soon as you save them, and no rig reconnects. Hopping gain starts again, because it is worked out with the weights.
+
+**Your hashrate does not change the right weights.** Cost comes from each chain's network difficulty, and the same rigs would mine whichever chain wins. Hashrate only sets how long a block takes, which is what the **Blocks / day** column shows.
+
 ### Install Offset
 
-Each GoSlimStratum install moves its switch threshold and minimum dwell by an offset of its own, so hoppers on different pools don't all switch at the same instant. **Install offset** sets its size: up to 20% either way by default, from 0 to 50. Where this install sits inside that range is picked when GoSlimStratum starts and kept until it restarts. At `0` the hopper uses the two values exactly as you set them, which is what you want when comparing one run with another. The Switch rules card shows the figures in force.
+Each GoSlimStratum install moves its switch threshold and minimum dwell by an offset of its own, so hoppers on different pools don't all switch at the same instant. **Install offset** sets its size: up to 20% either way by default, from 0 to 50. It is a share of each value, not percentage points: with a 15% threshold and the default offset, the threshold in force is somewhere from 12% to 18%. Where this install sits inside that range is picked when GoSlimStratum starts and kept until it restarts. At `0` the hopper uses the two values exactly as you set them, which is what you want when comparing one run with another. The Switch rules card shows the figures in force.
 
 ---
 
@@ -146,7 +181,7 @@ A full example, including the `stratum` block, is in [hopper.example.json](../ex
 | `chains` | `[]` | The coins the hopper may use, each with a `symbol` (the coin's key in `config.json`) and a `weight`. At least two when shadow mode is off. |
 | `switch_threshold_percent` | `15` | How much better another chain's weighted cost must be before rigs move to it. From 0 to under 100. |
 | `min_dwell_seconds` | `600` | The least time a profile's rigs stay on a chain before a better chain can take them. A chain that goes unhealthy is left at once regardless. |
-| `install_offset_percent` | `20` | The size of this install's own offset to the threshold and dwell. From 0 to 50. `0` turns it off. |
+| `install_offset_percent` | `20` | The size of this install's own offset to the threshold and dwell, as a share of each (20 moves a 15% threshold to somewhere from 12% to 18%). From 0 to 50. `0` turns it off. |
 | `liveness_window_minutes` | `120` | The window the liveness check looks back over. At least 1. |
 | `liveness_min_blocks` | `3` | Blocks other miners must have found on a chain inside the window for it to count as live. `0` turns the check off. |
 | `profiles` | `{}` | Payout addresses, by profile name. See below. |
@@ -159,7 +194,7 @@ A full example, including the `stratum` block, is in [hopper.example.json](../ex
 | Field | Default | Description |
 |-----|-------|-----------|
 | `symbol` | — | The coin's key in the `coins` section of `config.json`, for example `"BTCS"`. |
-| `weight` | `1` | What one block on this chain is worth compared with the others. |
+| `weight` | `1` | What one block on this chain is worth compared with the others. Any number above 0; decimals and values below 1 are allowed. See [Choosing Weights](#choosing-weights). |
 
 ### Profiles
 
@@ -233,7 +268,23 @@ The hopper port has its own Stratum Settings and VarDiff Settings, on the Hash H
 
 **Header tab.** While the hopper is turned on it has its own tab, after the coin tabs. The dot is green when it is moving hash, blue in shadow mode, and red when it is set to move hash but its port is not open.
 
-**Chains table.** One row per chain. **Weighted cost** is cost divided by weight; the lowest is the best chain. **Against the best chain** names the better chain: "WJK is 3.2% better" on the BTCS row means WJK's weighted cost is 3.2% below BTCS's, so a larger figure means a worse chain. The **State** column shows:
+**Chains table.** One row per chain.
+
+| Column | Meaning |
+|---|---|
+| State | An icon; see the table below. |
+| Next-block cost | The expected number of hashes to find the chain's next block, from its network difficulty right now. |
+| Weight | The weight saved for the chain. |
+| Weighted cost | Next-block cost divided by weight. This is the figure the hopper ranks chains on, and the lowest is the best chain. The small line under it gives the chain's place ("Lowest", "Rank 2 of 3"). |
+| Blocks / day | The blocks a day to expect on that chain at your hashrate: the hopper's own miners when it has any, otherwise the miners on the selected chains' own ports. |
+| Against the best chain | Names the better chain: "WJK is 3.2% better" on the BTCS row means WJK's weighted cost is 3.2% below BTCS's, so a larger figure means a worse chain. The line under it says what that means for rigs on the chain (when they move, or that they stay) or, for a chain with no rigs, the cost it must fall below to take them. |
+| Opportunity | The chain's average cost over the last day divided by its cost now. Above 1 means it is easier than usual. It is shown only; no switch uses it. It appears after 30 minutes. |
+| Others' blocks | Blocks found by other miners inside the liveness window. |
+| Rigs | The hopper rigs on that chain now. |
+
+The config page's Chains card shows Next-block cost and Blocks / day as well, and has two columns of its own, **Suggested weight** and **Chosen now**; see [Choosing Weights](#choosing-weights).
+
+The **State** column shows:
 
 | State | Meaning |
 |---|---|
@@ -286,6 +337,15 @@ No. It moves hash between coin pools in your own GoSlimStratum.
 
 **Does it pick the most profitable coin?**
 It picks the chain with the lowest weighted cost: the fewest expected hashes per block, adjusted by your weights. It has no price information. If you want it to follow value, put the value into the weights.
+
+**Do weights have to be whole numbers, or at least 1?**
+No. A weight is any number above 0, so `0.5` and `15.8` are fine.
+
+**Two sets of weights look very different in size. Which is right?**
+Both, if the proportions are the same. `1` / `2.5` / `16` and `6.25` / `15.625` / `100` make the hopper do exactly the same thing.
+
+**Does my hashrate change which weights I should use?**
+No. The choice between chains comes from their network difficulties and your weights. Your hashrate only sets how long a block takes.
 
 **Why is it not on the chain the table says is best?**
 Either the better chain is not yet better by the switch threshold, or the rigs have not been on their chain for the minimum dwell. The line under "Against the best chain" says which, and when they will move.

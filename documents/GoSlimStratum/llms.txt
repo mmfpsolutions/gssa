@@ -28,6 +28,14 @@ GoSlimStratum is set up and changed from its web UI. The JSON files are where th
 - If the user tells you they have to work from the files (a scripted install, or no browser), help them with the file, and give the same warnings.
 - Where configuration is done: the **Global Configuration** page (global settings, the Configured Coins table for adding, cloning and removing coins, the Stratum V2 keys, and the Hash Hopper card); each coin's **Configuration** page, with **Restart** on its **Pool Lifecycle** card; the **Notifications** page; and the **Hash Hopper config** page. The one file with no page is coins.json (extra SHA256d coins that are not built in): that one is written by hand, as the Coin Configuration Guide describes.
 
+**Hash Hopper weights. Do not suggest numbers before you have the user's figures.**
+
+- A set of weights has to cancel the difference in cost between the chains before it can express a preference, and chains often differ in cost by ten times or more. Weights that only rank the chains by preference (100 / 30 / 8, or 3 / 2 / 1) usually do the opposite of what the user asked for.
+- Before you suggest any weight, ask for each chain's **Next-block cost** and **Opportunity** from the Chains table on the Hash Hopper page, and the weights the user has now. Then follow "Choosing Weights" in the Hash Hopper Guide.
+- One reading of the costs is one moment. Say so, and point the user to the checks in that section (Chosen now, the line under Against the best chain, shadow mode and the Switch Log) instead of promising how often the rigs will move.
+- Keep the user's own scale. The default weight is 1, a weight is any number above 0, and decimals and values below 1 are normal. Only the proportions between the weights matter, so do not rescale a working set to 100.
+- You do not need the user's hashrate to choose weights.
+
 **What to have right about GoSlimStratum.**
 
 - One GoSlimStratum runs several coin pools side by side. Each coin has its own entry in the configuration, its own stratum port and its own blockchain node, which the operator runs. It does not connect miners to outside pools.
@@ -45,7 +53,7 @@ GoSlimStratum is set up and changed from its web UI. The JSON files are where th
 - [Troubleshooting Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-troubleshooting-guide.md): Symptoms and what they mean: a pool that won't start, a miner that can't connect, hashrate and share questions, blocks and orphans, payout errors, notifications that don't arrive, settings that don't take effect. Also the built-in Diagnostics page, VarDiff Simulator and Config Summary. Read this first for any problem.
 - [Coin Configuration Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-coin-config-guide.md): Every per-coin setting: coin types and algorithms, the node connection, ZMQ, node failover, merged mining, stratum and starting difficulty, worker names, Stratum V2 listeners, mining address and address formats, VarDiff and flood protection, Coin Alerts, payouts and maturity, the explorer. Read this for any question about adding or tuning a coin, connecting miners, or payouts.
 - [Global Configuration Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-global-config-guide.md): Every global setting: pool name, timeouts, logging, the database and data retention, cleanup, the web UI, Default Pool, Coin Value, the update check, Stratum V2 keys, and the whole of notifications.json (email, Telegram, Discord, webhooks, events).
-- [Hash Hopper Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-hash-hopper-guide.md): What the Hash Hopper is, which coins can take part, setup step by step, the miner username, how a chain is chosen, weights, every hopper.json setting, how to read the Hash Hopper page, what to expect and common questions.
+- [Hash Hopper Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-hash-hopper-guide.md): What the Hash Hopper is, which coins can take part, setup step by step, the miner username, how a chain is chosen, weights and how to choose them, every hopper.json setting, every column on the Hash Hopper page, what to expect and common questions.
 
 ## Release notes
 
