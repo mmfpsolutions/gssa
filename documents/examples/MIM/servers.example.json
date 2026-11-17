@@ -2,7 +2,6 @@
   "servers": [
     {
       "description": "MIM Server",
-      "docker_host": "ssh://mim@192.168.1.100",
       "enabled": true,
       "id": "qCwwociO",
       "mim_host": true,

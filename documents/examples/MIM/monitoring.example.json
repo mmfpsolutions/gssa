@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "host_checks": {
+    "qCwwociO": {
+      "armed": true,
+      "ssh_check": true,
+      "os_updates": true
+    }
+  },
+  "checks": {
+    "ssh_banner": {
+      "interval_seconds": 60,
+      "timeout_seconds": 10,
+      "failures_to_down": 3,
+      "successes_to_up": 1
+    },
+    "os_updates": {
+      "interval_hours": 24,
+      "notify_security": true,
+      "notify_risky": true,
+      "notify_other": false
+    }
+  }
+}

@@ -1,0 +1,69 @@
+# GoSlimStratum (GSS)
+
+> GoSlimStratum is a self-hosted stratum server and mining pool from MMFP Solutions. One install runs many coins at once, each on its own port against the operator's own node, with a web dashboard, Stratum V1 and V2, pool mode and Direct-to-Miner mode, merged mining, and (from 6.0.0) the Hash Hopper. This file tells an AI assistant how to help a GoSlimStratum user accurately and where the facts are.
+
+Accurate for GoSlimStratum 6.0.0. The current released version is in the latest.json file listed under "Current version".
+
+**Rules for the assistant. Follow these before answering any GoSlimStratum question.**
+
+- GoSlimStratum is its own software. Settings, file names, commands and behaviour from other pool software (ckpool, NOMP, yiimp, MiningCore, public-pool and others) do not apply. Do not carry anything over from them.
+- Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- This file contains no setting reference. The guides do. If you cannot open links, say so, and ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
+- If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
+- Ask which GoSlimStratum version the user runs (it is in the web UI footer and on the Version page). Many sections of the guides are marked "AS OF Version x", and several problems were fixed in a particular release.
+- For a problem, start with the Troubleshooting Guide. It lists symptoms and what they mean, and many of them are not faults.
+- Never ask the user for passwords, wallet passphrases, tokens or key files. If you need their configuration, ask for the Config Summary page (Global Configuration, View Summary): every secret on it is masked.
+- Licensing, tiers and limits: point to https://www.mmfpsolutions.io/pricing.html. Do not quote limits from memory.
+- The HTTP API is not covered by these files.
+
+**Configuration is done in the web UI. Steer the user there.**
+
+GoSlimStratum is set up and changed from its web UI. The JSON files are where the web UI saves what the user enters. The guides list every setting by its name in those files so that you can understand them, not so that the user edits them.
+
+- Answer "how do I set or change this" with where it is in the web UI: the page, the section or card, and the name of the field or button, as the guide gives them. Do not answer with JSON for the user to paste into a file.
+- Use the setting names in the guides to find the right setting, to read a file or an error message the user shows you, and to check what a value means. Then give your answer in the web UI's terms.
+- Do not tell the user to log in to the server, open a config file in an editor or restart GoSlimStratum to make a change the web UI can make. The web UI checks what is entered and applies it the right way. A hand edit is not checked, and a mistake in the file can stop GoSlimStratum from starting.
+- Suggest editing a file only when the guide says the setting is not in the web UI. The guides mark those few settings. Then say plainly that it is a file edit, name the file and the setting, tell the user to keep a copy of the file first, and say what restart the guide calls for.
+- If the user cannot open the web UI at all, the Troubleshooting Guide covers what to do, including the few file edits that get them back in.
+- If the user tells you they have to work from the files (a scripted install, or no browser), help them with the file, and give the same warnings.
+- Where configuration is done: the **Global Configuration** page (global settings, the Configured Coins table for adding, cloning and removing coins, the Stratum V2 keys, and the Hash Hopper card); each coin's **Configuration** page, with **Restart** on its **Pool Lifecycle** card; the **Notifications** page; and the **Hash Hopper config** page. The one file with no page is coins.json (extra SHA256d coins that are not built in): that one is written by hand, as the Coin Configuration Guide describes.
+
+**What to have right about GoSlimStratum.**
+
+- One GoSlimStratum runs several coin pools side by side. Each coin has its own entry in the configuration, its own stratum port and its own blockchain node, which the operator runs. It does not connect miners to outside pools.
+- Built-in coins: DigiByte (SHA256d, Scrypt, Skein, Qubit, Odocrypt), Bitcoin, Bitcoin Cash, eCash, Litecoin, Dogecoin, Bitcoin II, Bitcoin Silver, Bitcoin Cash II, WojakCoin and Fractal Bitcoin. Other SHA256d coins can be added through a coins.json file.
+- Configuration lives in JSON files in one config directory: config.json (global settings and every coin), notifications.json, coins.json and hopper.json. Most settings are changed in the web UI.
+- Two payout modes per coin. Pool mode: rewards go to the pool's node wallet and GoSlimStratum pays the miners. Direct-to-Miner (DTM) mode: each block pays the miner's own address directly in the block. DTM needs a license, or, on a built-in coin, accepting a 0.5% revenue share.
+- A miner's username on a coin's port is its wallet address for that coin, then a dot, then a worker name. Merged mining and the Hash Hopper port use different username formats; see their guides.
+- Miners can connect over Stratum V1, or Stratum V2 on SHA256d coins.
+- The dashboard's hashrate is worked out from the shares a miner submits. It is not read from the miner, so short-window figures are noisy.
+- The web UI, the API and all history need metrics enabled with a PostgreSQL database.
+- The Hash Hopper (6.0.0) moves SHA256d miners between the operator's own coin pools from one port of its own. It chooses by expected hashes per block and operator-set weights, not by price.
+
+## Guides
+
+- [Troubleshooting Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-troubleshooting-guide.md): Symptoms and what they mean: a pool that won't start, a miner that can't connect, hashrate and share questions, blocks and orphans, payout errors, notifications that don't arrive, settings that don't take effect. Also the built-in Diagnostics page, VarDiff Simulator and Config Summary. Read this first for any problem.
+- [Coin Configuration Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-coin-config-guide.md): Every per-coin setting: coin types and algorithms, the node connection, ZMQ, node failover, merged mining, stratum and starting difficulty, worker names, Stratum V2 listeners, mining address and address formats, VarDiff and flood protection, Coin Alerts, payouts and maturity, the explorer. Read this for any question about adding or tuning a coin, connecting miners, or payouts.
+- [Global Configuration Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-global-config-guide.md): Every global setting: pool name, timeouts, logging, the database and data retention, cleanup, the web UI, Default Pool, Coin Value, the update check, Stratum V2 keys, and the whole of notifications.json (email, Telegram, Discord, webhooks, events).
+- [Hash Hopper Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-hash-hopper-guide.md): What the Hash Hopper is, which coins can take part, setup step by step, the miner username, how a chain is chosen, weights, every hopper.json setting, how to read the Hash Hopper page, what to expect and common questions.
+
+## Release notes
+
+- [Release Notes, 6.x (current)](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/Release%20Notes.md): What changed in each 6.x release, newest first, with upgrade steps and "good to know" notes. Start here for "what's new".
+- [Release Notes, 5.x](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/release_notes-5.x.md): The 5.x series (Stratum V2, Coin Alerts, merged mining with DigiByte, Diagnostics, VarDiff Simulator, Coin Value, new built-in coins). Large (over 100 KB): if it does not fit, read the sections for the versions the user asks about.
+- [Release Notes, 4.x](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/release_note-4.x.md): The 4.x series.
+- [Release Notes, 3.x](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/release_notes-3.x.md): The 3.x series.
+
+## Current version
+
+- [latest.json](https://get.mmfpsolutions.io/versions/gss/latest.json): The current released GoSlimStratum version (`latest`), its release date, and the oldest version still recommended (`min_recommended`). Use it to answer "what is the current version" and "should I update".
+
+## Optional
+
+- [Stratum V2 Setup Guide](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/v5.0.0-Stratum-V2-Setup-Guide.md): Step-by-step key generation and miner setup for Stratum V2.
+- [Direct-to-Miner Best Practices, solo miners](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/v4.0.0-Direct-to-Miner-Best-Practices.md): Direct-to-Miner mode for someone running GoSlimStratum for their own devices.
+- [Direct-to-Miner Best Practices, pool operators](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/v4.0.0-DTM-Pool-Operators.md): Direct-to-Miner mode for someone running a pool that other miners connect to.
+- [Example config.json](https://get.mmfpsolutions.io/documents/examples/GoSlimStratum/gss-config.example.json): A complete example configuration.
+- [Example hopper.json](https://get.mmfpsolutions.io/documents/examples/GoSlimStratum/hopper.example.json): A complete Hash Hopper configuration.
+- [Example coins.json](https://get.mmfpsolutions.io/documents/examples/GoSlimStratum/coins.example.json): An example of a coin added through coins.json, with its [schema](https://get.mmfpsolutions.io/documents/examples/GoSlimStratum/coins.schema.json).
+- [MMFP Solutions index](https://get.mmfpsolutions.io/llms.txt): The other MMFP products and the installer.

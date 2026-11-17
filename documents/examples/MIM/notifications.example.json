@@ -1,0 +1,76 @@
+{
+  "enabled": true,
+  "channels": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.example.com",
+      "smtp_port": 587,
+      "username": "mim@example.com",
+      "password": "your-smtp-password",
+      "use_tls": true,
+      "from_address": "mim@example.com",
+      "to_addresses": [
+        "ops@example.com"
+      ]
+    },
+    "telegram": {
+      "enabled": true,
+      "bot_token": "123456:your-bot-token",
+      "chat_id": "123456789",
+      "message_prefix": "[Home]",
+      "parse_mode": "HTML"
+    },
+    "webhooks": {
+      "discord-alerts": {
+        "enabled": false,
+        "type": "discord",
+        "url": "https://discord.com/api/webhooks/your-webhook",
+        "message_prefix": "[Home]",
+        "username": "MIM"
+      },
+      "my-receiver": {
+        "enabled": false,
+        "type": "generic",
+        "url": "https://example.com/hooks/mim",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer your-token"
+        },
+        "timeout_seconds": 10
+      }
+    }
+  },
+  "events": {
+    "hosts": {
+      "enabled": true,
+      "channels": [
+        "telegram"
+      ],
+      "down": true,
+      "up": true
+    },
+    "updates": {
+      "enabled": true,
+      "channels": [
+        "telegram"
+      ]
+    },
+    "system": {
+      "startup": {
+        "enabled": false,
+        "channels": []
+      },
+      "shutdown": {
+        "enabled": false,
+        "channels": []
+      }
+    }
+  },
+  "rate_limiting": {
+    "hosts": {
+      "enabled": true,
+      "batch_window_seconds": 60,
+      "max_per_batch": 10
+    }
+  }
+}

@@ -1,6 +1,26 @@
 # GSSM Release Notes
 ## v5.x Series
 
+## v5.1.1
+
+**The in-app Help page is up to date again.** Help had fallen behind in a few places. Nothing about how GSSM works has changed.
+
+> **No operator action required on upgrade.**
+
+### Improvements
+
+- **Help matches the pages it describes.** The Add Pool form no longer shows an API Port or WebUI Port field it doesn't have, the device list covers all six device types (including Whatsminer on port 4433), refresh intervals show the real default of 120 seconds, and Standby names Bitaxe and NerdQAxe alongside the Avalon Q.
+
+- **Help covers more of what GSSM does.** New entries for the badges on a miner card, the electricity rate, the Disabled switch, what can be scheduled on which device, the Schedule Applied and Trigger Fired alerts, power tracking and the Energy report.
+
+### Good to know
+
+- **Excluding a miner from notifications also stops its history, its energy tracking and its triggers.** They all run on the same background check. Help now says so. To silence one kind of alert, turn that alert off instead.
+
+- **The Rate Limiting settings on the Notifications page are saved but not applied yet.** Every miner alert is sent. Help now says so.
+
+---
+
 ## v5.1.0
 
 **GSS Hash Hopper support.** GoSlimStratum 6.0.0's Hash Hopper mines whichever of your chains is best at

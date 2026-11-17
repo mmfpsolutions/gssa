@@ -68,9 +68,9 @@ gssa/
 │   ├── AxeOS Dashboard-deprecated/
 │   ├── GSSUC/
 │   ├── examples/             # Example configuration files for each product
-│   │   ├── GoSlimStratum/    # gss-config.example.json, coins.example.json
+│   │   ├── GoSlimStratum/    # gss-config.example.json, coins.example.json, hopper.example.json
 │   │   ├── GSS Miners/       # config.example.json, notifications.example.json
-│   │   ├── MIM/              # servers.example.json
+│   │   ├── MIM/              # servers.example.json, monitoring.example.json, notifications.example.json
 │   │   ├── AxeOS Dashboard-deprecated/  # config.json, access.json, rpcConfig.json, jsonWebTokenKey.json, notifications.json
 │   │   └── GSSUC/            # config.example.json
 │   └── diagrams/
@@ -78,6 +78,34 @@ gssa/
 ├── cli-installer.md          # CLI installer reference
 └── README.md                 # This file
 ```
+
+---
+
+## Using an AI Assistant?
+
+AI assistants don't know GoSlimStratum, GSS Miners or MIM, and tend to guess, borrowing settings from other software. Give yours the facts first. Paste the line for your product into the conversation before your question:
+
+**GoSlimStratum** (the stratum server and pool):
+
+```
+Read https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt and the guides it links to, then help me with GoSlimStratum.
+```
+
+**GSS Miners** (the miner monitoring dashboard):
+
+```
+Read https://get.mmfpsolutions.io/documents/GSS%20Miners/llms.txt and the guides it links to, then help me with GSS Miners.
+```
+
+**MIM** (the infrastructure manager):
+
+```
+Read https://get.mmfpsolutions.io/documents/MIM/llms.txt and the guides it links to, then help me with MIM.
+```
+
+Not sure which product your question is about? Use the index, which lists all three and the installer: [llms.txt](https://get.mmfpsolutions.io/llms.txt)
+
+If your assistant can't open links, open the guide yourself and paste it in.
 
 ---
 
@@ -91,6 +119,8 @@ GoSlimStratum is the stratum mining server at the core of MMFP. It manages miner
 |--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
 | [Global Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-global-config-guide.md)                             | Logging, metrics/database, web UI, and notifications configuration       |
 | [Coin Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-coin-config-guide.md)                                 | Per-coin settings: node connection, stratum, mining, vardiff, and payout |
+| [Hash Hopper Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-hash-hopper-guide.md)                                 | The Hash Hopper (v6.0.0+): setup, how a chain is chosen, every setting   |
+| [Troubleshooting Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/gss-troubleshooting-guide.md)                         | Symptoms and what they mean, and the built-in tools that answer them     |
 
 Example configs: [documents/examples/GoSlimStratum/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GoSlimStratum)
 
@@ -98,12 +128,14 @@ Example configs: [documents/examples/GoSlimStratum/](https://github.com/mmfpsolu
 
 ### GSS Miners (GSSM)
 
-GSS Miners is a monitoring dashboard for mining devices (Bitaxe, Antminer, AvalonQ, Nano3S), GoSlimStratum pools, and blockchain nodes — all in one place.
+GSS Miners is a monitoring dashboard for mining devices (Bitaxe, NerdQAxe, Avalon Q, Nano3s, Antminer, Whatsminer, ElphaPex, NerdMiner), GoSlimStratum pools, litecoinpool.org accounts and blockchain nodes — all in one place.
 
-| Document                                                                                                                                               | Description                                                        |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
-| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-config-guide.md)                                           | Device setup, pool/node integration, thresholds, refresh intervals |
-| [Notifications Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-notifications-guide.md)                             | Email, Telegram, webhook alerting for device/pool/node events      |
+| Document                                                                                                                                               | Description                                                                    |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-config-guide.md)                                           | Miners, pools, nodes, the Coin Map, thresholds, Historicals, every setting     |
+| [Miner Control Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-miner-control-guide.md)                             | Restart, settings, Standby and Wake, Schedules, Triggers, Auto Fan Control     |
+| [Notifications Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-notifications-guide.md)                             | Email, Telegram, webhook alerts, the background checks, every event            |
+| [Troubleshooting Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-troubleshooting-guide.md)                         | Symptoms and what they mean                                                    |
 
 Example configs: [documents/examples/GSS Miners/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GSS%20Miners)
 
@@ -111,11 +143,13 @@ Example configs: [documents/examples/GSS Miners/](https://github.com/mmfpsolutio
 
 ### MIM (Mining Infrastructure Manager)
 
-MIM is a Docker management dashboard that lets you start, stop, update, and monitor containers across one or more servers — all from a single web interface.
+MIM is a web dashboard for the servers your mining stack runs on. From a single web interface it controls Docker containers, installs and updates products and coin nodes, handles OS updates, and (with a license) watches your hosts and sends alerts, across one or more servers.
 
 | Document                                                                                                                  | Description                                        |
 |---------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------|
-| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-config-guide.md)                        | Server definitions (SSH/Docker), timeouts, logging |
+| [User Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-user-guide.md)                            | What each page does, installing coin nodes and other products, stratum ports, OS updates, updating MIM |
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-config-guide.md)                        | Servers and SSH, settings, logging, Host Monitoring, notifications |
+| [Troubleshooting Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-troubleshooting-guide.md)      | Symptoms and what they mean: connection, product, update and alert problems |
 
 Example configs: [documents/examples/MIM/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/MIM)
 

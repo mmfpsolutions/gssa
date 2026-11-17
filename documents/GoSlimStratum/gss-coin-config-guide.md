@@ -2,6 +2,8 @@
 
 Complete reference for configuring coins in your mining pool.
 
+*Current for GoSlimStratum 6.0.0.* See also the [Global Configuration Guide](gss-global-config-guide.md), the [Hash Hopper Guide](gss-hash-hopper-guide.md) and the [Troubleshooting Guide](gss-troubleshooting-guide.md).
+
 ---
 
 ## Summary
@@ -11,6 +13,8 @@ In GoSlimStratum (GSS), each coin can be configured to uniquely cater to the spe
 Every mining device, every blockchain, every network, every internet connection, every host machine (for GSS) can be different. The beauty of GSS is that those differences can be accommodated by way of configuration thereby allowing the operator to achieve maximum hashrate, stability and efficiency. This also presents opportunity for an operator to configure the system to be suboptimal, so careful consideration should be taken when adjusting coin configurations.
 
 > **Note:** Configuration fields can be edited in the GSS WebUI or via direct edits to the config.json file. It is recommended that edits be done with the WebUI. A restart is required after any changes to a coin configuration!
+>
+> **What "restart" means here:** after saving on a coin's Configuration page, restarting that one coin pool is enough for most fields. Use **Restart** on the **Pool Lifecycle** card at the top of the page; miners reconnect within a few seconds and other coins are not touched. Changing `coin_type`, `algorithm` or some merged mining settings needs **Unload**, then **Load & Start**. Coin Alerts thresholds apply as soon as you save. If you edit `config.json` by hand, restart GoSlimStratum.
 
 ---
 
@@ -121,9 +125,40 @@ Here is a complete example of a coin configuration object in `config.json`:
 | `enabled` | Whether this coin is active. Set to `false` to disable without removing config. | `true` |
 | `enable_dtm` | Enable Direct-to-Miner mode. Block rewards go directly to the miner's wallet address via the coinbase transaction. | `false` |
 | `dtm_revenue_share_accepted` | Accept 0.5% revenue share in lieu of a license for DTM mode. Only applies to built-in coins without a license. | `false` |
-| `coin_type` | The coin implementation to use. | `"digibyte"`, `"bitcoin"`, `"bitcoincash"`, `"ecash"`, `"litecoin"`, `"dogecoin"`, `"bitcoinii"` |
-| `algorithm` | Mining algorithm. Set automatically for most coins. DGB supports multiple algorithms on the same instance. | `"sha256d"` (default), `"scrypt"`, `"skein"`, `"qubit"` |
+| `coin_type` | The coin implementation to use. See the table of built-in coins below. Cannot be changed from the Config page once the coin exists. | `"digibyte"`, `"bitcoin"`, `"bitcoincash"` |
+| `algorithm` | Mining algorithm. Set automatically for most coins. DGB supports multiple algorithms on the same instance, each as its own coin entry on its own stratum port. | `"sha256d"` (default), `"scrypt"`, `"skein"`, `"qubit"`, `"odo"` |
 | `display_name` | Human-readable name shown in the web dashboard. | `"DigiByte Mainnet"` |
+
+The name you give the coin entry itself (the key under `coins`, such as `"DGB"`) is the coin's symbol in the web UI, in the database and in every other setting that names a coin. Blocks, shares and payment history are stored under it.
+
+### Built-In Coins
+
+| Coin | `coin_type` | Algorithms | Since |
+|----|-----------|----------|-----|
+| DigiByte (DGB) | `digibyte` | `sha256d`, `scrypt`, `skein`, `qubit`, `odo` (Odocrypt, v5.3.0+) | — |
+| Bitcoin (BTC) | `bitcoin` | `sha256d` | — |
+| Bitcoin Cash (BCH) | `bitcoincash` | `sha256d` | — |
+| eCash (XEC) | `ecash` | `sha256d` | — |
+| Litecoin (LTC) | `litecoin` | `scrypt` | — |
+| Dogecoin (DOGE) | `dogecoin` | `scrypt` | — |
+| Bitcoin II (BC2) | `bitcoinii` | `sha256d` | — |
+| Bitcoin Silver (BTCS) | `bitcoinsilver` | `sha256d` | v5.4.0 |
+| Bitcoin Cash II (BCH2) | `bitcoincashii` | `sha256d` | v5.4.0 |
+| WojakCoin (WJK) | `wojakcoin` | `sha256d` | v5.5.4 |
+| Fractal Bitcoin (FB) | `fractalbitcoin` | `sha256d` | v5.5.5 |
+
+- `odo` is DigiByte-only and Stratum V1 only. GSS won't start if `odo` is set on another coin.
+- Fractal Bitcoin: GSS mines Fractal's regular (permissionless) blocks. Merged mining with Bitcoin is not supported.
+- WojakCoin pays part of every block to its development fund. GSS builds those payments into the block for you; that is why WJK cannot be added through `coins.json`.
+
+### Other Coins (`coins.json`)
+
+A SHA256d coin that is not built in can be defined in `coins.json`, in the same directory as `config.json`. Each entry is keyed by a lowercase name, and that name is what you put in `coin_type`. An entry gives the coin's name, symbol, address formats and explorer links; see [coins.example.json](../examples/GoSlimStratum/coins.example.json) and [coins.schema.json](../examples/GoSlimStratum/coins.schema.json).
+
+- SHA256d coins only.
+- Direct-to-Miner mode on a `coins.json` coin needs a license. Revenue share in lieu of a license applies to built-in coins only.
+- Coin Value shows no price for a `coins.json` coin.
+- If an entry has the same name as a built-in coin, the built-in coin is used.
 
 ---
 
@@ -143,7 +178,7 @@ Connection settings for your coin's node (full or pruned).
 | `zmq_block_notify` | ZMQ endpoint for instant block notifications | Format: `"tcp://IP:PORT"`. Requires node ZMQ config. |
 | `template_refresh_interval` | Seconds between block template polls | 15-30 seconds typical. Lower = more network traffic |
 | `zmq_enabled` | Use ZMQ for instant new block detection | `true` recommended if node supports ZMQ |
-| `zmq_stale_detection_time` | Seconds before falling back to polling if ZMQ silent | 120 default. Adjust to block time for defined coin |
+| `zmq_stale_detection_time` | Seconds before falling back to polling if ZMQ silent | Leave it unset to get the default for the coin: DGB `120`, DOGE `180`, FB `180`, WJK `360`, BTC / BCH / BCH2 / BC2 / BTCS / XEC / LTC `900`, any other coin `300`. `0` disables the check |
 | `dual_node_comm` | Enable ZMQ + Polling, recommended | Default set to `false` if not defined |
 | `alternate_host` | Optional alternate node for block explorer queries and node failover | `"10.0.0.50"` or `"10.0.0.50:14022"`. If no port specified, uses the primary node's port |
 | `enable_failover` | Enable automatic failover to `alternate_host` when the primary node goes down (v4.1.0+) | `false` default. Requires `alternate_host` to be set and a license with the node failover scope. See **Node Failover** below |
@@ -269,9 +304,15 @@ curl --user rpc_user:rpc_password -d '{"jsonrpc":"1.0","method":"getblockchainin
 
 A 200 OK with JSON content = GSS should be detecting it. A 401, connection refused, or timeout = network/auth misconfiguration, not a GSS bug.
 
+### Starting After a Failed Start - AS OF Version 5.5.3
+
+If a coin fails to start once its node is up (for example because one of its ports was briefly in use), GSS tries again by itself on its regular health check and carries on until the coin is running. A coin you stopped yourself stays stopped. The error for a port that is in use says which port and what to do about it.
+
 ### Merged Mining (AuxPoW) - AS OF Version 4.1.0
 
 Merged mining lets your miners simultaneously mine a parent chain and one or more aux (auxiliary) chains using the same hashrate — no extra work, no extra hardware. The classic example is **LTC → DOGE**: scrypt miners hashing for Litecoin can also produce Dogecoin blocks, since DOGE accepts AuxPoW (Auxiliary Proof of Work) blocks proven by LTC's parent chain.
+
+**Supported pairs:** Litecoin + Dogecoin, and from v5.2.3 DigiByte-Scrypt + Dogecoin (a DGB coin entry with `"algorithm": "scrypt"` as the parent). Stratum V2 is not involved: V2 runs on SHA256d coins and merged mining runs on Scrypt.
 
 GSS implements full AuxPoW merged mining with **per-miner DTM coinbases on both chains**, including pool fee splits — most stratum pool implementations limit the aux chain coinbase to a single address. GSS uses the aux node's `submitblock` RPC with a fully constructed block, giving complete control over the aux chain's coinbase outputs.
 
@@ -335,7 +376,11 @@ ltc1qXXX|DXXX.workername    — LTC address + DOGE address + worker name
 ltc1qXXX.workername         — LTC only (no merged mining for this miner)
 ```
 
-If the DOGE address is omitted, GSS falls back to the DOGE pool's `mining.address` config field. Backward compatible — existing miners without pipe syntax continue working unchanged.
+**Merged mining is opt-in per miner (v5.2.3+).** A miner earns aux rewards only when its username carries its own aux payout address in the pipe format above. A miner without one keeps mining the parent chain normally; it just doesn't merge-mine, and the log says so when it connects. Before v5.2.3, a miner with no aux address was merge-mined anyway and its DOGE rewards went to the pool's configured DOGE address. That fallback is gone.
+
+- A mistyped aux address is caught when the miner connects: one warning in the log, and the miner keeps mining the parent chain.
+- **One wallet address, one decision.** Miners that share a parent wallet address share one coinbase, so they share one merged-mining decision. If any worker on an address opts in, every worker on that address contributes to the aux chain. If two workers on one address give different aux addresses, the most recent one wins and the log warns you. For separate aux payouts, use separate parent addresses.
+- **Revenue share (v5.2.3+):** without a license, the 0.5% revenue share you accepted on each coin applies on the aux chain too.
 
 **How it works:**
 
@@ -348,13 +393,14 @@ If the DOGE address is omitted, GSS falls back to the DOGE pool's `mining.addres
 
 **Dashboard:**
 
-- **Parent dashboard (LTC):** Orange `Merged → DOGE` badge in the status area. Each connected miner shows an orange `(M)` indicator next to their worker ID.
+- **Parent dashboard (LTC):** Orange `Merged → DOGE` badge in the status area. A worker shows an **M** badge only while it is actually merge-mining (connected, authorized, with a valid aux address); hover it to see the aux address its rewards pay to. No badge means that miner is not merge-mining. The Block Odds card gains an **Aux Odds** row, worked out from only the miners that are merge-mining.
 - **Aux dashboard (DOGE):** Orange `AuxPoW ← LTC` badge in the status area. DOGE blocks found via merged mining appear in the Recent Blocks card with the same display as standalone-mined blocks.
 
 **Graceful degradation:**
 
 - If the aux node (DOGE) goes offline, jobs are built without the AuxPoW commitment and LTC-only mining continues. When the aux node comes back, the commitment resumes automatically.
 - If `merged_mining` is not set on either coin, behavior is identical to standalone pools — there is zero performance or correctness impact.
+- From v5.2.6, merged mining is re-established automatically when the node comes online after a reboot, and after a coin pool is stopped and started. The dashboard banner also checks what is actually running, not just the configuration: "Merged Mining **Not Active**" with the reason (configured but not running, the aux coin was reloaded, or the aux node has stopped answering). While the aux node is not answering, any aux block found is rejected, so act on that banner.
 
 > **Note:** Merged mining requires DTM mode on both chains. If you don't have a license, you can use revenue share (0.5%) on built-in coins. LTC and DOGE are both built-in coins.
 
@@ -379,6 +425,9 @@ Settings for miners connecting to your pool.
 | `consolidation_threshold_seconds` | Grace period (seconds) for consolidating rapid reconnects under the same worker name | Default `3`. Set to `0` to disable. Only applies when `disambiguation_enabled` is `true` |
 | `ping_enabled` | Attempt to use mining.ping with miners | Default set to `true` if not defined |
 | `ping_interval_seconds` | Seconds between `mining.ping` keep-alive messages | Default `30`. Set to `0` to use legacy behavior (half of `connection_timeout_seconds`) |
+| `tcp_keepalive_idle_seconds`, `tcp_keepalive_interval_seconds`, `tcp_keepalive_count`, `tcp_user_timeout_ms` | Advanced (v5.1.0+). Per-coin overrides of the global TCP keepalive settings | Leave unset to use the global values. Editable in `config.json` only. See the [Global Configuration Guide](gss-global-config-guide.md) |
+
+> **Note:** These settings apply to miners on this coin's own stratum port. Miners on the Hash Hopper port (v6.0.0+) use the Hash Hopper's own Stratum and VarDiff settings on every coin they mine, never a coin's. See the [Hash Hopper Guide](gss-hash-hopper-guide.md).
 
 > [!TIP]
 > - use d=xxx or diff=xxx in the password field for miner suggested difficulty if your miner does not have a specific way to send mining.suggest_difficulty
@@ -453,8 +502,9 @@ Stratum V2 is the next-generation mining protocol — a binary, encrypted, authe
 
 **Important — what V2 is and isn't:**
 
-- **Only `sha256d` algorithm coins** can run V2 today (DGB, BTC, BCH, XEC). Scrypt and other algorithms are not in scope for this release.
-- **Only firmware that supports V2** can use a V2 listener (e.g. NerdQAxe++ firmware shipping today; Bitaxe firmware via [Bitaxe SV2 PR #1553](https://github.com/bitaxeorg/ESP-Miner/pull/1553) once it lands). V1-only firmware ignores the V2 listener and continues using the V1 port — no breaking changes for existing setups.
+- **Only `sha256d` algorithm coins** can run V2 (any SHA256d coin, built in or from `coins.json`). Scrypt, Skein, Qubit and Odo coins are Stratum V1 only.
+- **Only firmware that supports V2** can use a V2 listener. Tested: NerdQAxe++ (Extended channel), Bitaxe (Extended and Standard channels) and, from v5.2.7, Braiins-based miners such as an S19 on BraiinsOS. V1-only firmware ignores the V2 listener and continues using the V1 port — no breaking changes for existing setups.
+- **If you ran V2 in Standard channel mode before v5.2.7,** update: blocks found on a Standard channel were rejected by the node before that release. Extended channel was never affected.
 - **V2 requires a one-time key generation step** on the Global Config page. See the [v5.0.0 Stratum V2 Setup Guide](../../release%20notes/GoSlimStratum/v5.0.0-Stratum-V2-Setup-Guide.md) for the walkthrough.
 - **V2 is opt-in** — every existing coin pool starts up with V2 disabled. Nothing changes for existing operators until they explicitly enable a V2 listener.
 
@@ -477,7 +527,7 @@ The per-coin `sv2` field is an **array** of listener entries. Each entry binds o
 |-----|-----------|----------|
 | `variant` | The SV2 crypto stack. Today only `bip324` is supported (`Noise_NX_Secp256k1+EllSwift_ChaChaPoly_SHA256` with BIP-340 Schnorr cert). | `"bip324"` |
 | `enabled` | Whether this listener actually starts. A disabled entry is parsed and validated but the port is not bound. | `true` to enable; `false` to keep the config in place without binding |
-| `port` | TCP port miners connect to. Must be unique across this coin's V1 stratum port and all other V2 listeners. Default convention: `34254` (BTC), `34255` (BCH), `34256` (other SHA256d coins). | Any free TCP port |
+| `port` | TCP port miners connect to. Must be unique across this coin's V1 stratum port and all other V2 listeners. Default convention: `34254` (BTC), `34255` (BCH), `34256` (other SHA256d coins). | Any free TCP port. Ports from 32768 to 60999 are also the ones Linux hands out for outgoing connections, so a coin that starts late can find its port taken for a moment ("port is in use"). From v5.5.3 that clears by itself; to avoid it altogether, use a port below 32768 |
 | `cert_valid_hours` | Validity window of the server certificate. GSS auto-renews the cert every `cert_valid_hours / 2`, so newly-connecting miners always see a fresh cert. Already-connected miners are unaffected. | `24` (default) |
 
 ### Key Files
@@ -505,7 +555,7 @@ Block construction and coinbase settings.
 | Field | Description | Guidelines |
 |-----|-----------|----------|
 | `address` | **Your Node wallet address for block rewards** | Must be a valid address for this coin. Use legacy format (not bech32) for best compatibility |
-| `network` | Which network to validate against | `"mainnet"` or `"testnet"` |
+| `network` | Which network to validate against | `"mainnet"`, `"testnet"` or `"regtest"` |
 | `coinbase_text` | Text embedded in blocks you mine | Max ~20 chars. Your pool name/signature - default GoSlimStratum* |
 | `extranonce_size` | Bytes reserved for miner nonce space | 8 recommended. Don't change unless you know why |
 | `max_job_history` | Number of old jobs to keep for stale share validation | 20 typical. Higher uses more memory |
@@ -525,6 +575,21 @@ All standard address types are supported for each coin:
 | **BCH** | `1...` | `3...` | — | — | `bitcoincash:q/p...` |
 | **XEC** | `1...` | `3...` | — | — | `ecash:q/p...` |
 | **BC2** | `1...` | `3...` | `bc1q...` | `bc1p...` | — |
+| **BTCS** | `B...` | `3...` | `bs1q...` | `bs1p...` | — |
+| **BCH2** | `1...` | `3...` | — | — | `bitcoincashii:q...` (the prefix is optional) |
+| **WJK** | `W...` | `3...` | — | — | — |
+| **FB** | `1...` | `3...` | `bc1q...` | `bc1p...` | — |
+
+> **Addresses that look like another coin's.** GSS can only check that an address has the right form, and some coins share a form with Bitcoin:
+> - **Fractal Bitcoin** addresses look exactly like Bitcoin's, so any Bitcoin address passes the check.
+> - **WojakCoin** `3...` addresses start the same way as Bitcoin's, and a Bitcoin `3...` address is accepted. Use a `W...` address where you can.
+>
+> Use an address from your own wallet for that coin. Never use an exchange's Bitcoin deposit address: coins sent there are most likely lost.
+
+**Testnet and regtest notes:**
+
+- **Fractal Bitcoin's testnet uses mainnet-style addresses** (`1...`, `3...`, `bc1...`), unlike Bitcoin's testnet. Set `network` to `"testnet"` and use the same kind of address you would on mainnet. Fractal regtest uses `m...`, `n...`, `2...` and `bcrt1...` with `network` set to `"regtest"`.
+- **WojakCoin** uses `m...`, `n...` and `2...` on testnet and regtest. It has no `wj1...` addresses on mainnet or testnet.
 
 BTC and BC2 also accept `bcrt1` regtest addresses when `network` is set to `"testnet"`.
 
@@ -604,6 +669,49 @@ Flood protection automatically deactivates after the miner's first normal varDif
 
 ---
 
+## Alerts Section (Coin Alerts) - AS OF Version 5.1.0
+
+Per-coin alerts on noteworthy shares, rejected shares and network difficulty. They are set in the **Coin Alerts** panel on the coin's Configuration page, and sent through your notification channels.
+
+> **Requires** notifications (a licensed feature) and metrics (PostgreSQL) to be enabled. Without both, the panel does nothing.
+
+```json
+"alerts": {
+    "enabled_coin_alerts": true,
+    "best_share_minimum_value": 1000000000,
+    "notable_share_minimum_value": 0,
+    "notable_share_max_alert_rate": 10,
+    "share_rejection_threshold_count": 20,
+    "share_rejection_window_minutes": 10,
+    "share_rejection_max_alert_rate": 0,
+    "network_difficulty": {
+        "enabled": false,
+        "below_threshold": 0,
+        "above_threshold": 0
+    }
+}
+```
+
+| Field | Description | Guidelines |
+|-----|-----------|----------|
+| `enabled_coin_alerts` | Master switch for this coin's alerts | `false` default |
+| `best_share_minimum_value` | **Best Share alert.** Fires once when any miner sets a new pool-wide best share at or above this value | In the units the miner card's Best Share shows. `0` = off |
+| `notable_share_minimum_value` | **Notable Share alert.** Fires every time any miner submits a share at or above this value, record or not | Same units. `0` = off |
+| `notable_share_max_alert_rate` | Most Notable Share alerts per miner per hour | `10` = at most one every 6 minutes per miner. `0` = unlimited. A share at least twice the last one alerted on breaks through the limit |
+| `share_rejection_threshold_count` | **Rejected Shares alert.** Rejections by one miner, inside the window, that fire the alert | `0` = off. Stale shares count as rejections. The count starts again after the alert fires |
+| `share_rejection_window_minutes` | How far back rejections are counted | `10` default |
+| `share_rejection_max_alert_rate` | Most Rejected Shares alerts per miner per hour | `0` = no cap |
+| `network_difficulty.enabled` | Turn the **Network Difficulty alert** on | `false` default |
+| `network_difficulty.below_threshold` | Fires when network difficulty drops below this value | Raw units, the number the dashboard's Network Difficulty tile shows. `0` = off |
+| `network_difficulty.above_threshold` | Fires when network difficulty rises above this value | Raw units. `0` = off. If both are set, below must be less than above |
+
+- In the web UI the value fields accept SI suffixes: `1G`, `1.5G` or `1000000000`.
+- The Network Difficulty alert fires when a threshold is crossed, once, and again when difficulty comes back inside the band (a recovery alert).
+- **Thresholds apply as soon as you save.** No pool restart is needed, and the pool-best record and rejection counts are kept.
+- **Where each alert is sent** (which channels) is chosen on the Notifications page, under Best Share, Notable Share, Rejected Shares and Network Difficulty (Coin Alerts). See the Events section of the [Global Configuration Guide](gss-global-config-guide.md).
+
+---
+
 ## Payout Section
 
 Automatic payment processing settings.
@@ -632,6 +740,12 @@ Automatic payment processing settings.
 | LTC (Litecoin) | 100 | Standard coinbase maturity |
 | DOGE (Dogecoin) | 240 | Higher maturity requirement |
 | BC2 (Bitcoin II) | 100 | Standard coinbase maturity |
+| BTCS (Bitcoin Silver) | **200** | Twice the usual. Lower than 200 and payouts fail with "insufficient funds" |
+| BCH2 (Bitcoin Cash II) | 100 | Standard coinbase maturity |
+| WJK (WojakCoin) | 20 | The default of 100 is safe but pays out later |
+| FB (Fractal Bitcoin) | 100 | Standard coinbase maturity |
+
+> **Note:** `maturity_confirmations` defaults to `100`. For a coin whose rewards mature later than that (BTCS), you must raise it yourself. A coin added in `coins.json` may also need more than 100: check that coin's own rules.
 
 ### Understanding Satoshis
 
@@ -685,9 +799,9 @@ Settings for the built-in block explorer (v4.1.0+). The explorer queries the coi
 
 ### 5. Maturity Too Low
 
-**Problem:** Payout fails with "immature coinbase" error
+**Problem:** Payout fails with "immature coinbase" or "insufficient funds"
 
-**Solution:** Set `maturity_confirmations` to at least the coin's required maturity (usually 100)
+**Solution:** Set `maturity_confirmations` to at least the coin's required maturity (usually 100; **200 for Bitcoin Silver**). See the table in the Payout section
 
 ### 6. ZMQ Not Configured on Node
 
@@ -700,6 +814,34 @@ Settings for the built-in block explorer (v4.1.0+). The explorer queries the coi
 **Problem:** Payouts fail with "wallet locked" error
 
 **Solution:** Set `wallet_passphrase` in the coin's node config section. GSS will automatically unlock the wallet for each payout and re-lock it immediately after. The passphrase is auto-encrypted in config.json on first startup. Alternatively, use an unencrypted wallet.
+
+### 8. Merged Mining Without an Aux Address
+
+**Problem:** A miner on a merged-mining parent finds no aux (DOGE) blocks and shows no **M** badge
+
+**Solution:** Since v5.2.3 each miner opts in with its own aux address in the username: `PARENTADDRESS|DOGEADDRESS.workername`
+
+### 9. A Wallet Address on the Hash Hopper Port
+
+**Problem:** A miner pointed at the Hash Hopper port with `address.worker` as its username is refused
+
+**Solution:** The Hash Hopper port takes `hopper.<profile>` or `hopper.<profile>.<rig>`, never an address. Payout addresses are set in the profile. See the [Hash Hopper Guide](gss-hash-hopper-guide.md)
+
+For more symptoms and what they mean, see the [Troubleshooting Guide](gss-troubleshooting-guide.md).
+
+---
+
+## Using a Coin with the Hash Hopper - AS OF Version 6.0.0
+
+The Hash Hopper moves SHA256d miners between your coins on a port of its own. Nothing in a coin's configuration turns it on, but a coin can only take hopper miners when it:
+
+- uses the `sha256d` algorithm,
+- is running,
+- is in Direct-to-Miner mode (`enable_dtm`, with a license or accepted revenue share),
+- is not a merged-mining parent, and
+- has the same `extranonce_size` as the other coins the hopper uses.
+
+A block found by a hopper miner is built by that coin exactly as for its own Direct-to-Miner miners, so the coin's pool fee, revenue share and maturity settings apply. Everything else is in the [Hash Hopper Guide](gss-hash-hopper-guide.md).
 
 ---
 

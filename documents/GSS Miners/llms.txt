@@ -1,0 +1,70 @@
+# GSS Miners (GSSM)
+
+> GSS Miners is a self-hosted monitoring dashboard from MMFP Solutions. It reads mining devices (Bitaxe, NerdQAxe, Canaan Avalon, Antminer, Whatsminer, ElphaPex, NerdMiner), GoSlimStratum pools, litecoinpool.org accounts and blockchain nodes directly on the operator's own network, shows them on one dashboard, sends alerts, and can keep history, idle miners on a schedule and act when a miner overheats. This file tells an AI assistant how to help a GSS Miners user accurately and where the facts are.
+
+Accurate for GSS Miners 5.1.0. The current released version is in the latest.json file listed under "Current version".
+
+**Rules for the assistant. Follow these before answering any GSS Miners question.**
+
+- GSS Miners is its own software. Settings, file names, commands and behaviour from other monitoring or pool software (Awesome Miner, Foreman, minerstat, HiveOS and others) do not apply. Do not carry anything over from them.
+- Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- This file contains no setting reference. The guides do. If you cannot open links, say so, and ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
+- If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
+- Ask which GSS Miners version the user runs (it is in the web UI footer and on the Version page). Many entries in the guides are marked with the version they apply from, and several problems were fixed in a particular release.
+- For a problem, start with the Troubleshooting Guide. It lists symptoms and what they mean, and many of them are not faults.
+- Never ask the user for passwords, API keys, bot tokens or key files. Secrets in the configuration files are stored encrypted and shown masked in the web UI; ask the user to describe a setting, not to paste secrets.
+- GSS Miners is not GoSlimStratum. A question about the pool itself (coins, difficulty, payouts, miners connecting, the Hash Hopper's own settings) belongs to GoSlimStratum: open its llms.txt, listed under "Optional".
+- Licensing, tiers and limits: point to https://www.mmfpsolutions.io/pricing.html. Do not quote limits or prices from memory.
+- The HTTP API is not covered by these files, and neither is how sign-in is set up.
+
+**Configuration is done in the web UI. Steer the user there.**
+
+GSS Miners is set up and changed from its web UI. The JSON files are where the web UI saves what the user enters. The guides list every setting by its name in those files so that you can understand them, not so that the user edits them.
+
+- Answer "how do I set or change this" with where it is in the web UI: the page, the section or card, and the name of the field or button, as the guide gives them. Do not answer with JSON for the user to paste into a file.
+- Use the setting names in the guides to find the right setting, to read a file or an error message the user shows you, and to check what a value means. Then give your answer in the web UI's terms.
+- Do not tell the user to log in to the server, open a config file in an editor or restart GSS Miners to make a change the web UI can make. The web UI checks what is entered and applies it the right way. A hand edit is not checked, and a mistake in the file can stop GSS Miners from starting. A save from the web UI can also write over a hand edit.
+- Suggest editing a file only when the guide says the setting is not in the web UI. The guides mark those few settings. Then say plainly that it is a file edit, name the file and the setting, tell the user to keep a copy of the file first, and say that the edit takes effect when GSS Miners restarts.
+- If the user cannot open the web UI at all, the Troubleshooting Guide covers what to do, including the few file edits that get them back in.
+- If the user tells you they have to work from the files (a scripted install, or no browser), help them with the file, and give the same warnings.
+- Where configuration is done: the **Configuration** page (miners, pools, nodes, thresholds, refresh intervals, logging, application settings), with **Auto-Discover** for adding devices; the **Coin Map**, **Notifications** and **Historicals** pages, each opened from the Configuration page; a miner's **Details** page for its **Settings**, **Schedule** and **Triggers**; and the **License** page.
+
+**What to have right about GSS Miners.**
+
+- It is a monitor. Miners do not connect to it, it is not a pool, and it does not mine. It reads each miner over the miner's own API, each GoSlimStratum pool over the GoSlimStratum API, and each node over the node's RPC.
+- A miner is added with a device type (the firmware family), an address and a port: `axeos`, `nerdminer` and `elphapex` over HTTP; `cgminer`, `canaan` and `whatsminer` over TCP. There is no model to set: every miner names itself. What GSS Miners can do to a miner (restart, settings, standby) depends on the family; Antminers and Whatsminers are monitor-only.
+- Configuration lives in JSON files in one config folder: config.json (miners, pools, nodes, thresholds, the Coin Map, Historicals) and notifications.json (alerts, and the pace of the background checks). Almost everything is changed in the web UI, which applies it straight away.
+- Two different timers. `refresh_intervals` in config.json only sets how often an open dashboard page re-reads devices. The `polling` section of notifications.json sets the background checks that alerts, history, energy tracking and triggers run on, and it applies even with notifications off.
+- A miner's coin badge is worked out from what the miner reports (its pool address and username). Some coins share address formats and cannot be told apart; the Coin Map fixes that. A badge only labels a card.
+- A GoSlimStratum pool entry is one coin on one GoSlimStratum server, or that server's Hash Hopper. From 5.1.0 the pool's coin comes from GoSlimStratum itself.
+- Thresholds colour the cards and send the High Temperature alert. They do not act on a miner. Acting on a miner is what Triggers do, with values of their own.
+- Notifications, Historicals, Standby and Wake, Schedules, Triggers and Auto Fan Control need a Pro or Enterprise license. Monitoring does not.
+- Historicals is optional and needs a PostgreSQL database the operator provides. Without it GSS Miners keeps no history.
+- Schedules and time-of-day triggers use the server's clock. With no `TZ` set for the container, that is UTC.
+- Excluding a miner from notifications also stops its history, its energy tracking and its triggers, because they all run on the same background check.
+
+## Guides
+
+- [Troubleshooting Guide](https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-troubleshooting-guide.md): Symptoms and what they mean: GSS Miners won't start or you can't get in, a miner, pool or node that shows offline (with the reason shown on its card), wrong coin badges, figures that look wrong, alerts that don't arrive, schedules and triggers that don't do what was expected, settings that don't take effect, Historicals, Auto-Discover, updating and going back. Read this first for any problem.
+- [Configuration Guide](https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-config-guide.md): Every config.json setting: the config folder and when a change takes effect, top-level settings, miners and device types with what each family supports, GoSlimStratum pools and the Hash Hopper entry, litecoinpool accounts, nodes, the Coin Map (custom coins, address rules, pool mappings, logos), thresholds and their defaults, refresh intervals, logging, electricity cost, the update check, Historicals and energy tracking, secrets, Auto-Discover, the timezone, licensing. Read this for any question about adding a device, pool or node, or a setting in config.json.
+- [Miner Control Guide](https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-miner-control-guide.md): Everything GSS Miners can do to a miner: restart and Bulk Restart, the Settings page, Standby and Wake, Schedules (resting state and windows, when changes happen, the timezone check), Triggers (protective and routine rules, fan and pump rules, guards, holds), Auto Fan Control for the Avalon Nano3s, and the badges these put on the dashboard. Read this for any question about idling, scheduling or automatically protecting a miner.
+- [Notifications Guide](https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-notifications-guide.md): Every notifications.json setting: email, Telegram and its bot commands, Discord and generic webhooks, the polling intervals for the background checks, exclusions, every event with its severity, how alerts behave, and rate limiting.
+
+## Release notes
+
+- [Release Notes, 5.x (current)](https://get.mmfpsolutions.io/release%20notes/GSSM/Release%20Notes.md): What changed in each 5.x release, newest first, with "good to know" notes: Hash Hopper support, the Coin Map, no outside downloads. Start here for "what's new".
+- [Release Notes, 4.x](https://get.mmfpsolutions.io/release%20notes/GSSM/release_notes-4.x.md): Every miner names itself; hardware error rate and per-chip cards for NerdQAxe; NerdMiner firmware 2.0 or newer required.
+- [Release Notes, 3.x](https://get.mmfpsolutions.io/release%20notes/GSSM/release_notes-3.x.md): Historicals, Standby and Wake, Schedules, Triggers, energy tracking, cost estimate, dashboard badges, new coins. Large (about 60 KB): if it does not fit, read the sections for the versions the user asks about.
+- [Release Notes, 2.x](https://get.mmfpsolutions.io/release%20notes/GSSM/release_notes-2.x.md): Whatsminer support, the update check, NerdQAxe++ dual-pool mode, the Auto Fan Control safety fix.
+- [Release Notes, 1.x](https://get.mmfpsolutions.io/release%20notes/GSSM/release_notes-1.x.md): Auto-Discover, encrypted secrets, list view, Bulk Restart, litecoinpool, ElphaPex, disabling a miner, Auto Fan Control.
+
+## Current version
+
+- [latest.json](https://get.mmfpsolutions.io/versions/gssm/latest.json): The current released GSS Miners version (`latest`), its release date, and the oldest version still recommended (`min_recommended`). Use it to answer "what is the current version" and "should I update".
+
+## Optional
+
+- [Example config.json](https://get.mmfpsolutions.io/documents/examples/GSS%20Miners/config.example.json): A complete example configuration.
+- [Example notifications.json](https://get.mmfpsolutions.io/documents/examples/GSS%20Miners/notifications.example.json): A complete example notifications file.
+- [GoSlimStratum llms.txt](https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt): The stratum server and mining pool that GSS Miners monitors. Open this for a question about the pool itself or the Hash Hopper's settings.
+- [MMFP Solutions index](https://get.mmfpsolutions.io/llms.txt): The other MMFP products and the installer.

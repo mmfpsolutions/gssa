@@ -1,4 +1,28 @@
 {
+    "animatedBackground": "nonce-hunt",
+    "coinMap": {
+        "addressRules": [
+            {
+                "coin": "VTX",
+                "id": "aB3dE6gH",
+                "prefix": "vtx1"
+            }
+        ],
+        "customCoins": [
+            {
+                "gssCoinType": "vertexcoin",
+                "symbol": "VTX"
+            }
+        ],
+        "minerPoolMappings": [
+            {
+                "coin": "FB",
+                "host": "192.168.7.10",
+                "id": "jK9mN2pQ",
+                "port": 3334
+            }
+        ]
+    },
     "cookieMaxAge": 3600,
     "cryptNodesEnabled": true,
     "cryptoNodes": [
@@ -15,6 +39,10 @@
     "disableAuthentication": true,
     "disableConfigurations": false,
     "disableSettings": false,
+    "electricity": {
+        "currency": "USD",
+        "ratePerKWh": 0.12
+    },
     "goslimstratumPools": [
         {
             "apiPort": "4004",
@@ -22,11 +50,43 @@
             "gssCoinKey": "DGB",
             "host": "192.168.7.138",
             "id": "qA6wV9yM",
-            "name": "Digibyte",
-            "webuiPort": "3003"
+            "name": "Digibyte"
+        },
+        {
+            "apiPort": "4004",
+            "hashHopper": true,
+            "host": "192.168.7.138",
+            "id": "hK2pL8sD",
+            "name": "Hash Hopper"
         }
     ],
     "goslimstratumPoolsEnabled": true,
+    "historicals": {
+        "batchSize": 100,
+        "database": {
+            "connectionTimeout": 30,
+            "dbName": "gssm",
+            "host": "127.0.0.1",
+            "maxConnections": 10,
+            "password": "{databasePassword}",
+            "port": 5432,
+            "sslMode": "disable",
+            "user": "gssm"
+        },
+        "enabled": false,
+        "flushIntervalSeconds": 10,
+        "notificationRetentionDays": 90,
+        "retentionDays": 7,
+        "trackPowerConsumption": false
+    },
+    "litecoinpoolPools": [
+        {
+            "apiKey": "{litecoinpoolApiKey}",
+            "id": "tR4mN7xQ",
+            "name": "My LTC Account"
+        }
+    ],
+    "litecoinpoolPoolsEnabled": false,
     "logging": {
         "compress": false,
         "level": "info",
@@ -76,6 +136,30 @@
             "id": "4XNz3WzI",
             "name": "Nano3s",
             "port": 4028
+        },
+        {
+            "address": "http://192.168.1.105",
+            "addressType": "http",
+            "deviceType": "nerdminer",
+            "id": "nM3qT7vB",
+            "name": "NerdMiner1",
+            "port": 80
+        },
+        {
+            "address": "http://192.168.1.106",
+            "addressType": "http",
+            "deviceType": "elphapex",
+            "id": "eP5rY2kL",
+            "name": "DG-Home1",
+            "port": 80
+        },
+        {
+            "address": "192.168.1.107",
+            "addressType": "tcp",
+            "deviceType": "whatsminer",
+            "id": "wM8sH4cF",
+            "name": "Whatsminer M30S",
+            "port": 4433
         }
     ],
     "refresh_intervals": {
@@ -149,6 +233,24 @@
                     "warning": 70
                 }
             },
+            "elphapex": {
+                "hwErrorRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 1,
+                    "warning": 0.01
+                },
+                "temperature": {
+                    "critical": 85,
+                    "warning": 70
+                }
+            },
             "nano3s": {
                 "hwErrorRate": {
                     "critical": 5,
@@ -163,12 +265,37 @@
                     "warning": 0.01
                 },
                 "temperature": {
-                    "critical": 100,
-                    "warning": 110
+                    "critical": 95,
+                    "warning": 85
+                }
+            },
+            "whatsminer": {
+                "fanSpeed": {
+                    "critical": 95,
+                    "warning": 80
+                },
+                "hwErrorRate": {
+                    "critical": 5,
+                    "warning": 1
+                },
+                "performance": {
+                    "critical": 80,
+                    "warning": 95
+                },
+                "rejectRate": {
+                    "critical": 5,
+                    "warning": 1
+                },
+                "temperature": {
+                    "critical": 95,
+                    "warning": 85
                 }
             }
         }
     },
     "title": "GSS Miners",
+    "updates": {
+        "enabled": true
+    },
     "webServerPort": 3000
 }

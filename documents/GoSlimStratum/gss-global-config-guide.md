@@ -2,19 +2,25 @@
 
 Complete reference for the global configuration settings in GoSlimStratum (GSS).
 
+*Current for GoSlimStratum 6.0.0.*
+
 ---
 
 ## Summary
 > **Note:** Most of these settings can be changed in the WebUI.
 
-GoSlimStratum uses two configuration files:
+GoSlimStratum keeps its configuration in a few JSON files in its config directory:
 
 - **`config.json`** — The main configuration file. Contains global settings that apply to the entire pool (logging, metrics, web UI) as well as all per-coin configurations.
 - **`notifications.json`** — Optional. Controls alert notifications via email, Telegram, Discord, or custom webhooks.
+- **`coins.json`** — Optional. Defines extra SHA256d coins that are not built in. See the [Coin Configuration Guide](gss-coin-config-guide.md).
+- **`hopper.json`** — Optional (v6.0.0+). The Hash Hopper's settings. See the [Hash Hopper Guide](gss-hash-hopper-guide.md).
 
-This guide covers the global sections of `config.json` and the full `notifications.json`. For per-coin configuration settings, see the [Coin Configuration Guide](coin-config-guide.md).
+This guide covers the global sections of `config.json` and the full `notifications.json`. For per-coin configuration settings, see the [Coin Configuration Guide](gss-coin-config-guide.md). If something isn't working as expected, see the [Troubleshooting Guide](gss-troubleshooting-guide.md).
 
-> **Note:** Configuration changes require a restart of GoSlimStratum to take effect. It is recommended to use the WebUI for edits where possible.
+> **Note:** Most configuration changes require a restart of GoSlimStratum to take effect. It is recommended to use the WebUI for edits where possible.
+>
+> These apply as soon as you save them on the Global Config page, with no restart: **Animated Background**, **Default Pool**, and **Show Coin Price and Value**. Log levels changed on the **Log Stream** page also apply at once; log levels changed on the Global Config page apply at the next restart.
 
 ---
 
@@ -66,6 +72,7 @@ This guide covers the global sections of `config.json` and the full `notificatio
         "port": 3003,
         "api_base_url": "/api/v1",
         "animated_background": "hash-drift",
+        "default_coin": "",
         "block_explorer_urls": {
             "DGB": "https://chainz.cryptoid.info/dgb/block.dws?{hash}",
             "BTC": "https://chainz.cryptoid.info/btc/block.dws?{hash}",
@@ -94,8 +101,15 @@ This guide covers the global sections of `config.json` and the full `notificatio
             "bip324": { "static_key_path": "/app/config/gssv2-static-bip324.key" }
         }
     },
+    "updates": {
+        "enabled": true
+    },
+    "coin_value": {
+        "enabled": false,
+        "currency": "usd"
+    },
     "coins": {
-        "...": "see coin-config-guide.md"
+        "...": "see gss-coin-config-guide.md"
     }
 }
 ```
@@ -109,7 +123,20 @@ Top-level pool identity settings.
 | Field | Default | Description |
 |-----|-------|-----------|
 | `pool_name` | `"GoSlimStratum Pool"` | The display name of your pool. Shown in the web dashboard and used in notifications. |
-| `connection_timeout_seconds` | `600` | Default connection timeout for all coins (seconds). Can be overridden per coin in the stratum section. |
+| `connection_timeout_seconds` | `600` | Default connection timeout for all coins (seconds). Can be overridden per coin in the stratum section. Applies to Stratum V1 miners; Stratum V2 connections are watched by the TCP keepalive settings below. |
+
+### TCP Keepalive (advanced) - AS OF Version 5.1.0
+
+GSS asks the operating system to check that every miner connection (Stratum V1 and V2) is still alive. The defaults suit almost every pool; leave them alone unless you know why you are changing them.
+
+| Field | Default | Description |
+|-----|-------|-----------|
+| `tcp_keepalive_idle_seconds` | `30` | Seconds a connection may be idle before the first keepalive probe is sent. |
+| `tcp_keepalive_interval_seconds` | `15` | Seconds between probes. |
+| `tcp_keepalive_count` | `4` | Unanswered probes before the connection is closed. |
+| `tcp_user_timeout_ms` | `0` (automatic) | Milliseconds that sent data may go unacknowledged before the connection is closed. `0` works it out from the three values above: (idle + count × interval) × 1000, which is `90000` with the defaults. Linux only. |
+
+> **Note:** These four settings are not on the Global Config page. They can only be changed by editing `config.json`. A value of `0` means "use the default". Each can also be set per coin in that coin's `stratum` section; a coin that doesn't set one uses the global value.
 
 ---
 
@@ -201,6 +228,11 @@ Shares are buffered in memory before being written to the database in batches. T
 | `cleanup_interval_hours` | `24` | How often (in hours) the cleanup job runs to remove expired data. |
 | `network_stats_retention_days`|`7`| How many days of network stats to keep in the database. Older stats are pruned. |
 
+**When the cleanup runs:** the interval is counted from when GoSlimStratum starts. A restart starts it again, so the first cleanup comes one full interval after the restart. If you restart more often than the interval, the scheduled cleanup never gets its turn and old rows build up.
+
+**Run Cleanup Now (v6.0.0+):** the button at the foot of the Metrics section on the Global Config page runs the same cleanup straight away. It does not change the schedule. Use it after a restart if you restart often. If you have the `system.cleanup` notification turned on, a manual run sends it too.
+
+From v6.0.0 the cleanup also prunes each miner's difficulty-change history, on the same window as `share_retention_hours`. Blocks, payments and earnings are never pruned.
 
 ### Snapshots & Polling
 
@@ -237,6 +269,8 @@ Controls the built-in web dashboard served by GSS.
 | `host` | `"0.0.0.0"` | IP address to bind the web server to. `"0.0.0.0"` accepts connections on all interfaces. |
 | `port` | `3003` | Port the web dashboard is served on. |
 | `api_base_url` | `"/api/v1"` | URL the web frontend uses to fetch data from the HTTP API. Auto-rewritten to `/api/v1` at startup — the web UI proxies API calls through port 3003 to the backend on port 4004 internally. No need to configure an external URL. |
+| `animated_background` | `"hash-drift"` | The animation behind the dashboard: `"hash-drift"`, `"node-mesh"`, `"share-pulse"`, `"nonce-hunt"` or `"none"`. Applies on save, no restart. |
+| `default_coin` | `""` (automatic) | **Default Pool (v5.4.1+).** The coin pool the web UI opens on: a coin's key from the `coins` section, for example `"BTCS"`. Empty means automatic: DGB if it is loaded, otherwise the first loaded pool. If the chosen pool isn't loaded, the automatic choice is used until it is. From v6.0.0, `"@hopper"` opens the Hash Hopper page while the Hash Hopper is turned on. Applies on save, no restart. |
 
 ### Block Explorer URLs
 
@@ -288,6 +322,48 @@ Controls how often the web dashboard polls the API to update each section (in se
 | `network` | `30` | How often the network difficulty and block height refreshes. |
 
 > **Tip:** Lower refresh intervals give more real-time data but increase API load. The defaults are suitable for most setups.
+
+---
+
+## Coin Value Section - AS OF Version 5.5.0
+
+Shows each coin's price, and what your pool's rewards are worth today, on the dashboard and the Earnings page. On the Global Config page this is **Show Coin Price and Value**, under Web Server Settings. It applies on save, with no restart.
+
+```json
+"coin_value": {
+    "enabled": false,
+    "currency": "usd"
+}
+```
+
+| Field | Default | Description |
+|-----|-------|-----------|
+| `enabled` | `false` | Turn coin price and value on. |
+| `currency` | `"usd"` | The fiat currency to show, as a lowercase code (`"usd"`, `"eur"`, `"gbp"`, `"jpy"` and so on). Any currency the price source supports. |
+
+- **Off by default.** While it is off, GSS makes no price requests at all. While it is on, GSS asks CoinGecko (`api.coingecko.com`) for prices every 15 minutes, for all built-in coins in one request.
+- **Built-in coins on mainnet only.** Coins added in `coins.json`, and testnet or regtest pools, show no price. WojakCoin (WJK) has no price: the price source doesn't list it.
+- **Today's price only.** GSS does not record what a coin was worth when a block was found or paid, so this is not a tax or accounting figure.
+- **No price, no number.** If a price isn't available, the value and price lines don't appear. A zero or made-up price is never shown.
+
+---
+
+## Updates Section - AS OF Version 5.1.1
+
+GSS checks whether a newer version has been released and shows an "update available" badge in the footer and on the Version page. It never updates itself and never sends a notification about it.
+
+```json
+"updates": {
+    "enabled": true
+}
+```
+
+| Field | Default | Description |
+|-----|-------|-----------|
+| `enabled` | `true` | Turn the check on or off. Set to `false` if you want GSS to make no outbound request for it. |
+| `url` | `"https://get.mmfpsolutions.io/versions/gss/latest.json"` | Where the latest version is read from. Only change this if you run a private mirror. |
+
+The check runs when GSS starts and then about once a day. If the request fails (no internet, a firewall), nothing is shown and nothing is logged as an error.
 
 ---
 
@@ -404,6 +480,10 @@ Notifications are configured in a separate file, `notifications.json`. This file
         "payouts": { "enabled": true, "channels": ["telegram"] },
         "nodes": { "enabled": true, "channels": ["telegram"] },
         "miners": { "enabled": false, "channels": [] },
+        "best_share": { "enabled": true, "channels": ["telegram"] },
+        "notable_share": { "enabled": false, "channels": [] },
+        "rejected_shares": { "enabled": true, "channels": ["telegram"] },
+        "network_difficulty": { "enabled": false, "channels": [] },
         "system": {
             "startup": { "enabled": true, "channels": ["telegram"] },
             "shutdown": { "enabled": true, "channels": ["telegram"] },
@@ -504,7 +584,11 @@ Controls which pool events trigger notifications and which channels receive them
 | `blocks` | A block was found by the pool. |
 | `payouts` | A payment was sent to a miner. |
 | `nodes` | A node connection status change (connected, disconnected, error). |
-| `miners` | A miner connected or disconnected. High frequency — rate limiting recommended. |
+| `miners` | A miner connected or disconnected. High frequency — rate limiting recommended. From v6.0.0 this includes rigs on the Hash Hopper port, listed under the hopper's symbol; a move from one chain to another sends neither message. |
+| `best_share` | *(Coin Alerts, v5.1.0+)* A miner set a new pool-best share above the coin's floor. |
+| `notable_share` | *(Coin Alerts, v5.1.0+)* A miner submitted a share above the coin's notable floor. |
+| `rejected_shares` | *(Coin Alerts, v5.1.0+)* A miner crossed the coin's rejected-share threshold. |
+| `network_difficulty` | *(Coin Alerts, v5.1.0+)* A coin's network difficulty crossed a threshold you set, or came back inside it. |
 | `system.startup` | GSS pool started successfully. |
 | `system.shutdown` | GSS pool is shutting down. |
 | `system.cleanup` | A database cleanup task ran. |
@@ -512,6 +596,10 @@ Controls which pool events trigger notifications and which channels receive them
 Each event takes:
 - `enabled` — `true` or `false`
 - `channels` — list of channel names to notify (e.g., `["telegram", "discord"]`)
+
+The `blocks` event covers a block found and, from v5.2.8, a block that was later orphaned (**Block ORPHANED**). Orphan checks run for coins with payouts enabled.
+
+The four Coin Alerts events only say where an alert is sent. What triggers each one (the floors and thresholds) is set per coin: see the Alerts section of the [Coin Configuration Guide](gss-coin-config-guide.md). The easiest way to set events and channels is the **Notifications** page in the web UI, which applies changes without a restart.
 
 ---
 

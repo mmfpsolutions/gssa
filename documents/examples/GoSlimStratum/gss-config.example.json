@@ -1,7 +1,11 @@
 {
   "global": {
     "pool_name": "GoSlimStratum Pool",
-    "connection_timeout_seconds": 600
+    "connection_timeout_seconds": 600,
+    "tcp_keepalive_idle_seconds": 30,
+    "tcp_keepalive_interval_seconds": 15,
+    "tcp_keepalive_count": 4,
+    "tcp_user_timeout_ms": 0
   },
   "coins": {
     "DGB": {
@@ -24,7 +28,8 @@
         "zmq_enabled": true,
         "zmq_stale_detection_time": 120,
         "dual_node_comm": false,
-        "alternate_host": ""
+        "alternate_host": "",
+        "enable_failover": false
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -32,14 +37,22 @@
         "difficulty": 4096,
         "accept_miner_suggested_diff": true,
         "probe_difficulty": 0,
-        "user_agent_difficulty_map": {},
+        "user_agent_difficulty_map": {
+          "nerdqaxe": 50000,
+          "bitaxe": 9000,
+          "nerdoctopus": 24000
+        },
         "connection_timeout_seconds": 600,
         "disambiguation_enabled": false,
         "auto_worker_id": true,
         "default_worker_id": "",
         "consolidation_threshold_seconds": 3,
         "ping_enabled": true,
-        "ping_interval_seconds": 30
+        "ping_interval_seconds": 30,
+        "tcp_keepalive_idle_seconds": 30,
+        "tcp_keepalive_interval_seconds": 15,
+        "tcp_keepalive_count": 4,
+        "tcp_user_timeout_ms": 0
       },
       "sv2": [
         {
@@ -89,6 +102,20 @@
       "explorer": {
         "use_rest_api": false,
         "use_alternate_host": false
+      },
+      "alerts": {
+        "enabled_coin_alerts": false,
+        "best_share_minimum_value": 0,
+        "notable_share_minimum_value": 0,
+        "notable_share_max_alert_rate": 0,
+        "share_rejection_threshold_count": 0,
+        "share_rejection_window_minutes": 10,
+        "share_rejection_max_alert_rate": 0,
+        "network_difficulty": {
+          "enabled": false,
+          "below_threshold": 0,
+          "above_threshold": 0
+        }
       }
     },
     "BTC": {
@@ -110,7 +137,8 @@
         "zmq_enabled": true,
         "zmq_stale_detection_time": 900,
         "dual_node_comm": true,
-        "alternate_host": ""
+        "alternate_host": "",
+        "enable_failover": false
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -196,7 +224,8 @@
         "zmq_enabled": true,
         "zmq_stale_detection_time": 900,
         "dual_node_comm": true,
-        "alternate_host": ""
+        "alternate_host": "",
+        "enable_failover": false
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -283,7 +312,8 @@
         "zmq_enabled": true,
         "zmq_stale_detection_time": 300,
         "dual_node_comm": true,
-        "alternate_host": ""
+        "alternate_host": "",
+        "enable_failover": false
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -340,6 +370,12 @@
       "explorer": {
         "use_rest_api": false,
         "use_alternate_host": false
+      },
+      "merged_mining": {
+        "role": "parent",
+        "aux_chains": [
+          "DOGE"
+        ]
       }
     },
     "DOGE": {
@@ -362,7 +398,8 @@
         "zmq_enabled": true,
         "zmq_stale_detection_time": 120,
         "dual_node_comm": true,
-        "alternate_host": ""
+        "alternate_host": "",
+        "enable_failover": false
       },
       "stratum": {
         "host": "0.0.0.0",
@@ -419,6 +456,10 @@
       "explorer": {
         "use_rest_api": false,
         "use_alternate_host": false
+      },
+      "merged_mining": {
+        "role": "aux",
+        "aux_of": "LTC"
       }
     }
   },
@@ -449,7 +490,11 @@
     "network_poll_interval_seconds": 60,
     "network_stats_retention_days": 7,
     "cleanup_interval_hours": 24,
-    "hashrate_windows": [60, 300, 900],
+    "hashrate_windows": [
+      60,
+      300,
+      900
+    ],
     "log_interval_seconds": 30,
     "connection_flush_interval_seconds": 2,
     "enable_api_cache": true,
@@ -482,12 +527,23 @@
       "miners": 10,
       "blocks": 30,
       "network": 30
-    }
+    },
+    "default_coin": ""
   },
   "sv2": {
     "authority_key_path": "/app/config/gssv2-authority.key",
     "variants": {
-      "bip324": { "static_key_path": "/app/config/gssv2-static-bip324.key" }
+      "bip324": {
+        "static_key_path": "/app/config/gssv2-static-bip324.key"
+      }
     }
+  },
+  "updates": {
+    "enabled": true,
+    "url": "https://get.mmfpsolutions.io/versions/gss/latest.json"
+  },
+  "coin_value": {
+    "enabled": false,
+    "currency": "usd"
   }
 }

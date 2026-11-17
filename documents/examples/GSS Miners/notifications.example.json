@@ -18,7 +18,15 @@
       "bot_token": "[TELEGRAM_BOT_TOKEN]",
       "chat_id": "[YOUR_CHAT_ID]",
       "message_prefix": "[GSS Miners] ",
-      "parse_mode": "HTML"
+      "parse_mode": "HTML",
+      "bot": {
+        "enabled": false,
+        "poll_timeout_seconds": 30,
+        "rate_limit": {
+          "commands_per_minute": 10,
+          "burst_size": 3
+        }
+      }
     },
     "webhooks": {
       "discord-alerts": {
@@ -43,9 +51,11 @@
     }
   },
   "polling": {
-    "miner_check_interval_seconds": 120,
+    "miner_check_interval_seconds": 60,
     "pool_check_interval_seconds": 120,
-    "node_check_interval_seconds": 120
+    "node_check_interval_seconds": 120,
+    "fan_control_interval_seconds": 30,
+    "schedule_interval_seconds": 60
   },
   "exclusions": {
     "miners": [],
@@ -55,34 +65,46 @@
   "events": {
     "miners": {
       "enabled": false,
-      "channels": ["telegram"],
+      "channels": [
+        "telegram"
+      ],
       "failover": true,
       "offline": true,
       "online": true,
       "zero_hashrate": true,
       "temp_high": true,
-      "temp_normal":true
+      "temp_normal": true,
+      "schedule": true,
+      "triggers": true
     },
     "pools": {
       "enabled": false,
-      "channels": ["telegram"],
+      "channels": [
+        "telegram"
+      ],
       "offline": true,
       "online": true
     },
     "nodes": {
       "enabled": false,
-      "channels": ["telegram"],
+      "channels": [
+        "telegram"
+      ],
       "offline": true,
       "online": true
     },
     "system": {
       "startup": {
         "enabled": false,
-        "channels": ["telegram"]
+        "channels": [
+          "telegram"
+        ]
       },
       "shutdown": {
         "enabled": false,
-        "channels": ["telegram"]
+        "channels": [
+          "telegram"
+        ]
       }
     }
   },

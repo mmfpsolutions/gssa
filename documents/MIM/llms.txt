@@ -1,0 +1,66 @@
+# MIM (Mining Infrastructure Manager)
+
+> MIM is a self-hosted web dashboard from MMFP Solutions for the servers that run a mining stack. From one page it shows and controls Docker containers, shows a server's resources, sensors and performance, installs and updates products (coin nodes, GoSlimStratum, GSS Miners and others), checks for and installs operating system updates, opens a terminal, and, with a license, watches hosts and sends alerts. This file tells an AI assistant how to help a MIM user accurately and where the facts are.
+
+Accurate for MIM 3.6.1. The current released version is in the latest.json file listed under "Current version".
+
+**Rules for the assistant. Follow these before answering any MIM question.**
+
+- MIM is its own software. Settings, file names, commands and behaviour from other server or container dashboards (Portainer, Cockpit, Webmin, Rancher and others) do not apply. Do not carry anything over from them.
+- Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- This file contains no setting reference. The guides do. If you cannot open links, say so, and ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
+- If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
+- Ask which MIM version the user runs (it is the version link in the footer of every page). Many sections of the guides are marked with the version they apply from, and several problems were fixed in a particular release.
+- For a problem, start with the Troubleshooting Guide. It lists symptoms and what they mean, and many of them are not faults.
+- Never ask the user for passwords, SSH keys, bot tokens, webhook addresses or a license file. If you need their configuration, ask them to read you the settings from the Config page, or to paste a file with those values removed.
+- MIM acts on real servers. Before recommending an action that is hard to undo, say what it does: Uninstall deletes a coin node's data folder including the blockchain; Reboot and Shutdown act on the whole server; upgrading Docker on the server MIM runs on stops MIM part-way through.
+- Licensing, tiers and limits: point to https://www.mmfpsolutions.io/pricing.html. Do not quote limits from memory.
+- Questions about the mining pool itself (coins, miners connecting, difficulty, payouts) belong to GoSlimStratum, not MIM. Its file is listed under "Optional".
+- The HTTP API is not covered by these files.
+
+**Configuration is done in the web UI. Steer the user there.**
+
+MIM is set up and changed from its web UI. The JSON files are where the web UI saves what the user enters. The guides list every setting by its name in those files so that you can understand them, not so that the user edits them.
+
+- Answer "how do I set or change this" with where it is in the web UI: the page, the section or card, and the name of the field or button, as the guide gives them. Do not answer with JSON for the user to paste into a file.
+- Use the setting names in the guides to find the right setting, to read a file or an error message the user shows you, and to check what a value means. Then give your answer in the web UI's terms.
+- Do not tell the user to log in to the server, open a config file in an editor or restart MIM to make a change the web UI can make. The web UI checks what is entered and applies it the right way. A hand edit is not checked, and a mistake in the file can stop MIM from starting.
+- Suggest editing a file only when the guide says the setting is not in the web UI. The guides mark those few settings. Then say plainly that it is a file edit, name the file and the setting, tell the user to keep a copy of the file first, and say what the guide says is needed for the edit to take effect (**Reload from Disk** on the Config page, or a restart).
+- If the user cannot open the web UI at all, the Troubleshooting Guide covers what to do, including the few file edits that get them back in.
+- If the user tells you they have to work from the files (a scripted install, or no browser), help them with the file, and give the same warnings.
+- Where configuration is done: the **Config** page (gear icon) for servers, general settings, logging and Host Monitoring, and the **Notifications** page (bell icon) for alert channels and events.
+
+**What to have right about MIM.**
+
+- MIM runs as one Docker container and is opened in a browser on port 3001. It manages a server by logging in to it over SSH and running commands there with sudo. Nothing is installed on the managed servers for MIM itself.
+- One MIM can manage several servers. Each is an entry in servers.json with an SSH user. One of them is the "MIM host", the server MIM itself runs on. Only enabled servers count toward the license.
+- Configuration lives in JSON files in one config folder (/data/mim/config on a server set up by the CLI installer): servers.json (servers and global settings), monitoring.json (Host Monitoring) and notifications.json (alert channels and events). Almost all of it is changed on the Config page and the Notifications page.
+- Each server has four tabs: Containers, Server, Performance and Products. The header has Notifications, Monitoring and Config. The footer has the Version page, Logs and Health.
+- MIM does not refresh pages in the background. A page reads the server when it is opened and when Refresh is pressed. Only the Monitoring page updates itself.
+- Products are Docker services in one compose file on the server, /data/docker-compose/docker-compose.yml. Installing a coin node from MIM also creates its wallet, adds a pool for that coin to GoSlimStratum and restarts GoSlimStratum. Each node has its own stratum port, listed in the User Guide.
+- OS updates use apt. MIM lists what is pending and installs only what the user ticks. It never installs or reboots by itself.
+- Host Monitoring, notifications and scheduled OS update checks need a license. Host Monitoring decides what raises an alert (a host that stops answering on SSH, new OS updates); the Notifications page decides where an alert goes (email, Telegram, Discord or a webhook).
+- MIM is not the mining pool and not the miner dashboard. It does not mine, hold coins or talk to miners.
+
+## Guides
+
+- [Troubleshooting Guide](https://get.mmfpsolutions.io/documents/MIM/mim-troubleshooting-guide.md): Symptoms and what they mean: MIM won't start or its pages are blocked, a server that won't connect, settings that seem to do nothing, product install, update and uninstall problems, OS update problems, alerts that don't arrive, and what the Monitoring page's messages mean. Read this first for any problem.
+- [User Guide](https://get.mmfpsolutions.io/documents/MIM/mim-user-guide.md): What MIM is and what each page does: Containers, Server, Performance, Products, OS Updates, Monitoring, Notifications. Installing a coin node step by step, the table of coin nodes with their stratum ports and which run on ARM, what each product button does, where products live on the server, and how to update MIM. Read this for any "how do I" question.
+- [Configuration Guide](https://get.mmfpsolutions.io/documents/MIM/mim-config-guide.md): Every setting: the config files and when a change takes effect, server entries and SSH authentication, what the SSH user needs, general settings, the update check, logging, Host Monitoring (monitoring.json), notifications (notifications.json) with channels, events and the webhook format, validation, licensing and a multi-server example.
+
+## Release notes
+
+- [Release Notes, 3.x (current)](https://get.mmfpsolutions.io/release%20notes/MIM/Release%20Notes.md): What changed in each 3.x release, newest first, with "good to know" notes. Start here for "what's new" and for which release fixed a problem.
+
+## Current version
+
+- [latest.json](https://get.mmfpsolutions.io/versions/mim/latest.json): The current released MIM version (`latest`), its release date, and the oldest version still recommended (`min_recommended`). Use it to answer "what is the current version" and "should I update".
+
+## Optional
+
+- [Example servers.json](https://get.mmfpsolutions.io/documents/examples/MIM/servers.example.json): A one-server configuration.
+- [Example monitoring.json](https://get.mmfpsolutions.io/documents/examples/MIM/monitoring.example.json): Host Monitoring with one host armed.
+- [Example notifications.json](https://get.mmfpsolutions.io/documents/examples/MIM/notifications.example.json): Email, Telegram and two webhooks, with events and rate limiting.
+- [CLI installer guide](https://get.mmfpsolutions.io/cli-installer.md): The one-command installer that sets up MIM together with a coin node, GoSlimStratum and the rest of the stack.
+- [GoSlimStratum llms.txt](https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt): For questions about the mining pool that MIM installs: coins, miners, difficulty, payouts.
+- [MMFP Solutions index](https://get.mmfpsolutions.io/llms.txt): The other MMFP products and the installer.
