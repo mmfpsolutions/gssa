@@ -102,7 +102,7 @@ Weights do two jobs at once. They cancel the difference in cost between chains (
 **Or start from cost: level the chains, then favour one.**
 
 1. On the Hash Hopper page, read each chain's **Next-block cost** in the Chains table. One reading is one moment, and costs move all day. Multiply it by the chain's **Opportunity** figure to get its average over the last day. (Opportunity appears once the hopper has 30 minutes of history.)
-2. Leave the cheapest chain at `1`. Give each other chain its usual cost divided by the cheapest chain's usual cost. The chains are now level, and the hopper moves among all of them as their costs rise and fall.
+2. Leave the cheapest chain at `1`. Give each other chain its usual cost divided by the cheapest chain's usual cost. The chains are now level, and the hopper moves among all of them as their costs rise and fall. Level means no chain is favoured. It does not mean each chain gets an equal share of the time.
 3. To spend more time on a chain, raise its weight. To spend less, lower it. Halving a chain's weight means its cost must fall to half of its usual before it draws level again.
 
 An example, for three chains whose usual costs are 170 PH, 420 PH and 2.8 EH. These figures are an illustration. Use the costs on your own page.
@@ -115,12 +115,16 @@ An example, for three chains whose usual costs are 170 PH, 420 PH and 2.8 EH. Th
 
 With the last column, and DGB at its usual cost, BTCS draws level with DGB when it is about 20% cheaper than usual, and WJK when it is at half its usual cost. A chain then has to be better by the switch threshold as well before rigs move to it.
 
+How far to move a weight is your choice, and the steps in this example are not a rule. Start with a small step, watch for a day, then adjust: lower a chain's weight if it takes the rigs too often, raise it if it never does.
+
 **Check the result before you rely on it.**
 
 - **Chosen now**, on the config page's Chains card, marks the chain that the weights on screen would pick, before you save them.
 - On the Hash Hopper page, the line under **Against the best chain** gives the cost at which a chain would take the rigs: "Needs to fall below 298 PH to beat DGB by 15.0%".
-- Run in shadow mode for a day and read the Switch Log: how often the hopper would have moved, and how long it stayed on each chain. With rigs connected, **Time and shares** on the Profiles table shows how their time was split between the chains.
+- **If you are still in shadow mode,** run it for a day and read the Switch Log: how often the hopper would have moved, and how long it stayed on each chain.
+- **If your rigs are already hopping,** leave shadow mode off: turning it on closes the hopper port and disconnects them. Save the new weights, then read the Switch Log and **Time and shares** on the Profiles table, which shows how the rigs' time was split between the chains.
 - New weights apply as soon as you save them, and no rig reconnects. Hopping gain starts again, because it is worked out with the weights.
+- **Look again now and then.** Usual costs drift over days and weeks as miners come and go on each chain, so a set that was level last week may not be level now. Weights worked out today can rightly differ from ones worked out on another day. Saving each set as a preset makes it easy to go back.
 
 **Your hashrate does not change the right weights.** Cost comes from each chain's network difficulty, and the same rigs would mine whichever chain wins. Hashrate only sets how long a block takes, which is what the **Blocks / day** column shows.
 

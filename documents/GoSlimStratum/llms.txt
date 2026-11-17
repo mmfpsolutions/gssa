@@ -32,9 +32,10 @@ GoSlimStratum is set up and changed from its web UI. The JSON files are where th
 
 - A set of weights has to cancel the difference in cost between the chains before it can express a preference, and chains often differ in cost by ten times or more. Weights that only rank the chains by preference (100 / 30 / 8, or 3 / 2 / 1) usually do the opposite of what the user asked for.
 - Before you suggest any weight, ask for each chain's **Next-block cost** and **Opportunity** from the Chains table on the Hash Hopper page, and the weights the user has now. Then follow "Choosing Weights" in the Hash Hopper Guide.
-- One reading of the costs is one moment. Say so, and point the user to the checks in that section (Chosen now, the line under Against the best chain, shadow mode and the Switch Log) instead of promising how often the rigs will move.
+- One reading of the costs is one moment. Say so, and point the user to the checks in that section (Chosen now, the line under Against the best chain, the Switch Log) instead of promising how often the rigs will move. Level weights do not mean equal time on each chain.
 - Keep the user's own scale. The default weight is 1, a weight is any number above 0, and decimals and values below 1 are normal. Only the proportions between the weights matter, so do not rescale a working set to 100.
 - You do not need the user's hashrate to choose weights.
+- Ask whether the user's rigs are already hopping. If they are, do not tell them to turn shadow mode on to test: that closes the hopper port and disconnects the rigs.
 
 **What to have right about GoSlimStratum.**
 
