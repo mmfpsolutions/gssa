@@ -123,7 +123,7 @@ Not sure which product your question is about? Use the index, which lists all th
 
 If your assistant says it can't open `get.mmfpsolutions.io`, give it the GitHub copy of the same files: replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` in each line.
 
-If it can't open links at all, open the guide yourself and paste it in.
+If it still won't open them, open the first link of your block yourself (the product's `llms.txt`), copy what it shows and paste that into the conversation. It is a short file, and most assistants will then open the guides it links to.
 
 ---
 
