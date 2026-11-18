@@ -6,7 +6,7 @@
 
 - These products are their own software. Nothing from other mining pool or monitoring software applies to them. Do not guess setting names, commands or behaviour.
 - If a link on `get.mmfpsolutions.io` will not open, the same file is on GitHub at the same path. Replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` and try again. For example, `https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt` is also at `https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/llms.txt`. Do this before you ask the user to paste anything.
-- Each product listed under "Products" has its own llms.txt with rules and links to its guides. Open it before answering a question about that product. If you cannot open links, say so and ask the user to paste the file.
+- Each product listed under "Products" has its own llms.txt with rules and links to its guides. Open it before answering a question about that product. If you cannot open a link in this file yourself, say so, give its full address, and ask the user to send you that address in a message of their own: a link the user sends you may open when one found in a file does not. If that fails too, ask the user to paste the file.
 - Each product is configured from its own web UI. When a user asks how to set or change something, tell them where it is in the web UI. Do not hand them JSON to paste into a config file, and do not send them to edit files on the server, unless the product's guide says that setting is not in the web UI. Each product's llms.txt says where its settings are changed.
 - If the files here do not cover something, say so plainly.
 - Pricing and license tiers: https://www.mmfpsolutions.io/pricing.html

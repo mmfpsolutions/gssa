@@ -83,33 +83,45 @@ gssa/
 
 ## Using an AI Assistant?
 
-AI assistants don't know GoSlimStratum, GSS Miners or MIM, and tend to guess, borrowing settings from other software. Give yours the facts first. Paste the line for your product into the conversation before your question:
+AI assistants don't know GoSlimStratum, GSS Miners or MIM, and tend to guess, borrowing settings from other software. Give yours the facts first. Paste the lines for your product into the conversation before your question.
+
+Each block is the product's `llms.txt` (the rules for the assistant) followed by its guides. Paste all of the lines: most assistants open a link you send them, but will not follow the links inside a file they have read.
 
 **GoSlimStratum** (the stratum server and pool):
 
 ```
-Read https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt and the guides it links to, then help me with GoSlimStratum.
+Read all of these, then help me with GoSlimStratum:
+https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt
+https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-troubleshooting-guide.md
+https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-coin-config-guide.md
+https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-global-config-guide.md
+https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-hash-hopper-guide.md
 ```
 
 **GSS Miners** (the miner monitoring dashboard):
 
 ```
-Read https://get.mmfpsolutions.io/documents/GSS%20Miners/llms.txt and the guides it links to, then help me with GSS Miners.
+Read all of these, then help me with GSS Miners:
+https://get.mmfpsolutions.io/documents/GSS%20Miners/llms.txt
+https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-troubleshooting-guide.md
+https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-config-guide.md
+https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-miner-control-guide.md
+https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-notifications-guide.md
 ```
 
 **MIM** (the infrastructure manager):
 
 ```
-Read https://get.mmfpsolutions.io/documents/MIM/llms.txt and the guides it links to, then help me with MIM.
+Read all of these, then help me with MIM:
+https://get.mmfpsolutions.io/documents/MIM/llms.txt
+https://get.mmfpsolutions.io/documents/MIM/mim-troubleshooting-guide.md
+https://get.mmfpsolutions.io/documents/MIM/mim-config-guide.md
+https://get.mmfpsolutions.io/documents/MIM/mim-user-guide.md
 ```
 
 Not sure which product your question is about? Use the index, which lists all three and the installer: [llms.txt](https://get.mmfpsolutions.io/llms.txt)
 
-If your assistant says it can't open `get.mmfpsolutions.io`, give it the GitHub copy of the same file: replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` in the line above. For GoSlimStratum that is:
-
-```
-Read https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/llms.txt and the guides it links to, then help me with GoSlimStratum.
-```
+If your assistant says it can't open `get.mmfpsolutions.io`, give it the GitHub copy of the same files: replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` in each line.
 
 If it can't open links at all, open the guide yourself and paste it in.
 
