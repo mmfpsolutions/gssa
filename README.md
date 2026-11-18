@@ -105,7 +105,13 @@ Read https://get.mmfpsolutions.io/documents/MIM/llms.txt and the guides it links
 
 Not sure which product your question is about? Use the index, which lists all three and the installer: [llms.txt](https://get.mmfpsolutions.io/llms.txt)
 
-If your assistant can't open links, open the guide yourself and paste it in.
+If your assistant says it can't open `get.mmfpsolutions.io`, give it the GitHub copy of the same file: replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` in the line above. For GoSlimStratum that is:
+
+```
+Read https://github.com/mmfpsolutions/gssa/blob/main/documents/GoSlimStratum/llms.txt and the guides it links to, then help me with GoSlimStratum.
+```
+
+If it can't open links at all, open the guide yourself and paste it in.
 
 ---
 

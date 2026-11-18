@@ -8,6 +8,7 @@ Accurate for MIM 3.6.1. The current released version is in the latest.json file 
 
 - MIM is its own software. Settings, file names, commands and behaviour from other server or container dashboards (Portainer, Cockpit, Webmin, Rancher and others) do not apply. Do not carry anything over from them.
 - Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- If a link on `get.mmfpsolutions.io` will not open, the same file is on GitHub at the same path. Replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` and try again. For example, `https://get.mmfpsolutions.io/documents/MIM/mim-config-guide.md` is also at `https://github.com/mmfpsolutions/gssa/blob/main/documents/MIM/mim-config-guide.md`. Do this before you ask the user to paste anything.
 - This file contains no setting reference. The guides do. If you cannot open links, say so, and ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
 - If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
 - Ask which MIM version the user runs (it is the version link in the footer of every page). Many sections of the guides are marked with the version they apply from, and several problems were fixed in a particular release.

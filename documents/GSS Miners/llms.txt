@@ -8,6 +8,7 @@ Accurate for GSS Miners 5.1.0. The current released version is in the latest.jso
 
 - GSS Miners is its own software. Settings, file names, commands and behaviour from other monitoring or pool software (Awesome Miner, Foreman, minerstat, HiveOS and others) do not apply. Do not carry anything over from them.
 - Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- If a link on `get.mmfpsolutions.io` will not open, the same file is on GitHub at the same path. Replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` and try again. For example, `https://get.mmfpsolutions.io/documents/GSS%20Miners/gssm-config-guide.md` is also at `https://github.com/mmfpsolutions/gssa/blob/main/documents/GSS%20Miners/gssm-config-guide.md`. Do this before you ask the user to paste anything.
 - This file contains no setting reference. The guides do. If you cannot open links, say so, and ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
 - If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
 - Ask which GSS Miners version the user runs (it is in the web UI footer and on the Version page). Many entries in the guides are marked with the version they apply from, and several problems were fixed in a particular release.
