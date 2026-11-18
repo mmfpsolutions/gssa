@@ -12,9 +12,19 @@ In GoSlimStratum (GSS), each coin can be configured to uniquely cater to the spe
 
 Every mining device, every blockchain, every network, every internet connection, every host machine (for GSS) can be different. The beauty of GSS is that those differences can be accommodated by way of configuration thereby allowing the operator to achieve maximum hashrate, stability and efficiency. This also presents opportunity for an operator to configure the system to be suboptimal, so careful consideration should be taken when adjusting coin configurations.
 
-> **Note:** Configuration fields can be edited in the GSS WebUI or via direct edits to the config.json file. It is recommended that edits be done with the WebUI. A restart is required after any changes to a coin configuration!
+> **Note:** Configuration fields can be edited in the GSS WebUI or via direct edits to the config.json file. It is recommended that edits be done with the WebUI. A saved change to a coin's configuration does not take effect until that coin pool is unloaded and loaded again (see below).
 >
-> **What "restart" means here:** after saving on a coin's Configuration page, restarting that one coin pool is enough for most fields. Use **Restart** on the **Pool Lifecycle** card at the top of the page; miners reconnect within a few seconds and other coins are not touched. Changing `coin_type`, `algorithm` or some merged mining settings needs **Unload**, then **Load & Start**. Coin Alerts thresholds apply as soon as you save. If you edit `config.json` by hand, restart GoSlimStratum.
+> **How to apply a saved change:** a coin pool reads its configuration when it is loaded. After saving on a coin's Configuration page, use the **Pool Lifecycle** card at the top of the page, in this order:
+>
+> 1. **Stop** (the red square).
+> 2. **Unload** (the grey bin, shown once the pool is stopped).
+> 3. **Load & Start** (the green triangle marked "Click to load", shown once the pool is not loaded).
+>
+> This applies to every field on the page, the stratum port included. That coin's miners are disconnected and reconnect once it is running again; other coins are not touched. The page says the same when you save: "Unload and reload the pool to apply changes."
+>
+> **Restart is not enough.** **Restart** (the blue circular arrow) and **Stop** followed by **Start** bring the pool back with the configuration it was loaded with, so a saved change is not picked up. Restart is for getting a pool going again, not for applying a change.
+>
+> Two exceptions: Coin Alerts thresholds apply as soon as you save, with nothing to stop or load. And restarting GoSlimStratum itself loads every coin afresh, so it applies saved changes too; that is the way to apply a hand edit to `config.json`.
 
 ---
 

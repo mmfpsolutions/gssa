@@ -207,8 +207,7 @@ By design. A rig stays connected to the hopper port while it is moved, so there 
 
 | Changed | Takes effect |
 |---|---|
-| Most fields on a coin's Configuration page | After **Restart** on that coin's Pool Lifecycle card |
-| A coin's `coin_type`, `algorithm`, some merged mining settings | After **Unload**, then **Load & Start** |
+| Any field on a coin's Configuration page, the stratum port included | After **Stop**, then **Unload**, then **Load & Start** on that coin's Pool Lifecycle card. **Restart** alone does not apply it: Restart brings the pool back with the configuration it was loaded with |
 | Coin Alerts thresholds | On save |
 | Notifications page | On save |
 | Animated Background, Default Pool, Show Coin Price and Value | On save |
