@@ -1,6 +1,54 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.7.0
+
+**MIM can now tell you when a server reboots.** A server that freezes and resets itself, loses power
+for a moment, or is restarted can be back up before MIM's "host down" check ever notices. A new
+check, **Reboots**, catches every one of them: it sees that the server has booted again, however
+briefly it was away, and tells you whether the shutdown was planned.
+
+### What's new
+
+- **Reboot detection.** Tick **Reboots** for a host in the Hosts to watch table (Config page, Host
+  Monitoring). MIM checks every 5 minutes by default; you can set anywhere from 1 minute to 24 hours.
+- **Clean or unplanned.** Each reboot is marked:
+  - **Clean:** the server shut down normally, so someone or something asked for it.
+  - **Unplanned:** no normal shutdown was recorded. That means a freeze, a watchdog reset, a power
+    cut or a forced restart.
+  - **Unknown:** MIM found the reboot but couldn't read the server's log to tell which.
+- **A "Host rebooted" notification** for every reboot, with when the server came back, how long it had
+  been up before, and the last time it logged anything. Tick **Host rebooted** on the Hosts row of the
+  Notifications page.
+- **Uptime & Reboots on the Monitoring page.** For each host: how long it has been up, its last reboot
+  and whether it was clean, and how many unplanned reboots it has had. Click the last reboot to see
+  the host's last 10.
+- **The MIM host is covered.** If the server MIM itself runs on reboots, MIM reports it as soon as it
+  is back up. Reboots that happen while MIM is stopped are reported when it starts.
+- **A tidier Monitoring page.** Each check now has its own card: **SSH Availability**, **OS Updates**
+  and **Uptime & Reboots**. Click a card's heading to collapse or expand it, and MIM remembers what
+  you closed. Each heading sums its card up, for example "1 down · 3 up", so a closed card still shows
+  when something needs a look.
+
+### Good to know
+
+- **Reboot detection is included with any MIM license.**
+- **Nothing changes when you upgrade.** The check is off on every host, and the notification is off,
+  until you turn them on.
+- **A host's first check doesn't send a notification.** MIM records the current boot and reports
+  reboots from then on.
+- **Every reboot is reported, including your own maintenance reboots.** Those arrive marked Clean.
+- **A slower check never misses a reboot;** it only tells you later. Each check is one SSH login to
+  the host.
+- **Telling clean from unplanned needs sudo on the host,** which MIM already uses. Nothing needs
+  setting up. If sudo doesn't work for that server, the reboot is still reported, as Unknown.
+- **The "last log entry" time is not the moment of a freeze.** It's the last thing the server wrote
+  before it stopped, which can be a few minutes earlier.
+- **MIM's log now records each failed SSH check,** so a single missed check can be seen afterwards.
+- **Long durations now read in days,** for example "4d 19h".
+
+---
+
 ## v3.6.1.
 
 **MIM's pages now load everything from MIM itself.** The charts on the Server, Performance and Health

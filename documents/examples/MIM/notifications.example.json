@@ -47,7 +47,8 @@
         "telegram"
       ],
       "down": true,
-      "up": true
+      "up": true,
+      "rebooted": true
     },
     "updates": {
       "enabled": true,

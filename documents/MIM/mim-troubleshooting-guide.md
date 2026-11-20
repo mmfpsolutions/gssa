@@ -2,7 +2,7 @@
 
 Symptoms, what they mean, and what to do. Many of them are not faults: they are a setting, a design choice, or something fixed in a later release.
 
-*Current for MIM 3.6.1.*
+*Current for MIM 3.7.0.*
 
 See also the [User Guide](mim-user-guide.md) and the [Configuration Guide](mim-config-guide.md).
 
@@ -85,7 +85,7 @@ A server that accepted the connection and then stopped responding could leave MI
 
 ### Changing Docker Timeout or Refresh Interval changes nothing
 
-Neither is used by MIM 3.6.1. They are kept on the Config page and in `servers.json`, but nothing reads them. Pages load when you open them and when you press Refresh; the Monitoring page updates itself every 10 seconds.
+Neither is used by MIM 3.7.0. They are kept on the Config page and in `servers.json`, but nothing reads them. Pages load when you open them and when you press Refresh; the Monitoring page updates itself every 10 seconds.
 
 ### I edited `monitoring.json` or `notifications.json` and nothing changed
 
@@ -231,15 +231,24 @@ Every one of these must be true. Work down the list:
 2. **Notifications page, Events:** the event is ticked, and at least one channel is ticked under it.
 3. **Notifications page, Channels:** that channel is itself enabled. A channel shown as "(off)" under an event is selected but not enabled.
 4. **Config page, Host Monitoring:** **Monitor hosts** is ticked.
-5. **Config page, Host Monitoring:** the host is **Armed**, with **SSH check** (or **OS updates**) ticked.
+5. **Config page, Host Monitoring:** the host is **Armed**, with the check you expect ticked: **SSH check**, **OS updates** or **Reboots**.
 
 Then press **Send Test** on the channel. Send Test works even when "Send notifications" is off, so a test that arrives proves the channel only, not the rest of the list. If the test fails, the message says why.
 
 ### A host is down but I got no "host down" alert
 
 - **It was already down when MIM started** (or when monitoring was switched on). MIM alerts on changes it sees, so it does not report a host that was down from the start. You will get "host back up" when it returns.
-- **It is the server MIM runs on.** If that server goes down, MIM goes down with it and cannot send anything. To watch it, use a MIM on another machine.
+- **It is the server MIM runs on.** If that server goes down, MIM goes down with it and cannot send anything. To watch it live, use a MIM on another machine. With **Reboots** on for it (v3.7.0+), MIM does tell you afterwards that it rebooted.
+- **The outage was shorter than the check allows.** See "A host froze or rebooted and I got no alert".
 - **Not enough time has passed.** See the next entry.
+
+### A host froze or rebooted and I got no alert
+
+The SSH check reports a host down only after `failures_to_down` failed checks in a row. A host that hangs and is reset, or reboots, within that time never reaches the count, so no "host down" is sent. With a long **Check every (seconds)**, that window is several minutes: at 300 seconds and 3 failures it is about 10.
+
+Turn on **Reboots** for that host (Config page, Host Monitoring, v3.7.0+), and tick **Host rebooted** under Events on the Notifications page. Reboot detection does not depend on catching the outage: it sees that the host has booted again, however short the gap, and says whether the shutdown was clean or unplanned.
+
+From 3.7.0 MIM's log also records each failed SSH check ("check failed (1 of 3)"), so a single miss can be seen afterwards.
 
 ### The alert took several minutes
 
@@ -263,6 +272,32 @@ That is rate limiting. The first alert goes out at once, and the rest arrive as 
 | `cannot resolve host` | The host name could not be looked up |
 | `connected but no SSH banner` | The connection opened but the SSH service never answered: the sign of a hung server |
 | `unexpected banner` | Something other than SSH answered on that port |
+
+### A reboot alert says "Unknown", or that MIM couldn't read the journal
+
+MIM found the reboot but could not tell whether the shutdown was clean. To read the previous boot's journal it uses `sudo`:
+
+| Reason given | Meaning |
+|-----|-----|
+| `sudo failed` | `sudo` did not accept the password MIM has for that server, or the server uses a key with no password and has no passwordless `sudo`. See "A Server Won't Connect". |
+| `no earlier boot in its journal` | The host keeps no journal from before this boot (the journal is not stored on disk, or the host does not use systemd). |
+| `timed out reading its journal` | The host did not answer in time. |
+
+The reboot itself is real in every case. Nothing needs changing on the host beyond `sudo` working for the SSH user.
+
+### A reboot is marked "Unplanned" but I restarted the server myself
+
+MIM calls a reboot clean when the system logged a normal shutdown. A reboot that skips that, such as `reboot -f`, the SysRq key, holding the power button, or a reset from a hypervisor, logs nothing and is marked unplanned. A normal `sudo reboot`, the **Reboot** button on the Server tab, and an update's restart are all clean.
+
+### I turned on reboot detection and got no alert for a reboot
+
+- **A host's first check is silent.** It records the current boot. Reboots after that alert.
+- **The event is off.** After upgrading to 3.7.0, **Host rebooted** on the Hosts row (Notifications page, Events) is off until you tick it.
+- **It is reported at the next check,** not at once. **Check every (minutes)** under Reboot detection on the Config page sets how soon; the default is 5.
+
+### The "last log entry" time doesn't match when the host froze
+
+It is the last thing the previous boot wrote to its log, which can be minutes before a hang. It tells you the host was still alive then, not the exact moment it stopped.
 
 ### MIM's address got banned by fail2ban, sshguard or CrowdSec
 

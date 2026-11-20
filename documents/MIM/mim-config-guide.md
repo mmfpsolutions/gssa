@@ -2,7 +2,7 @@
 
 Reference for every setting in MIM (Mining Infrastructure Manager): the servers it manages, its global settings, Host Monitoring and notifications.
 
-*Current for MIM 3.6.1.*
+*Current for MIM 3.7.0.*
 
 See also the [User Guide](mim-user-guide.md) (what each page does, installing products) and the [Troubleshooting Guide](mim-troubleshooting-guide.md).
 
@@ -27,6 +27,7 @@ MIM also writes these files itself. Don't edit them unless a guide tells you to:
 |-----|-----|
 | `product-inventory.json` | Which products are installed on each server |
 | `os-updates-state.json` | The latest OS update check result for each host (v3.6.0+) |
+| `host-boot-state.json` | Each host's boot ID and its last 10 reboots (v3.7.0+) |
 | `mmfp_license.dat` | Your license, installed from the License page |
 
 **Where the folder is.** Inside the MIM container it is `/app/config`. On a server set up with the [CLI installer](../../cli-installer.md), that folder is `/data/mim/config` on the host.
@@ -182,8 +183,8 @@ Global settings, under `settings` in `servers.json`. On the Config page they are
 | Field | Default | Description |
 |-----|-------|-----------|
 | `ssh_timeout` | `30` | Seconds MIM waits for an SSH connection and login to a server before giving up. From v3.6.0 this also covers a server that accepts the connection and then stops responding. It does not limit how long a command may run once connected. Raise it for slow or distant servers. |
-| `docker_timeout` | `30` | **Not used by MIM 3.6.1.** The value is kept in the file and shown on the Config page (Docker Timeout), but changing it has no effect. Docker commands run over the SSH connection. |
-| `refresh_interval` | `60` | **Not used by MIM 3.6.1.** The value is kept in the file and shown on the Config page (Refresh Interval), but changing it has no effect. Pages load their data when you open them and when you press **Refresh**; the Monitoring page refreshes itself every 10 seconds. |
+| `docker_timeout` | `30` | **Not used by MIM 3.7.0.** The value is kept in the file and shown on the Config page (Docker Timeout), but changing it has no effect. Docker commands run over the SSH connection. |
+| `refresh_interval` | `60` | **Not used by MIM 3.7.0.** The value is kept in the file and shown on the Config page (Refresh Interval), but changing it has no effect. Pages load their data when you open them and when you press **Refresh**; the Monitoring page refreshes itself every 10 seconds. |
 
 ### Update Check (v3.1.2+)
 
@@ -249,12 +250,13 @@ Log timestamps follow the container's timezone (the `TZ` line in `docker-compose
 
 ## Host Monitoring (monitoring.json)
 
-**AS OF Version 3.5.0** (per-host settings and OS update checks from 3.6.0; on the Config page from 3.6.1)
+**AS OF Version 3.5.0** (per-host settings and OS update checks from 3.6.0; on the Config page from 3.6.1; reboot detection from 3.7.0)
 
-Host Monitoring watches the servers you choose and raises an alert when something changes. It has two checks:
+Host Monitoring watches the servers you choose and raises an alert when something changes. It has three checks:
 
 - **SSH check:** connects to the host's SSH port and waits for the SSH service to answer. It does not log in. It catches a server that has hung even when it still answers ping.
 - **OS updates:** logs in with the server's saved SSH credentials, runs `apt update` with `sudo`, and reports what is pending. It never installs anything.
+- **Reboots (v3.7.0+):** logs in and reads the host's boot ID, a value Linux sets fresh at every boot. If it has changed since the last check, the host rebooted, however briefly it was away. MIM then says whether the shutdown was clean or unplanned.
 
 Results show on the **Monitoring** page (pulse icon in the header). Whether an alert is *sent*, and where, is set on the Notifications page.
 
@@ -267,8 +269,8 @@ Results show on the **Monitoring** page (pulse icon in the header). Whether an a
 {
   "enabled": true,
   "host_checks": {
-    "qCwwociO": { "armed": true, "ssh_check": true, "os_updates": true },
-    "Xk29LmP4": { "armed": false, "ssh_check": true, "os_updates": false }
+    "qCwwociO": { "armed": true, "ssh_check": true, "os_updates": true, "reboot_check": true },
+    "Xk29LmP4": { "armed": false, "ssh_check": true, "os_updates": false, "reboot_check": false }
   },
   "checks": {
     "ssh_banner": {
@@ -282,6 +284,9 @@ Results show on the **Monitoring** page (pulse icon in the header). Whether an a
       "notify_security": true,
       "notify_risky": true,
       "notify_other": false
+    },
+    "reboot": {
+      "interval_minutes": 5
     }
   }
 }
@@ -300,9 +305,10 @@ On the Config page this is the **Hosts to watch** table: one row per server.
 
 | Field | Default | Description |
 |-----|-------|-----------|
-| `armed` | `false` | The host's own on/off switch. Disarming stops both checks on that host but keeps the two settings below, so re-arming puts them back. |
-| `ssh_check` | `false` | Run the SSH check on this host. On the Config page, a host armed for the first time starts with this ticked. |
-| `os_updates` | `false` | Run the OS update check on this host. |
+| `armed` | `false` | The host's own on/off switch (the **Armed** column). Disarming stops every check on that host but keeps the settings below, so re-arming puts them back. |
+| `ssh_check` | `false` | Run the SSH check on this host (the **SSH check** column). On the Config page, a host armed for the first time starts with this ticked. |
+| `os_updates` | `false` | Run the OS update check on this host (the **OS updates** column). |
+| `reboot_check` | `false` | Run reboot detection on this host (the **Reboots** column, v3.7.0+). |
 
 A host is checked only when `enabled` is on, the host is `armed`, and that check's own setting is on. A server that is disabled in `servers.json` cannot be armed.
 
@@ -339,6 +345,33 @@ How the check behaves:
 - **One summary per run,** covering every host with something new.
 - **If a host can't be checked,** the Monitoring page says so and MIM tries again every hour. This is not counted as the host being down.
 - **Updates installed outside MIM** show up at the next check. Clicking **Check** on the server's Updates page refreshes the result straight away.
+
+### Reboot Detection Settings (`checks.reboot`)
+
+**AS OF Version 3.7.0**
+
+| Field | Default | Range | Description |
+|-----|-------|-----|-----------|
+| `interval_minutes` | `5` | 1 to 1440 | How often each host's boot ID is read. On the Config page: **Check every (minutes)** under Reboot detection. |
+
+**Choosing the interval.** It only sets how soon you are told. A reboot leaves a mark that stays, so a slower check never misses one; it reports it later. Each check is one SSH login, which the host records in its login log. `5` tells you within 5 minutes at 288 logins a day per host. Use a larger number (`15`, `60`) if you want fewer logins and can wait longer to hear.
+
+**Clean, unplanned or unknown.** When a reboot is found, MIM reads the end of the previous boot's system journal with `sudo`:
+
+| Kind | Meaning |
+|-----|-----|
+| **Clean** | The system logged a normal shutdown: someone or something asked for the reboot (a maintenance reboot, the Reboot button, an update). |
+| **Unplanned** | The previous boot's journal has no shutdown in it: a hang, a watchdog reset, a power cut, or a forced reboot. |
+| **Unknown** | MIM could not read the journal, so it does not guess. The alert gives the reason, usually `sudo failed` (see "What the SSH User Needs"). The reboot is still reported. |
+
+How the check behaves:
+
+- **Every reboot is reported,** clean or not. The kind tells them apart.
+- **A host's first check is silent.** It records the current boot and alerts on changes after that.
+- **Reboots that happen while MIM is stopped are still reported,** when MIM starts. This includes the server MIM itself runs on: MIM goes down with it and reports the reboot once it is back.
+- **Several reboots between two checks count as one.**
+- **If a host can't be checked,** its row on the Monitoring page says so. Nothing is lost: the reboot is found when the host answers again.
+- **It needs a Linux host with systemd** to tell clean from unplanned. No change is needed on the host: the SSH user does not have to be in any extra group, because MIM uses `sudo`.
 
 ### Upgrading From 3.5.x
 
@@ -397,7 +430,7 @@ The Notifications page (bell icon) sets where alerts go. It decides delivery onl
     }
   },
   "events": {
-    "hosts": { "enabled": true, "channels": ["telegram", "email"], "down": true, "up": true },
+    "hosts": { "enabled": true, "channels": ["telegram", "email"], "down": true, "up": true, "rebooted": true },
     "updates": { "enabled": true, "channels": ["telegram"] },
     "system": {
       "startup": { "enabled": false, "channels": [] },
@@ -486,6 +519,7 @@ Each event has its own switch and its own list of channels. A channel is named `
 |-----|-----|-----|-----|-----|
 | Host down | `host_down` | critical | A watched host fails the SSH check `failures_to_down` times in a row | `events.hosts.enabled` and `events.hosts.down` |
 | Host back up | `host_up` | info | A down host answers again. The message says how long it was down. | `events.hosts.enabled` and `events.hosts.up` |
+| Host rebooted (v3.7.0+) | `host_rebooted` | info for a clean reboot; warning for unplanned or unknown | Reboot detection finds a host's boot ID has changed | `events.hosts.enabled` and `events.hosts.rebooted` |
 | OS updates available | `os_updates_available` | warning if any new update is a Security update, otherwise info | A scheduled OS update check finds new updates | `events.updates.enabled` |
 | MIM started | `system_startup` | info | MIM starts | `events.system.startup.enabled` |
 | MIM shutting down | `system_shutdown` | info | MIM is stopped or restarted | `events.system.shutdown.enabled` |
@@ -495,6 +529,7 @@ Each event has its own switch and its own list of channels. A channel is named `
 | `events.hosts.enabled` | `true` | Host events on or off as a group. |
 | `events.hosts.down` | `true` | Send "host down". |
 | `events.hosts.up` | `true` | Send "host back up". |
+| `events.hosts.rebooted` | `true` on a new install | Send "host rebooted" (**Host rebooted** on the Hosts row). **Off after upgrading from 3.6.x or earlier** until you tick it. |
 | `events.hosts.channels` | empty | Channels for host events. |
 | `events.updates.enabled` | `true` on a new install | Send "OS updates available". **Off after upgrading from 3.5.x** until you turn it on. |
 | `events.updates.channels` | empty | Channels for OS update alerts. |
@@ -508,11 +543,12 @@ An event is delivered only when all of these are true: `enabled` at the top is o
 Things to know:
 
 - **A host that is already down when monitoring starts does not raise "host down".** MIM alerts on changes it sees, so restarting MIM does not resend alerts. You still get "host back up" when it returns.
-- **MIM can't report its own outage.** If the server MIM runs on goes down, MIM goes down with it.
+- **MIM can't report its own outage while it is happening.** If the server MIM runs on goes down, MIM goes down with it. With reboot detection on for that server (v3.7.0+), MIM does report the reboot once it is back up.
+- **A "host rebooted" alert carries details:** `kind` (`clean`, `unplanned` or `unknown`), `back_up_at`, `last_log_entry` (the last thing the previous boot logged, which is not the exact moment of a hang) and `up_before` (how long it had been up).
 
 ### Rate Limiting (`rate_limiting.hosts`)
 
-Stops a flood of host alerts when several hosts go down together (a switch failing, for example). The first alert goes out at once; any more in the same window are held and sent as one summary when the window closes. It applies to host events only.
+Stops a flood of host alerts when several hosts go down or reboot together (a switch failing or a power cut, for example). The first alert goes out at once; any more in the same window are held and sent as one summary when the window closes. It applies to host events only.
 
 | Field | Default | Range | Description |
 |-----|-------|-----|-----------|

@@ -2,7 +2,7 @@
 
 What MIM (Mining Infrastructure Manager) does, page by page, and how to install and look after products with it.
 
-*Current for MIM 3.6.1.*
+*Current for MIM 3.7.0.*
 
 See also the [Configuration Guide](mim-config-guide.md) (every setting) and the [Troubleshooting Guide](mim-troubleshooting-guide.md).
 
@@ -17,7 +17,7 @@ MIM is a web dashboard for the servers that run your mining stack. From one page
 - install, update and remove products: coin nodes, GoSlimStratum, GSS Miners and others;
 - check for and install operating system updates;
 - open a terminal on a server;
-- be told when a server stops responding or has new OS updates (with a license).
+- be told when a server stops responding, reboots, or has new OS updates (with a license).
 
 **How it works.** MIM runs as one Docker container. It manages a server by logging in to it over SSH and running commands there. Nothing is installed on the servers for MIM itself: it needs only an SSH user with `sudo` (see "What the SSH User Needs" in the Configuration Guide). One MIM can manage several servers.
 
@@ -37,7 +37,7 @@ MIM is a web dashboard for the servers that run your mining stack. From one page
 | Server tabs | One per enabled server. Click to switch server. On a phone this is a dropdown. |
 | Refresh (circular arrow) | Reloads the page |
 | Notifications (bell) | Where alerts go |
-| Monitoring (pulse) | Status of watched hosts and their OS updates |
+| Monitoring (pulse) | Status of watched hosts, their OS updates and their reboots |
 | Config (gear) | Servers, settings, logging, Host Monitoring |
 
 The header buttons show icons only (v3.6.1+). Hover over one to see its name.
@@ -209,9 +209,11 @@ Checking and installing updates here is free. Having MIM check on a schedule and
 
 ## Monitoring (licensed)
 
-The **Monitoring** page (pulse icon) shows what Host Monitoring has found. It has two parts.
+The **Monitoring** page (pulse icon) shows what Host Monitoring has found. It has three cards, one per check: **SSH Availability**, **OS Updates** and **Uptime & Reboots**. Each shows only the hosts that have that check turned on.
 
-**Host Monitoring:** one row per host with the SSH check on.
+From v3.7.0, click a card's heading to collapse or expand it; MIM remembers which you closed. The right side of each heading sums the card up ("1 down · 3 up", "2 with updates", "1 with unplanned reboots"), so a closed card still tells you when something needs a look.
+
+**SSH Availability:** one row per host with the SSH check on.
 
 | Column | Meaning |
 |-----|-----|
@@ -223,6 +225,17 @@ The **Monitoring** page (pulse icon) shows what Host Monitoring has found. It ha
 
 **OS Updates (v3.6.0+):** totals across your servers, then one row per host with the OS update check on: how many updates are pending, how many are Security and Risky, when it was last checked, whether a reboot is needed, and an **Updates** button that opens that server's Updates page. A host with nothing pending shows **Up to date**. If a host could not be checked, its row says so and keeps its last figures.
 
+**Uptime & Reboots (v3.7.0+):** one row per host with reboot detection on.
+
+| Column | Meaning |
+|-----|-----|
+| Up since | How long the host has been up, and when it booted |
+| Last reboot | How long ago, with a badge: **Clean**, **Unplanned** or **Unknown**. Click it to list that host's last 10 reboots: when it came back, the kind, the last log entry before it, and how long it had been up. "None seen" until the first one. |
+| Unplanned | How many of the stored reboots were unplanned |
+| Detail | "Couldn't check: …" when MIM could not log in to read the boot ID |
+
+Hosts with an unplanned reboot on record are listed first. **Clean** means a normal shutdown was logged. **Unplanned** means none was: a hang, a watchdog reset or a power cut. **Unknown** means MIM could not read the host's journal; hover the badge for the reason.
+
 There is no "check now" button here. To check a server right away, use **Check** on its Updates page.
 
 Which hosts are watched, and how, is set on the Config page under **Host Monitoring**; the **Settings** button on this page goes there. Where alerts are sent is set on the Notifications page. Both are described in the [Configuration Guide](mim-config-guide.md).
@@ -233,7 +246,7 @@ Which hosts are watched, and how, is set on the Config page under **Host Monitor
 
 The **Notifications** page (bell icon) sets up where alerts go: email, Telegram, and any number of webhooks (Discord, or JSON for your own receiver), and which events go to which. Each channel has a **Send Test** button that works before you save.
 
-Events MIM can send: host down, host back up, OS updates available, MIM started, MIM shutting down. See the [Configuration Guide](mim-config-guide.md#notifications-notificationsjson) for every setting.
+Events MIM can send: host down, host back up, host rebooted, OS updates available, MIM started, MIM shutting down. See the [Configuration Guide](mim-config-guide.md#notifications-notificationsjson) for every setting.
 
 ---
 

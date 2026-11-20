@@ -4,7 +4,8 @@
     "qCwwociO": {
       "armed": true,
       "ssh_check": true,
-      "os_updates": true
+      "os_updates": true,
+      "reboot_check": true
     }
   },
   "checks": {
@@ -19,6 +20,9 @@
       "notify_security": true,
       "notify_risky": true,
       "notify_other": false
+    },
+    "reboot": {
+      "interval_minutes": 5
     }
   }
 }
