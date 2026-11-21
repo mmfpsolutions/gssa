@@ -141,7 +141,10 @@ Fractal has three kinds of blocks, each with its own difficulty. GSS mines at th
 
 ### Merged mining: no aux (DOGE) blocks, or no M badge on a miner
 
-- Since v5.2.3, each miner opts in with its own aux address: `PARENTADDRESS|DOGEADDRESS.worker`. No pipe address, no merged mining for that miner.
+- **Look on the parent coin, not the aux coin.** Miners connect to the parent's port, so they are listed on the parent (LTC) dashboard only. No miners on the DOGE dashboard, and the DOGE log line `DTM: Dispatched per-miner jobs to 0 miners`, are both normal.
+- A miner is merge-mining when it has the **M** badge on the parent's dashboard. The parent's log says so when the miner connects: `Merged mining: aux payout registered — DOGE → <address>`.
+- Since v5.2.3, each miner opts in with its own aux address: `PARENTADDRESS|DOGEADDRESS.worker`. No pipe address, no merged mining for that miner. The password field is not read for the aux address.
+- The miner is listed as `PARENTADDRESS.worker`. The aux address is not part of the name shown.
 - An orange **Merged Mining Not Active** banner on the parent's dashboard gives the reason. "Configured but not running": restart the parent coin pool. "The DOGE node has not responded": the aux node is down, and any aux block found meanwhile is rejected.
 - Before v5.2.6, merged mining could stop silently after a server reboot. Update.
 

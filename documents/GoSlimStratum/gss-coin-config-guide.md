@@ -386,7 +386,7 @@ ltc1qXXX|DXXX.workername    — LTC address + DOGE address + worker name
 ltc1qXXX.workername         — LTC only (no merged mining for this miner)
 ```
 
-**Merged mining is opt-in per miner (v5.2.3+).** A miner earns aux rewards only when its username carries its own aux payout address in the pipe format above. A miner without one keeps mining the parent chain normally; it just doesn't merge-mine, and the log says so when it connects. Before v5.2.3, a miner with no aux address was merge-mined anyway and its DOGE rewards went to the pool's configured DOGE address. That fallback is gone.
+**Merged mining is opt-in per miner (v5.2.3+).** A miner earns aux rewards only when its username carries its own aux payout address in the pipe format above. The password field is not read for the aux address. A miner without one keeps mining the parent chain normally; it just doesn't merge-mine, and the log says so when it connects. Before v5.2.3, a miner with no aux address was merge-mined anyway and its DOGE rewards went to the pool's configured DOGE address. That fallback is gone.
 
 - A mistyped aux address is caught when the miner connects: one warning in the log, and the miner keeps mining the parent chain.
 - **One wallet address, one decision.** Miners that share a parent wallet address share one coinbase, so they share one merged-mining decision. If any worker on an address opts in, every worker on that address contributes to the aux chain. If two workers on one address give different aux addresses, the most recent one wins and the log warns you. For separate aux payouts, use separate parent addresses.
@@ -405,6 +405,13 @@ ltc1qXXX.workername         — LTC only (no merged mining for this miner)
 
 - **Parent dashboard (LTC):** Orange `Merged → DOGE` badge in the status area. A worker shows an **M** badge only while it is actually merge-mining (connected, authorized, with a valid aux address); hover it to see the aux address its rewards pay to. No badge means that miner is not merge-mining. The Block Odds card gains an **Aux Odds** row, worked out from only the miners that are merge-mining.
 - **Aux dashboard (DOGE):** Orange `AuxPoW ← LTC` badge in the status area. DOGE blocks found via merged mining appear in the Recent Blocks card with the same display as standalone-mined blocks.
+- **Miners are listed on the parent dashboard only.** A merge-mining miner is connected to the parent's port, so it never appears in the aux coin's miner list, and the aux coin's log line `DTM: Dispatched per-miner jobs to 0 miners` is normal. Neither means merged mining is not working.
+- **The aux address is not part of the name shown.** A miner that logged in as `ltc1qXXX|DXXX.workername` is listed as `ltc1qXXX.workername`.
+
+**How to confirm a miner is merge-mining:**
+
+- The **M** badge beside the worker on the parent (LTC) dashboard.
+- The parent's log when the miner connects: `Merged mining: aux payout registered — DOGE → <address>`. If it says `no aux address supplied` or `invalid DOGE address`, the miner is mining the parent chain only.
 
 **Graceful degradation:**
 

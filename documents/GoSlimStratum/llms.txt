@@ -48,6 +48,7 @@ GoSlimStratum is set up and changed from its web UI. The JSON files are where th
 - Configuration lives in JSON files in one config directory: config.json (global settings and every coin), notifications.json, coins.json and hopper.json. Most settings are changed in the web UI.
 - Two payout modes per coin. Pool mode: rewards go to the pool's node wallet and GoSlimStratum pays the miners. Direct-to-Miner (DTM) mode: each block pays the miner's own address directly in the block. DTM needs a license, or, on a built-in coin, accepting a 0.5% revenue share.
 - A miner's username on a coin's port is its wallet address for that coin, then a dot, then a worker name. Merged mining and the Hash Hopper port use different username formats; see their guides.
+- In merged mining, miners connect to the parent coin's port (for example LTC) and are listed on the parent coin's dashboard only. An aux coin (for example DOGE) that shows no miners, or logs "Dispatched per-miner jobs to 0 miners", is normal: do not treat either as a fault. A miner is merge-mining when it has the **M** badge on the parent's dashboard.
 - Miners can connect over Stratum V1, or Stratum V2 on SHA256d coins.
 - The dashboard's hashrate is worked out from the shares a miner submits. It is not read from the miner, so short-window figures are noisy.
 - The web UI, the API and all history need metrics enabled with a PostgreSQL database.
