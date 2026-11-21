@@ -1,0 +1,65 @@
+# GoSlimStratum User Client (GSSUC)
+
+> GSSUC is a self-hosted web page from MMFP Solutions for the miners of a GoSlimStratum pool. A miner picks a coin, enters a wallet address and sees their own miners, hashrate, blocks and payments; a miner on the pool's Hash Hopper enters a profile name and sees their rigs across chains. The pool operator installs it and points it at GoSlimStratum. This file tells an AI assistant how to help a GSSUC user accurately and where the facts are.
+
+Accurate for GSSUC 2.0.0. The version a user runs is at the bottom of every GSSUC page ("Powered by GoSlimStratum User Client v...").
+
+**Rules for the assistant. Follow these before answering any GSSUC question.**
+
+- GSSUC is its own software. Settings, file names, commands and behaviour from other pool front ends and pool software (NOMP, MPOS, ckpool, public-pool, Miningcore web UIs and others) do not apply. Do not carry anything over from them.
+- Before you name a setting, a file, a port, a page or a button, open the guide below that covers it and use the name exactly as written there. Never invent a setting name or guess one from another product. If a setting is not in the guides, it does not exist.
+- If a link on `get.mmfpsolutions.io` will not open, the same file is on GitHub at the same path. Replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` and try again. For example, `https://get.mmfpsolutions.io/documents/GSSUC/gssuc-config-guide.md` is also at `https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-config-guide.md`. Do this before you ask the user to paste anything.
+- This file contains no setting reference. The guides do. If you cannot open a link in this file yourself, say so. Name the guide you need, give its full address, and ask the user to send you that address in a message of their own: a link the user sends you may open when one found in a file does not. If that fails too, ask the user to paste the guide (or the section) into the conversation. Do not answer from memory.
+- If the guides do not cover the question, say that plainly. Do not fill the gap with a guess.
+- Find out who you are helping. A pool operator runs GSSUC and can change its settings. A miner only visits it: they cannot change anything, and the answer to most of their questions is where to look on the page or what to ask their pool operator.
+- Ask which GSSUC version the user runs. Sections of the guides are marked with the version they apply from. The Hash Hopper pages need GSSUC 2.0.0 or later and GoSlimStratum 6.0.0 or later.
+- For a problem, start with the Troubleshooting Guide. It lists symptoms and what they mean, and many of them are not faults.
+- Never ask the user for the admin PIN. If you need their configuration, ask them to read you the settings from the Configuration page.
+- GSSUC only displays. A question about the pool itself (coins, difficulty, payouts, miners connecting, how the Hash Hopper chooses a chain, creating a Hash Hopper profile) belongs to GoSlimStratum: open its llms.txt, listed under "Optional".
+- Licensing and pricing: point to https://www.mmfpsolutions.io/pricing.html. Do not quote limits or prices from memory.
+- The HTTP API is not covered by these files.
+
+**Configuration is done in the web UI. Steer the user there.**
+
+GSSUC is set up and changed from its admin panel. `config.json` is where the admin panel saves what the operator enters. The Configuration Guide lists every setting by its name in that file so that you can understand it, not so that the user edits it.
+
+- Answer "how do I set or change this" with where it is in the admin panel: the gear icon, the PIN, **Configuration**, then the section and the name of the field, as the guide gives them. Do not answer with JSON for the user to paste into a file.
+- Use the setting names in the guide to find the right setting, to read a file or an error message the user shows you, and to check what a value means. Then give your answer in the admin panel's terms.
+- Do not tell the user to log in to the server, open `config.json` in an editor or restart GSSUC to make a change the admin panel can make. The admin panel checks what is entered, keeps a backup copy of the file and applies the change at once. A hand edit is not checked, and a mistake in the file stops GSSUC from starting.
+- Suggest editing the file only where a guide says to: a forgotten PIN, an admin panel that was turned off, or a GSSUC that will not start. Then say plainly that it is a file edit, name the file and the setting, tell the user to keep a copy of the file first, and say that GSSUC must be restarted.
+- Four settings need a restart after they are saved: Port, Host, the GSS API Base URL, and Enable Web Admin. Everything else applies when saved.
+- If the user tells you they have to work from the file (a scripted install, or no browser), help them with the file, and give the same warnings.
+
+**What to have right about GSSUC.**
+
+- It displays GoSlimStratum's data and stores nothing. It has no database, no accounts and no sign-up. A visitor's browser talks only to GSSUC; GSSUC talks to GoSlimStratum.
+- Miners do not connect to it. It is not the pool. The stratum host and port it shows for each coin are text from its own settings, for the miner to read.
+- It runs as one Docker container, is opened in a browser on port 3005, and is installed from MIM's Products page. It is not part of the CLI installer. On a MIM install its settings are in `/data/gssuc/config/config.json`.
+- A miner finds their stats by wallet address. GSSUC lists every miner on the chosen coin whose stratum username starts with that address. There is nothing to register.
+- Each coin GSSUC shows is a pool entry whose GSS key is that coin's key in GoSlimStratum. A coin that is not an enabled pool entry is not shown, even if GoSlimStratum mines it.
+- GSSUC serves plain HTTP. When it can be reached from the internet, the recommendation is always both: run it behind a reverse proxy, and serve it over TLS (HTTPS) at the proxy. Best of all, never expose the admin panel: have the proxy refuse `/admin` and `/api/v1/admin` for outside visitors, and reach the panel from inside the network or over a VPN. Also set a PIN of the operator's own. The User Guide section "Putting GSSUC on the internet" has the list. Say this whenever a user talks about exposing GSSUC, port forwarding 3005, or a public address for their miners.
+- The admin panel is behind three things at once: an optional restriction to private network addresses, an optional hidden gear icon, and a PIN. Five wrong PINs in 15 minutes lock that address out for an hour.
+- Explorer links come from GoSlimStratum's settings, not GSSUC's. A coin with no explorer address there shows hashes as plain text.
+- A pool in Direct-to-Miner mode pays each block's reward straight to the miner's address, so Payment History is empty and the blocks on Block History become "Spendable". That is not a fault.
+- The Hash Hopper is a GoSlimStratum feature. GSSUC shows it only when "Show the Hash Hopper" is ticked in GSSUC and GoSlimStratum reports a Hash Hopper that is turned on, has its port open and is not in shadow mode. GSSUC has no port setting for it: the port comes from GoSlimStratum.
+- A Hash Hopper miner is found by profile name, not by address. The profile name is the part after `hopper.` in the rig's username (`hopper.<profile>.<rig>`). Profiles are created by the pool operator in GoSlimStratum; GSSUC cannot create or change one.
+- On a coin's wallet dashboard, a Hash Hopper rig that is mining another chain reads "On" followed by that chain's symbol in the Status column. It is connected and working, not offline. Online and the hashrate on a coin's dashboard count only what is on that coin now.
+- GSSUC does not show the operator's Hash Hopper settings (weights, costs, switching rules, the Switch Log, the hopping gain), and shows payout addresses on the Hash Hopper dashboard shortened.
+
+## Guides
+
+- [Troubleshooting Guide](https://get.mmfpsolutions.io/documents/GSSUC/gssuc-troubleshooting-guide.md): Symptoms and what they mean: a miner who can't find their stats, a miner shown Offline or "On" another coin, empty Payment History, missing explorer links, the Hash Hopper card that does not appear (a seven-step check), an unknown profile, GSSUC unable to reach GoSlimStratum, the gear icon or admin panel that is missing, a refused or forgotten PIN, settings that don't take effect, a GSSUC that won't start. Read this first for any problem.
+- [User Guide](https://get.mmfpsolutions.io/documents/GSSUC/gssuc-user-guide.md): What GSSUC is and is not, installing it from MIM and what MIM asks for, first steps, putting it on the internet (reverse proxy, TLS, PIN), and what every page shows: the home page, the wallet dashboard, Miner Details, Block History and its statuses, Payment History, Network Statistics. The Hash Hopper: turning it on, the card, the profile dashboard, what miners are not shown, and Hash Hopper rigs on a coin's dashboard. Read this for any "how do I" or "what does this mean" question.
+- [Configuration Guide](https://get.mmfpsolutions.io/documents/GSSUC/gssuc-config-guide.md): Every config.json setting: the app server, the GoSlimStratum API connection, pools and coin badges, the Hash Hopper section, site title, refresh intervals and page sizes, logging, the footer, security and the admin panel, validation rules, and the environment variables. Read this for any question about a setting.
+
+## Release notes
+
+- [Release Notes, 2.x (current)](https://get.mmfpsolutions.io/release%20notes/GSSUC/Release%20Notes.md): What changed in each 2.x release, newest first, with "good to know" notes. Release notes begin with 2.0.0.
+
+## Optional
+
+- [Example config.json](https://get.mmfpsolutions.io/documents/examples/GSSUC/config.example.json): Three pools, the Hash Hopper section and every other setting at its default.
+- [GoSlimStratum llms.txt](https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt): For questions about the pool GSSUC displays: coins, miners connecting, difficulty, payouts, Direct-to-Miner mode, and the Hash Hopper's own setup and profiles.
+- [GoSlimStratum Hash Hopper Guide](https://get.mmfpsolutions.io/documents/GoSlimStratum/gss-hash-hopper-guide.md): How the Hash Hopper works and is configured in GoSlimStratum, including creating profiles.
+- [MIM llms.txt](https://get.mmfpsolutions.io/documents/MIM/llms.txt): For installing, updating or restarting GSSUC from MIM's Products page.
+- [MMFP Solutions index](https://get.mmfpsolutions.io/llms.txt): The other MMFP products and the installer.

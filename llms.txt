@@ -1,6 +1,6 @@
 # MMFP Solutions
 
-> MMFP Solutions makes a self-hosted cryptocurrency mining stack: GoSlimStratum (the stratum server and mining pool), GSS Miners (a miner monitoring dashboard), MIM (an infrastructure manager) and a one-command installer that deploys them with a coin node. This site, get.mmfpsolutions.io, holds the installer, the product guides, the release notes and the current version of each product. This file is the index for AI assistants.
+> MMFP Solutions makes a self-hosted cryptocurrency mining stack: GoSlimStratum (the stratum server and mining pool), GSS Miners (a miner monitoring dashboard), MIM (an infrastructure manager), GSSUC (a web page where a pool's miners look up their own stats) and a one-command installer that deploys them with a coin node. This site, get.mmfpsolutions.io, holds the installer, the product guides, the release notes and the current version of each product. This file is the index for AI assistants.
 
 **For the assistant.**
 
@@ -16,6 +16,7 @@
 - [GoSlimStratum (GSS)](https://get.mmfpsolutions.io/documents/GoSlimStratum/llms.txt): The stratum server and mining pool. Open this for anything about coins, miners connecting, difficulty, payouts, Direct-to-Miner mode, merged mining, Stratum V2, notifications, the Hash Hopper, or a GoSlimStratum problem.
 - [GSS Miners (GSSM)](https://get.mmfpsolutions.io/documents/GSS%20Miners/llms.txt): The monitoring dashboard for miners, pools and nodes. Open this for anything about adding a miner, pool or node to the dashboard, a device that shows offline, coin badges, thresholds, alerts, history and energy tracking, idling a miner (Standby, Schedules), protecting one that overheats (Triggers), or a GSS Miners problem.
 - [MIM (Mining Infrastructure Manager)](https://get.mmfpsolutions.io/documents/MIM/llms.txt): The infrastructure manager, a web dashboard for the servers the stack runs on. Open this for anything about managing servers over SSH, Docker containers, installing or updating products and coin nodes from the Products page, OS updates, the server terminal, host monitoring and its alerts, or a MIM problem.
+- [GoSlimStratum User Client (GSSUC)](https://get.mmfpsolutions.io/documents/GSSUC/llms.txt): The web page a pool operator runs for the pool's miners. Open this for anything about a miner looking up their stats by wallet address, the wallet dashboard, Block History and Payment History, the Hash Hopper dashboard a miner sees, a rig shown as offline or on another coin, GSSUC's admin panel and PIN, or a GSSUC problem. It is installed from MIM, not by the CLI installer.
 
 ## Installing
 
@@ -38,8 +39,11 @@ Each file gives the current released version (`latest`), its release date (`rele
 - [GSS Miners latest.json](https://get.mmfpsolutions.io/versions/gssm/latest.json): Current GSS Miners (GSSM) version.
 - [MIM latest.json](https://get.mmfpsolutions.io/versions/mim/latest.json): Current MIM version.
 
+GSSUC has no latest.json. The version a user runs is at the bottom of every GSSUC page.
+
 ## Release notes
 
 - [GoSlimStratum release notes](https://get.mmfpsolutions.io/release%20notes/GoSlimStratum/Release%20Notes.md): The current series (6.x), newest first: what changed, what to do when upgrading, and things to know. Earlier series (5.x, 4.x, 3.x) are linked from the GoSlimStratum llms.txt.
 - [GSS Miners release notes](https://get.mmfpsolutions.io/release%20notes/GSSM/Release%20Notes.md): The current series (5.x), newest first. Earlier series (4.x, 3.x, 2.x, 1.x) are linked from the GSS Miners llms.txt.
 - [MIM release notes](https://get.mmfpsolutions.io/release%20notes/MIM/Release%20Notes.md): The 3.x series, newest first: what changed in each release and things to know.
+- [GSSUC release notes](https://get.mmfpsolutions.io/release%20notes/GSSUC/Release%20Notes.md): The 2.x series, newest first. Release notes begin with 2.0.0.

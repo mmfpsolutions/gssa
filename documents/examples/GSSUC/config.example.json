@@ -39,6 +39,11 @@
       "stratum_port": 3335
     }
   ],
+  "hash_hopper": {
+    "enabled": false,
+    "display_name": "Hash Hopper",
+    "stratum_host": "stratum.example.com"
+  },
   "web_ui": {
     "site_title": "My Mining Pool",
     "refresh_intervals": {

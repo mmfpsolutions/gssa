@@ -83,7 +83,7 @@ gssa/
 
 ## Using an AI Assistant?
 
-AI assistants don't know GoSlimStratum, GSS Miners or MIM, and tend to guess, borrowing settings from other software. Give yours the facts first. Paste the lines for your product into the conversation before your question.
+AI assistants don't know GoSlimStratum, GSS Miners, MIM or GSSUC, and tend to guess, borrowing settings from other software. Give yours the facts first. Paste the lines for your product into the conversation before your question.
 
 Each block is the product's `llms.txt` (the rules for the assistant) followed by its guides. Paste all of the lines: most assistants open a link you send them, but will not follow the links inside a file they have read.
 
@@ -119,7 +119,17 @@ https://get.mmfpsolutions.io/documents/MIM/mim-config-guide.md
 https://get.mmfpsolutions.io/documents/MIM/mim-user-guide.md
 ```
 
-Not sure which product your question is about? Use the index, which lists all three and the installer: [llms.txt](https://get.mmfpsolutions.io/llms.txt)
+**GSSUC** (the page where a pool's miners look up their stats):
+
+```
+Read all of these, then help me with GSSUC:
+https://get.mmfpsolutions.io/documents/GSSUC/llms.txt
+https://get.mmfpsolutions.io/documents/GSSUC/gssuc-troubleshooting-guide.md
+https://get.mmfpsolutions.io/documents/GSSUC/gssuc-user-guide.md
+https://get.mmfpsolutions.io/documents/GSSUC/gssuc-config-guide.md
+```
+
+Not sure which product your question is about? Use the index, which lists all four and the installer: [llms.txt](https://get.mmfpsolutions.io/llms.txt)
 
 If your assistant says it can't open `get.mmfpsolutions.io`, give it the GitHub copy of the same files: replace `https://get.mmfpsolutions.io/` with `https://github.com/mmfpsolutions/gssa/blob/main/` in each line.
 
@@ -187,11 +197,13 @@ Example configs: [documents/examples/AxeOS Dashboard/](https://github.com/mmfpso
 
 ### GoSlimStratum User Client (GSSUC)
 
-GSSUC is a public-facing web dashboard for miners using a GoSlimStratum pool. Miners enter their wallet address to view their active rigs, hashrate, block discoveries, and payment history. Supports multiple coins and includes an admin panel for operators.
+GSSUC is a public-facing web dashboard for miners using a GoSlimStratum pool. Miners enter their wallet address to view their active rigs, hashrate, block discoveries, and payment history. From v2.0.0, miners on the pool's Hash Hopper enter their profile name to see their rigs across chains. Supports multiple coins and includes an admin panel for operators. Installed from MIM's Products page.
 
 | Document                                                                                                                  | Description                                                                           |
 |---------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-config-guide.md)                    | App server, GSS API connection, pools, web UI, logging, footer, and security settings |
+| [User Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-user-guide.md)                        | Installing, what each page shows, turning on the Hash Hopper pages (v2.0.0+)          |
+| [Config Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-config-guide.md)                    | App server, GSS API connection, pools, the Hash Hopper, web UI, logging, footer, and security settings |
+| [Troubleshooting Guide](https://github.com/mmfpsolutions/gssa/blob/main/documents/GSSUC/gssuc-troubleshooting-guide.md)  | Symptoms and what they mean: stats that can't be found, the Hash Hopper card, the admin panel and PIN |
 
 Example configs: [documents/examples/GSSUC/](https://github.com/mmfpsolutions/gssa/tree/main/documents/examples/GSSUC)
 
