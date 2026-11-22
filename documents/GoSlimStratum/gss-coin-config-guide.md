@@ -386,7 +386,20 @@ ltc1qXXX|DXXX.workername    — LTC address + DOGE address + worker name
 ltc1qXXX.workername         — LTC only (no merged mining for this miner)
 ```
 
-**Merged mining is opt-in per miner (v5.2.3+).** A miner earns aux rewards only when its username carries its own aux payout address in the pipe format above. The password field is not read for the aux address. A miner without one keeps mining the parent chain normally; it just doesn't merge-mine, and the log says so when it connects. Before v5.2.3, a miner with no aux address was merge-mined anyway and its DOGE rewards went to the pool's configured DOGE address. That fallback is gone.
+**If your miner won't accept the `|` (v6.0.1+):** some miner firmware refuses a `|` in the username, or cuts a long username short. Keep the plain username and put the aux address in the miner's **password** field instead:
+
+```
+username:  ltc1qXXX.workername
+password:  doge=DXXX
+```
+
+- The word before the `=` is the aux coin's symbol as it is named in your configuration (`DOGE` here). Upper or lower case both work.
+- A difficulty request can go beside it, separated by a comma: `d=1024,doge=DXXX`.
+- **Pick one way, not both.** Give the aux address in the username or in the password. The two together make a long pool entry, and some miners can't save it: on one we tested, the miner failed to save its pool settings and dropped the password.
+- If a miner does send an aux address both ways, the one in the username is used, and the log says so.
+- Everything else is the same as the pipe format: the address is checked when the miner connects, and the miner gets the **M** badge.
+
+**Merged mining is opt-in per miner (v5.2.3+).** A miner earns aux rewards only when it gives its own aux payout address, in the pipe username above or (v6.0.1+) in the password field. Before v6.0.1 the password field is not read for it. A miner without one keeps mining the parent chain normally; it just doesn't merge-mine, and the log says so when it connects. Before v5.2.3, a miner with no aux address was merge-mined anyway and its DOGE rewards went to the pool's configured DOGE address. That fallback is gone.
 
 - A mistyped aux address is caught when the miner connects: one warning in the log, and the miner keeps mining the parent chain.
 - **One wallet address, one decision.** Miners that share a parent wallet address share one coinbase, so they share one merged-mining decision. If any worker on an address opts in, every worker on that address contributes to the aux chain. If two workers on one address give different aux addresses, the most recent one wins and the log warns you. For separate aux payouts, use separate parent addresses.
@@ -836,7 +849,7 @@ Settings for the built-in block explorer (v4.1.0+). The explorer queries the coi
 
 **Problem:** A miner on a merged-mining parent finds no aux (DOGE) blocks and shows no **M** badge
 
-**Solution:** Since v5.2.3 each miner opts in with its own aux address in the username: `PARENTADDRESS|DOGEADDRESS.workername`
+**Solution:** Since v5.2.3 each miner opts in with its own aux address in the username: `PARENTADDRESS|DOGEADDRESS.workername`. If the miner's firmware won't accept the `|`, from v6.0.1 use the plain username and put `doge=DOGEADDRESS` in the password field
 
 ### 9. A Wallet Address on the Hash Hopper Port
 

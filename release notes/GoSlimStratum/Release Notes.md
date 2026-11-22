@@ -5,6 +5,36 @@ Earlier releases: [v5.x](release_notes-5.x.md), [v4.x](release_note-4.x.md), [v3
 
 ---
 
+## v6.0.1
+
+**A second way for a miner to opt in to merged mining, and the Hash Hopper's settings on the Config Summary.** A miner can now give its aux address in the password field, for firmware that won't accept the `|` of a merged-mining username or that limits how long a username can be.
+
+### ⛏️ Merged mining: the aux address in the password field
+
+- Keep the plain username (`ltc1qXXX.workername`) and set the miner's password to `doge=DXXX`: the aux coin's symbol, then the address.
+- A difficulty request can go beside it: `d=1024,doge=DXXX`.
+- The pipe username (`ltc1qXXX|DXXX.workername`) works exactly as before.
+- **Pick one way, not both.** Give the aux address in the username or in the password. The two together make a long pool entry, and some miners can't save it: on one we tested, the miner failed to save its pool settings and dropped the password. If a miner does send both, the address in the username is used.
+- Nothing to turn on. The address is checked when the miner connects, and the miner gets the **M** badge on the parent coin's dashboard, as with the pipe format.
+
+See [Merged Mining](../../documents/GoSlimStratum/gss-coin-config-guide.md#merged-mining-auxpow---as-of-version-410) in the Coin Configuration Guide.
+
+### 📋 Config Summary: the Hash Hopper's settings
+
+- **View Summary** (Global Configuration) now has a Hash Hopper section: whether it is on, shadow mode, its ports, the chains and their weights, the hopping rules, the port's stratum and VarDiff settings, each profile with its username and payout addresses, and your saved weight presets.
+- A setting you never changed shows the value the hopper is using.
+- If the hopper has never been set up, the section says so.
+
+### 🐛 Fixed
+
+- **Help.** The Merged Mining section said a miner with no aux address was paid to the aux pool's mining address. That stopped in v5.2.3: a miner with no aux address mines the parent chain only.
+
+### Upgrading
+
+Nothing to do. There are no configuration or database changes.
+
+---
+
 ## v6.0.0 — Hash Hopper
 
 **GoSlimStratum can now move your SHA256d miners between your coins by itself.** Point your rigs at one

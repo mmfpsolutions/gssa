@@ -14,7 +14,7 @@ Three tools inside GoSlimStratum answer most questions before you change anythin
 
 - **Diagnostics (v5.2.5+).** On the Global Configuration page, find the coin in the Configured Coins table and click the **pulse icon**, then **Run Diagnostics**. One table covers your node (RPC and ZMQ), your database and the pool itself, each line marked green, amber or red, with anything amber or red explained underneath. It tells a slow node apart from a problem in GSS. Run this first when "GSS is broken".
 - **VarDiff Simulator (v5.2.4+).** The **calculator icon** on a coin dashboard. Enter the miners you run and it gives the difficulty settings for that coin as the exact fields on the Coin Config page. Use it for any "what should my difficulty be" question.
-- **Config Summary (v5.1.5+).** **View Summary** on the Global Configuration page (`/summary/config`). Your whole configuration on one read-only page with every secret masked. Safe to share when asking for help.
+- **Config Summary (v5.1.5+).** **View Summary** on the Global Configuration page (`/summary/config`). Your whole configuration on one read-only page with every secret masked. Safe to share when asking for help. From v6.0.1 it includes the Hash Hopper's settings.
 
 Also check which version you are running (the Version page, or the footer). Several entries below were fixed in a particular release.
 
@@ -73,7 +73,7 @@ A coin you stopped yourself stays stopped. The automatic retry only applies to c
 On a coin's own port the username is `<your address for that coin>.<worker name>`, and the password can be anything.
 
 - The address must be valid for that coin and that coin's `network`. A testnet address on a mainnet pool is refused.
-- Merged mining: `PARENTADDRESS|AUXADDRESS.worker` (see below).
+- Merged mining: `PARENTADDRESS|AUXADDRESS.worker`, or from v6.0.1 the plain username with `doge=AUXADDRESS` in the password field (see below).
 - **On the Hash Hopper port the username is `hopper.<profile>` or `hopper.<profile>.<rig>`, never an address.** An address on the hopper port is refused, and a `hopper.` username on a coin's port is refused.
 - **odo-miner (FPGA):** use `<DGB address>.<worker>`. Don't use the stratum proxy's `--workers` option: it joins the worker name with `_`, which GSS reads as part of the address, so the connection is refused.
 
@@ -143,7 +143,8 @@ Fractal has three kinds of blocks, each with its own difficulty. GSS mines at th
 
 - **Look on the parent coin, not the aux coin.** Miners connect to the parent's port, so they are listed on the parent (LTC) dashboard only. No miners on the DOGE dashboard, and the DOGE log line `DTM: Dispatched per-miner jobs to 0 miners`, are both normal.
 - A miner is merge-mining when it has the **M** badge on the parent's dashboard. The parent's log says so when the miner connects: `Merged mining: aux payout registered — DOGE → <address>`.
-- Since v5.2.3, each miner opts in with its own aux address: `PARENTADDRESS|DOGEADDRESS.worker`. No pipe address, no merged mining for that miner. The password field is not read for the aux address.
+- Since v5.2.3, each miner opts in with its own aux address: `PARENTADDRESS|DOGEADDRESS.worker`. No aux address, no merged mining for that miner.
+- **The miner's firmware won't accept the `|`, or cuts a long username short:** from v6.0.1, keep the plain username (`PARENTADDRESS.worker`) and put `doge=DOGEADDRESS` in the miner's password field. Before v6.0.1 the password field is not read for the aux address, so update first. Check the parent's log before assuming this: if it shows `aux payout registered` for the miner, the username arrived intact and the problem is something else.
 - The miner is listed as `PARENTADDRESS.worker`. The aux address is not part of the name shown.
 - An orange **Merged Mining Not Active** banner on the parent's dashboard gives the reason. "Configured but not running": restart the parent coin pool. "The DOGE node has not responded": the aux node is down, and any aux block found meanwhile is rejected.
 - Before v5.2.6, merged mining could stop silently after a server reboot. Update.
