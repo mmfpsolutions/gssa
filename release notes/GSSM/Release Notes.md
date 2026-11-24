@@ -1,6 +1,34 @@
 # GSSM Release Notes
 ## v5.x Series
 
+## v5.1.2
+
+**A tidier Workers table on the Pool Details page.**
+
+> **No operator action required on upgrade.**
+
+### Improvements
+
+- **Workers table: the protocol is a badge on the worker.** The Protocol column is gone. Each worker now has a V1 or V2 badge in front of its name, green when the worker is active and red when it isn't, the same as the Rigs table on the Hash Hopper page.
+
+- **Workers table: one Shares column.** Valid and Invalid are now a single Shares column showing accepted · rejected in green and red. Hover over it for the two figures in words.
+
+- **Workers table: the user agent sits under the worker.** The User Agent column is gone too. A worker's user agent is now a small line under its name, so the table is four columns and fits a narrow screen better.
+
+- **Workers table: shorter names for Hash Hopper rigs.** A rig that mines through the Hash Hopper used to be listed by its full name, wallet address and all. It is now listed as profile.rig with the Hash Hopper badge after it, so hopper rigs are easy to tell from miners that connect to the coin directly. Hover over the name for the full name. Direct miners are listed as before.
+
+- **Blocks table: shorter names for Hash Hopper rigs.** A block found by a hopper rig now lists its worker as hopper.profile.rig, without the wallet address. Hover over it for the full name.
+
+- **A Run ID on the License page.** The License page now shows a short ID for the current run of GSS Miners. Support may ask you for it.
+
+### Bug Fixes
+
+- **Telegram bot: nodes and pools it hasn't checked are no longer called offline.** Just after GSS Miners starts, or when Node alerts are off, `/status` could say "No nodes configured" and `/nodes` could list every node as Offline. They now say "not checked" and show the node as Unknown, with a line explaining why. The same goes for `/pools`. Offline now always means a check ran and failed.
+
+- **A failed Telegram or webhook test no longer shows your bot token.** When a Telegram message or a webhook could not be sent, the error message included the full address it was sent to, and for Telegram and Discord that address contains the token. The error now gives only the reason. If you have shared a screenshot or a log of such an error, make a new token with BotFather (or a new webhook in Discord) and save it in GSS Miners.
+
+---
+
 ## v5.1.1
 
 **A Blocks Found card on the Miners dashboard, an Auto Fan Control fix for the Avalon Nano3s, and the in-app Help page is up to date again.**

@@ -2,7 +2,7 @@
 
 > GSS Miners is a self-hosted monitoring dashboard from MMFP Solutions. It reads mining devices (Bitaxe, NerdQAxe, Canaan Avalon, Antminer, Whatsminer, ElphaPex, NerdMiner), GoSlimStratum pools, litecoinpool.org accounts and blockchain nodes directly on the operator's own network, shows them on one dashboard, sends alerts, and can keep history, idle miners on a schedule and act when a miner overheats. This file tells an AI assistant how to help a GSS Miners user accurately and where the facts are.
 
-Accurate for GSS Miners 5.1.1. The current released version is in the latest.json file listed under "Current version".
+Accurate for GSS Miners 5.1.2. The current released version is in the latest.json file listed under "Current version".
 
 **Rules for the assistant. Follow these before answering any GSS Miners question.**
 
