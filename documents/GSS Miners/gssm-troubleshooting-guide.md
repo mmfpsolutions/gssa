@@ -442,6 +442,14 @@ GSSM could not match the coin GoSlimStratum reports, which happens for a GoSlimS
 
 GSSM was stopped suddenly (a crash or a power cut) while it was managing the fan, so it could not hand the fan back. Start GSSM and it takes control again. A normal stop, and disabling the miner, hand the fan back to the device's automatic mode (v2.0.5+).
 
+### Auto Fan Control is on but the minimum fan speed is not held after the Nano3s restarts
+
+Fixed in v5.1.1. A restart puts the Nano3s back on its own automatic mode, and earlier versions did not notice: GSSM took the fan back only once the temperature rose above your target, which in Low and Medium may never happen. On an earlier version, disable the miner and enable it again, and GSSM sets the fan at once.
+
+### Auto Fan Control is on but the fan is below the minimum just after the Nano3s starts
+
+That is expected (v5.1.1+). GSSM leaves the fan to the miner for its first 10 minutes after a start, so the miner can warm up and tune itself. Live Status on the miner's Settings page shows "Device (warming up)" and the time left. GSSM then sets the fan, and the minimum holds.
+
 ### Docker stops GSSM before it finishes shutting down
 
 Give the container a `stop_grace_period` of 30 seconds or more.

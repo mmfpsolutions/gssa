@@ -3,15 +3,29 @@
 
 ## v5.1.1
 
-**The in-app Help page is up to date again.** Help had fallen behind in a few places. Nothing about how GSSM works has changed.
+**A Blocks Found card on the Miners dashboard, an Auto Fan Control fix for the Avalon Nano3s, and the in-app Help page is up to date again.**
 
 > **No operator action required on upgrade.**
+
+### New Features
+
+- **A Blocks Found card on the Miners dashboard.** A fifth summary card adds up the blocks your online miners say they've found. Hover over it for the small print: each miner counts from when it last started, and ElphaPex and Whatsminer devices don't report a count, so it isn't an all-time record.
+
+- **Blocks Found by miner on Fleet View.** A new chart shows which miners found those blocks. If none have, it says so.
 
 ### Improvements
 
 - **Help matches the pages it describes.** The Add Pool form no longer shows an API Port or WebUI Port field it doesn't have, the device list covers all six device types (including Whatsminer on port 4433), refresh intervals show the real default of 120 seconds, and Standby names Bitaxe and NerdQAxe alongside the Avalon Q.
 
 - **Help covers more of what GSSM does.** New entries for the badges on a miner card, the electricity rate, the Disabled switch, what can be scheduled on which device, the Schedule Applied and Trigger Fired alerts, power tracking and the Energy report.
+
+### Bug Fixes
+
+- **Auto Fan Control takes the fan back after a Nano3s restarts.** A restart puts the Nano3s on its own automatic fan mode, and GSSM didn't notice. It took the fan back only once the temperature rose above your target, so in Low or Medium, where the device stays at or under it, your minimum fan speed was not held. GSSM now notices the restart and sets the fan again once the miner has been up for 10 minutes. If you worked around this by disabling and re-enabling the miner, you no longer need to.
+
+- **Auto Fan Control lets a Nano3s warm up first.** A Nano3s tunes itself in its first few minutes, and it settles at a lower hashrate if the fan is held at your minimum speed while it does. GSSM now leaves the fan to the miner for its first 10 minutes after a start, then takes over. The emergency temperature still applies during that time. The miner's Settings page shows "Device (warming up)" and how long is left.
+
+- **Fleet View keeps its fleet total current.** The "Fleet Total" in the middle of the Device Types chart, and the percentages when you hover over it or over Hashrate Contribution, stayed at the value from when the page was opened. They now update with each refresh.
 
 ### Good to know
 
