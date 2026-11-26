@@ -407,7 +407,7 @@ password:  doge=DXXX
 
 **How it works:**
 
-1. The aux chain (DOGE) is polled for new block templates via `getblocktemplate`
+1. GSS keeps a current block template for the aux chain (DOGE). From v6.0.2 the parent picks up a new DOGE block as soon as the DOGE coin's own pool hears of it, which with ZMQ on is at once. The DOGE coin's Template Refresh interval is the fallback, used when its pool is stopped. Before v6.0.2 the parent only polled at that interval. For the fastest pick-up, set up ZMQ on the aux coin and keep its pool running.
 2. GSS embeds an AuxPoW commitment (DOGE block hash) in the parent chain's (LTC) coinbase scriptSig
 3. Miners hash LTC headers as normal
 4. Every accepted LTC share is also checked against the DOGE difficulty target

@@ -5,6 +5,33 @@ Earlier releases: [v5.x](release_notes-5.x.md), [v4.x](release_note-4.x.md), [v3
 
 ---
 
+## v6.0.2
+
+**Merged mining picks up a new aux block as soon as the aux coin's pool hears of it.**
+
+### ⛏️ Merged mining: faster pick-up of new aux blocks
+
+- Until now a merge-mining parent (LTC or DGB-Scrypt) only learned of a new aux block (DOGE) by polling, on the aux coin's Template Refresh interval. At 15 or 30 seconds, your miners spent part of every aux block working on one that could no longer be accepted.
+- Now the aux coin's pool tells the parent the moment it has a new block, which with ZMQ on is at once. The parent sends the new work straight away.
+- Nothing to set and nothing to change. The Template Refresh interval is still used, as the fallback.
+- Your miners get the same number of jobs as before, just sooner. Parent-chain mining is not affected.
+- The aux coin's pool must be running for the faster pick-up. If it is stopped, merged mining carries on at the polling interval, as before.
+
+### 🔔 Notifications: Per-Coin Settings keep up with your coins
+
+- A coin you add or clone now appears under **Per-Coin Settings** on the Notifications page straight away, switched on. Before, it only appeared after GoSlimStratum was restarted (its notifications were sent all along; you just couldn't switch that coin off).
+- A coin you remove leaves the list straight away.
+- Saving the Notifications page no longer drops a coin that was added while the page was open.
+
+### 🔧 Also in this release
+
+- A browser closing a page while it loads is no longer logged as an error (`Template render error … broken pipe`). It is a Debug line now; real page errors are still logged as errors.
+
+- The License page shows a **Run ID**, a short ID for the current run of GoSlimStratum. Support may ask for it.
+- Database schema v20, applied automatically at start. No action needed.
+
+---
+
 ## v6.0.1
 
 **A second way for a miner to opt in to merged mining, and the Hash Hopper's settings on the Config Summary.** A miner can now give its aux address in the password field, for firmware that won't accept the `|` of a merged-mining username or that limits how long a username can be.
