@@ -1,6 +1,26 @@
 # GSSM Release Notes
 ## v5.x Series
 
+## v5.1.3
+
+**See what a node offers the outside world, on its detail page.**
+
+> **No operator action required on upgrade.**
+
+### Improvements
+
+- **Node detail: a Network Services card.** The first card on a node's detail page now shows what the node offers to the rest of its network: the services it advertises, the address and port it advertises, how many inbound peers it has, and which networks it uses. It is a quick way to check a public-facing node. Inbound peers above zero is the sign that the outside world can reach it.
+
+- **Node detail: warnings only when something is off.** The same card adds an amber row when the node's peer-to-peer networking is switched off, when it is not relaying transactions, or when its clock is a minute or more away from its peers'. A healthy node shows none of them.
+
+- **Help page: what the services mean.** The Nodes section of Help & Reference explains the new card and the common service names.
+
+### Bug Fixes
+
+- **Nodes no longer show "0 in / 0 out" when they don't report it.** Some node software, such as Dogecoin Core 1.14, reports only its total number of connections. GSS Miners showed those nodes with Inbound 0 and Outbound 0. It now shows the total alone.
+
+---
+
 ## v5.1.2
 
 **A tidier Workers table on the Pool Details page.**
