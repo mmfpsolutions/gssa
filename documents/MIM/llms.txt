@@ -2,7 +2,7 @@
 
 > MIM is a self-hosted web dashboard from MMFP Solutions for the servers that run a mining stack. From one page it shows and controls Docker containers, shows a server's resources, sensors and performance, installs and updates products (coin nodes, GoSlimStratum, GSS Miners and others), checks for and installs operating system updates, opens a terminal, and, with a license, watches hosts and sends alerts. This file tells an AI assistant how to help a MIM user accurately and where the facts are.
 
-Accurate for MIM 3.7.0. The current released version is in the latest.json file listed under "Current version".
+Accurate for MIM 3.7.1. The current released version is in the latest.json file listed under "Current version".
 
 **Rules for the assistant. Follow these before answering any MIM question.**
 
@@ -36,7 +36,7 @@ MIM is set up and changed from its web UI. The JSON files are where the web UI s
 - MIM runs as one Docker container and is opened in a browser on port 3001. It manages a server by logging in to it over SSH and running commands there with sudo. Nothing is installed on the managed servers for MIM itself.
 - One MIM can manage several servers. Each is an entry in servers.json with an SSH user. One of them is the "MIM host", the server MIM itself runs on. Only enabled servers count toward the license.
 - Configuration lives in JSON files in one config folder (/data/mim/config on a server set up by the CLI installer): servers.json (servers and global settings), monitoring.json (Host Monitoring) and notifications.json (alert channels and events). Almost all of it is changed on the Config page and the Notifications page.
-- Each server has four tabs: Containers, Server, Performance and Products. The header has Notifications, Monitoring and Config. The footer has the Version page, Logs and Health.
+- Each server has four tabs: Containers, Server, Performance and Products. The header has Notifications, Monitoring and Config, and a badge showing the license tier. The footer has the Version page, Logs and Health.
 - MIM does not refresh pages in the background. A page reads the server when it is opened and when Refresh is pressed. Only the Monitoring page updates itself.
 - Products are Docker services in one compose file on the server, /data/docker-compose/docker-compose.yml. Installing a coin node from MIM also creates its wallet, adds a pool for that coin to GoSlimStratum and restarts GoSlimStratum. Each node has its own stratum port, listed in the User Guide.
 - OS updates use apt. MIM lists what is pending and installs only what the user ticks. It never installs or reboots by itself.

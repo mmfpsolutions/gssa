@@ -2,7 +2,7 @@
 
 What MIM (Mining Infrastructure Manager) does, page by page, and how to install and look after products with it.
 
-*Current for MIM 3.7.0.*
+*Current for MIM 3.7.1.*
 
 See also the [Configuration Guide](mim-config-guide.md) (every setting) and the [Troubleshooting Guide](mim-troubleshooting-guide.md).
 
@@ -42,13 +42,15 @@ MIM is a web dashboard for the servers that run your mining stack. From one page
 
 The header buttons show icons only (v3.6.1+). Hover over one to see its name.
 
+From v3.7.1 a badge at the right of the header shows your license tier: **Free Tier**, **Professional** or **Enterprise** (shortened to Free, Pro and Ent on a phone). The Free Tier badge opens the [pricing page](https://www.mmfpsolutions.io/pricing.html).
+
 **Tabs for the selected server:** Containers, Server, Performance, Products.
 
 **Footer, on every page:**
 
 | Link | What it opens |
 |-----|-----|
-| The version number | The Version page: version, runtime status, the update check and your license. An **update** badge appears beside it when a newer MIM is out. |
+| The version number | The Version page: version, runtime status, the update check and your license. The License page reached from it also shows a **Run ID** (v3.7.1+), a short ID for the current run of MIM; support may ask you for it. An **update** badge appears beside it when a newer MIM is out. |
 | Logs | A live view of MIM's own log. Needs file logging turned on (Config page, Logging). |
 | Health | How the MIM application itself is doing: uptime, memory, garbage collection (v3.3.7+) |
 
@@ -100,12 +102,14 @@ Install and manage software on the selected server. Products are grouped:
 
 | Section | What is in it |
 |-----|-----|
-| **MMFP Solutions** | MIM, GoSlimStratum, GSS Miners, GoSlimStratum User Client, Axeos Dashboard (deprecated) |
+| **MMFP Solutions** | MIM, GoSlimStratum, GSS Miners, GoSlimStratum User Client |
 | **Crypto Nodes** | The coin nodes in the table below |
 | **3rd Party** | PostgreSQL, Dozzle, Watchtower |
 | **Other** | Services you have added to the server's `docker-compose.yml` yourself that are not in MIM's catalog |
 
 Each installed product shows the version it is actually running, read from the container.
+
+**Compose file check (v3.7.1+).** Every time the page opens, MIM asks Docker on that server whether it can read the server's `docker-compose.yml`. If it cannot, a red banner at the top says "This server's compose file has an error" and shows Docker's message. Until the file is fixed, Install, Update, Disable and Enable fail for every product on that server. See the Troubleshooting Guide.
 
 ### Buttons on a Product
 
@@ -118,7 +122,9 @@ Each installed product shows the version it is actually running, read from the c
 | **Enable** | The reverse of Disable |
 | **Uninstall** | Removes the product. **For a coin node this deletes its data folder, including the downloaded blockchain.** |
 
-Not every product has every button. MIM itself and PostgreSQL cannot be installed or uninstalled from this page: MIM has **Update** only, and PostgreSQL has Update, Disable and Enable. Deprecated products (Bitcoin Knots, Axeos Dashboard) have no Install or Update, but can still be disabled, enabled and uninstalled.
+**Disabled is recorded on the server** (in its `docker-compose.yml`), not in MIM. From v3.7.1 the Products page reads it each time it opens, so a product disabled from another MIM, or by editing that file yourself, shows as disabled here too, and can be enabled from any MIM.
+
+Not every product has every button. MIM itself and PostgreSQL cannot be installed or uninstalled from this page: MIM has **Update** only, and PostgreSQL has Update, Disable and Enable.
 
 ### Buttons at the Top of the Page
 
@@ -156,7 +162,6 @@ Uninstalling reverses it: the node is stopped and removed, its pool is removed f
 |-----|-----|-----|-----|-----|-----|
 | DigiByte Node | DGB | SHA256d (the pool MIM creates) | 3333 | AMD64, ARM64 | 563 MB |
 | Bitcoin Cash Node | BCH | SHA256d | 3334 | AMD64, ARM64 | 563 MB |
-| Bitcoin Knots Node (deprecated) | BTC | SHA256d | 3335 | AMD64, ARM64 | 563 MB |
 | Bitcoin Core Node | BTC | SHA256d | 3336 | AMD64, ARM64 | 563 MB |
 | eCash Node | XEC | SHA256d | 3337 | AMD64, ARM64 | 550 MB |
 | Bitcoin II Node | BC2 | SHA256d | 3338 | **AMD64 only** | 563 MB |
@@ -171,7 +176,7 @@ Notes:
 
 - **"Pruned (Recommended)" uses the smallest pruned size** in the table. A full node needs far more disk and a long first sync.
 - **AMD64 only** nodes will not install on ARM servers such as a Raspberry Pi. The list marks them with an "AMD64 only" badge.
-- **Bitcoin has two nodes.** Bitcoin Core is the supported one. Bitcoin Knots is deprecated (v3.3.8): an existing Knots node keeps running and can be managed, but it cannot be newly installed or updated. The two can run side by side as separate pools on separate ports.
+- **Bitcoin Knots and Axeos Dashboard were removed in v3.7.1.** Bitcoin Core is MIM's Bitcoin node, and GSS Miners replaces Axeos Dashboard. One that is still on a server keeps running and moves to the **Other** section. See [the Troubleshooting Guide](mim-troubleshooting-guide.md) for how to remove it.
 - **Dogecoin is Direct-to-Miner only.** MIM creates no wallet for it, and installing it accepts GoSlimStratum's 0.5% revenue share unless you have a GoSlimStratum license. Read the product's description before installing.
 - **GoSlimStratum version needed:** Bitcoin Cash II and Bitcoin Silver need GoSlimStratum 5.4.0 or later, WojakCoin 5.5.4 or later, Fractal Bitcoin 5.5.5 or later. Update GoSlimStratum first: an older GoSlimStratum does not know the coin and will not start once it is added.
 - **Already running a coin yourself?** Do not install the same coin's node from MIM on that server. MIM would replace that coin's pool settings in GoSlimStratum, including its wallet address, with the new node's.
@@ -180,6 +185,8 @@ Notes:
 ### The Other Section
 
 Services in the server's compose file that MIM's catalog does not know. Each can be **Updated**, **Disabled** and **Enabled** from here. For plain start and stop, use the Containers tab.
+
+From v3.7.1 this is also where a Bitcoin Knots node (listed as `btc`) or an Axeos Dashboard (`axeos-dashboard`) appears, because MIM no longer has them as products.
 
 ### Orphaned Inventory
 

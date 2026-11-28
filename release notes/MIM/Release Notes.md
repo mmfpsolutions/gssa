@@ -1,6 +1,57 @@
 # MIM Release Notes
 ## v3.x Series
 
+## v3.7.1
+
+**MIM now tells you when a server's compose file is broken, and keeps disabled products in step
+across every MIM that manages a server.** A broken compose file used to show up as a confusing
+failure on some unrelated product; the Products page now says so plainly. This release also adds a
+license tier badge to the header and removes two long-deprecated products, Bitcoin Knots and Axeos
+Dashboard.
+
+### What changed
+
+- **Bitcoin Knots Node is gone from Crypto Nodes.** It was deprecated in v3.3.8. **Bitcoin Core Node**
+  is MIM's Bitcoin node; miners connect to it on port 3336.
+- **Axeos Dashboard is gone from MMFP Solutions.** **GSS Miners** replaces it.
+- **New: MIM tells you when a server's compose file is broken.** If Docker cannot read the file,
+  every product action on that server fails, usually with an error that points nowhere useful. The
+  Products page now checks the file each time it opens and shows a red banner with Docker's own
+  message, including the line number.
+- **Your license tier in the header.** A badge at the top right of every page shows Free Tier,
+  Professional or Enterprise.
+- **A Run ID on the License page.** The License page now shows a short ID for the current run of MIM.
+  Support may ask you for it.
+- **Fixed: a disabled product now shows as disabled in every MIM.** If you manage one server from
+  two MIMs and disabled a product in one, the other still showed it as running until you ran
+  Discover. The Products page now reads the server each time it opens, so both agree. The same goes
+  for a product you disabled by editing the server's compose file yourself.
+- **Fixed: disabling a product twice could stop Docker from working on that server.** Disabling it
+  again from the second MIM wrote the "disabled" setting into the compose file twice, and Docker then
+  refused every command for that server. That can no longer happen.
+- **Bitcoin Cash II Node: a wrong bootstrap address is fixed.** One of the addresses a new node uses
+  to find the network had the wrong port, so that one address never answered. The others worked, so
+  nodes still synced.
+- **Bitcoin Cash II and Bitcoin Cash nodes: clearer settings for inbound connections.** The node's
+  configuration file now shows which lines to uncomment if you turn inbound connections on. They
+  stay off by default.
+
+### Good to know
+
+- **Most people will see no difference.** If you run neither product, there is nothing to do.
+- **One you still run is not touched.** It keeps running after the upgrade and moves to the **Other**
+  section of the Products tab, where you can still update, disable and enable it. A Knots node is
+  listed there as `btc`, the dashboard as `axeos-dashboard`.
+- **MIM can no longer uninstall them.** Disabling one stops it for good. The Troubleshooting Guide
+  has the steps to remove one completely.
+- **If your compose file is already broken by the double disable,** update to 3.7.1 and press
+  **Enable** or **Disable** on that product. Either one repairs the file.
+- **Enable works from any MIM.** A product disabled from one MIM can be enabled from another.
+- **The node configuration fixes apply to new installs.** A node you already run keeps its
+  configuration file.
+- **Installing GSS Miners still checks for a running Axeos Dashboard** and asks you to disable it
+  first. Do that in the Other section.
+
 ## v3.7.0
 
 **MIM can now tell you when a server reboots.** A server that freezes and resets itself, loses power

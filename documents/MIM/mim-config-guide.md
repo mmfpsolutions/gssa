@@ -2,7 +2,7 @@
 
 Reference for every setting in MIM (Mining Infrastructure Manager): the servers it manages, its global settings, Host Monitoring and notifications.
 
-*Current for MIM 3.7.0.*
+*Current for MIM 3.7.1.*
 
 See also the [User Guide](mim-user-guide.md) (what each page does, installing products) and the [Troubleshooting Guide](mim-troubleshooting-guide.md).
 
@@ -28,6 +28,7 @@ MIM also writes these files itself. Don't edit them unless a guide tells you to:
 | `product-inventory.json` | Which products are installed on each server |
 | `os-updates-state.json` | The latest OS update check result for each host (v3.6.0+) |
 | `host-boot-state.json` | Each host's boot ID and its last 10 reboots (v3.7.0+) |
+| `instance_id.json` | A short ID for this MIM install (v3.7.1+) |
 | `mmfp_license.dat` | Your license, installed from the License page |
 
 **Where the folder is.** Inside the MIM container it is `/app/config`. On a server set up with the [CLI installer](../../cli-installer.md), that folder is `/data/mim/config` on the host.

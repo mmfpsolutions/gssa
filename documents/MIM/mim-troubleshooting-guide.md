@@ -2,7 +2,7 @@
 
 Symptoms, what they mean, and what to do. Many of them are not faults: they are a setting, a design choice, or something fixed in a later release.
 
-*Current for MIM 3.7.0.*
+*Current for MIM 3.7.1.*
 
 See also the [User Guide](mim-user-guide.md) and the [Configuration Guide](mim-config-guide.md).
 
@@ -157,9 +157,49 @@ Expected. MIM adds or removes the coin's pool in GoSlimStratum and restarts GoSl
 
 Installing a coin's node from MIM writes that coin's pool into GoSlimStratum, replacing any pool of the same name, including its wallet address. Do not install a node from MIM for a coin you already run on that server. If it has happened, put your settings back in GoSlimStratum's web UI.
 
-### Bitcoin Knots has no Install or Update button
+### Bitcoin Knots or Axeos Dashboard is missing from the product list
 
-Bitcoin Knots is deprecated (3.3.8). A node you already run keeps working and can still be disabled, enabled and uninstalled. For a new Bitcoin node use **Bitcoin Core** (miners connect on port **3336**; Knots is on 3335). To move over: install Core, let it finish syncing, point your miners at 3336, and only then uninstall Knots.
+Both were removed from MIM in v3.7.1. Bitcoin Knots had been deprecated since v3.3.8 and Axeos Dashboard for longer. Neither can be installed from MIM any more.
+
+One that is still on a server is not touched by the upgrade. It keeps running, and it now appears in the **Other** section of the Products tab: a Knots node as `btc`, the dashboard as `axeos-dashboard`. From there it can be **Updated**, **Disabled** and **Enabled**. **Disable** stops it and keeps it from starting again.
+
+What replaces them:
+
+- **Bitcoin Knots:** install **Bitcoin Core Node**. Miners connect to it on port **3336** (Knots was on 3335). To move over: install Core, let it finish syncing, point your miners at 3336, and only then disable Knots.
+- **Axeos Dashboard:** install **GSS Miners**. Disable the dashboard first; the GSS Miners install refuses to start while the dashboard is running or enabled.
+
+MIM can no longer uninstall either one. Disabling is enough to stop it for good. To remove it completely, this is one of the few jobs done by hand on the server. Keep a copy of the file before you edit it:
+
+1. Disable it in the **Other** section.
+2. Delete its service (`btc` or `axeos-dashboard`) from `/data/docker-compose/docker-compose.yml`. Leave `btc-core` alone: that is Bitcoin Core.
+3. For Knots, remove the `BTC` coin in GoSlimStratum's own web UI. Bitcoin Core's coin is `BTC-CORE`; leave that one.
+4. Delete its data folder if you want the disk space back: `/data/btc` for Knots (`/data/btc-core` is Bitcoin Core's), `/data/axeos-dashboard` for the dashboard.
+
+### A red banner says "This server's compose file has an error"
+
+From v3.7.1 the Products page asks Docker on that server to read `/data/docker-compose/docker-compose.yml` each time it opens. The banner means Docker refused the file. The text in the box is Docker's own message, and it usually names the line.
+
+While the banner shows, Install, Update, Disable and Enable fail for **every** product on that server, not only the one with the mistake, because Docker reads the whole file for each command. Containers that are already running keep running.
+
+What to do:
+
+- **The message says `mapping key "profiles" already defined`:** a product was disabled twice by an older MIM. Press **Enable** or **Disable** on that product; either one repairs the file. See "Docker commands fail on a server after a product was disabled from two MIMs" below.
+- **Anything else:** the file was edited by hand and has a mistake. This is fixed on the server. Keep a copy of the file, correct the line Docker names, and reload the Products page. The banner goes as soon as Docker accepts the file.
+- **The message is about a missing file**, such as an `env_file` that is not there: the compose file is fine but points at something that does not exist. Put the file back or remove the line that refers to it.
+
+MIM does not change the file for you, apart from the repair above.
+
+### A product I disabled in one MIM still shows as running in another
+
+Fixed in v3.7.1. Before that, each MIM kept its own note of which products were disabled and only compared it with the server when you ran **Discover**. From 3.7.1 the Products page reads the server every time it opens.
+
+On an older version, run **Discover** on that server in the MIM that is out of date. Do not press Disable there: see the next entry.
+
+### Docker commands fail on a server after a product was disabled from two MIMs
+
+Before v3.7.1, disabling a product from a second MIM that did not know it was already disabled wrote the "disabled" setting into the server's compose file twice. Docker then reports a syntax error in the compose file and refuses every command for that server, so products there will not start, stop or update.
+
+Update MIM to 3.7.1 or later, open that server's Products tab, and press **Enable** or **Disable** on the product that was disabled twice. Either one repairs the file.
 
 ### Uninstalling a node deleted my blockchain
 
